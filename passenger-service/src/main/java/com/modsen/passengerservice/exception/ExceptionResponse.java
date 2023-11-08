@@ -1,13 +1,13 @@
 package com.modsen.passengerservice.exception;
 
+import lombok.*;
+
 import java.util.Map;
 
+@Data
+@RequiredArgsConstructor
+public class ExceptionResponse {
 
-public record ExceptionResponse (
-        String message,
-        Map<String, String> errors
-) {
-    public ExceptionResponse(String message) {
-        this(message, null);
-    }
+    private final String message;
+    private Map<String, String> errors;
 }
