@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.util.Map;
 
 @RestController
@@ -31,7 +32,7 @@ public class PassengerController {
 
     @PostMapping
     public ResponseEntity<PassengerResponse> createPassenger(
-            @RequestBody CreatePassengerRequest createRequest,
+            @Valid @RequestBody CreatePassengerRequest createRequest,
             UriComponentsBuilder uriComponentsBuilder
     ) {
         PassengerResponse response = passengerService.addPassenger(createRequest);
@@ -44,7 +45,10 @@ public class PassengerController {
 
     @PatchMapping("/{id}")
     @ResponseStatus(value = HttpStatus.OK)
-    public PassengerResponse updatePassenger(@PathVariable Long id, @RequestBody UpdatePassengerRequest updateRequest) {
+    public PassengerResponse updatePassenger(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdatePassengerRequest updateRequest
+    ) {
         return passengerService.updatePassenger(updateRequest, id);
     }
 
