@@ -1,9 +1,9 @@
 package com.modsen.passengerservice.service.impl;
 
-import com.modsen.passengerservice.dto.CreatePassengerRequest;
-import com.modsen.passengerservice.dto.PassengerListResponse;
-import com.modsen.passengerservice.dto.PassengerResponse;
-import com.modsen.passengerservice.dto.UpdatePassengerRequest;
+import com.modsen.passengerservice.dto.passenger.CreatePassengerRequest;
+import com.modsen.passengerservice.dto.passenger.PassengerListResponse;
+import com.modsen.passengerservice.dto.passenger.PassengerResponse;
+import com.modsen.passengerservice.dto.passenger.UpdatePassengerRequest;
 import com.modsen.passengerservice.entity.Passenger;
 import com.modsen.passengerservice.exception.PassengerNotFoundException;
 import com.modsen.passengerservice.mapper.PassengerMapper;
@@ -34,7 +34,8 @@ public class PassengerServiceImpl implements PassengerService {
     public PassengerResponse getById(Long id) {
         log.info("Retrieving passenger by id {}", id);
 
-        Passenger passenger = passengerRepository.findById(id).orElseThrow(() -> {
+        Passenger passenger = passengerRepository.findById(id)
+                .orElseThrow(() -> {
             log.error("Passenger with id {} was not found", id);
             return new PassengerNotFoundException(id);
         });
@@ -45,15 +46,19 @@ public class PassengerServiceImpl implements PassengerService {
     @Override
     public PassengerResponse addPassenger(CreatePassengerRequest createRequest) {
         log.info("Adding passenger");
-        Passenger passenger = passengerRepository.save(passengerMapper.fromCreateRequestToEntity(createRequest));
-        return passengerMapper.fromEntityToResponse(passenger);
+
+        Passenger passengerToCreate = passengerMapper.fromCreateRequestToEntity(createRequest);
+        Passenger createdPassenger = passengerRepository.save(passengerToCreate);
+
+        return passengerMapper.fromEntityToResponse(createdPassenger);
     }
 
     @Override
     public PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, Long id) {
         log.info("Updating passenger with id {}", id);
 
-        Passenger passenger = passengerRepository.findById(id).orElseThrow(() -> {
+        Passenger passenger = passengerRepository.findById(id)
+                .orElseThrow(() -> {
             log.error("Passenger with id {} was not found", id);
             return new PassengerNotFoundException(id);
         });
@@ -68,7 +73,8 @@ public class PassengerServiceImpl implements PassengerService {
     public void deletePassenger(Long id) {
         log.info("Deleting passenger with id {}", id);
 
-        Passenger passenger = passengerRepository.findById(id).orElseThrow(() -> {
+        Passenger passenger = passengerRepository.findById(id)
+                .orElseThrow(() -> {
             log.error("Passenger with id {} was not found", id);
             return new PassengerNotFoundException(id);
         });

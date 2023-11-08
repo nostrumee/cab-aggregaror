@@ -1,12 +1,11 @@
 package com.modsen.passengerservice.mapper;
 
-import com.modsen.passengerservice.dto.CreatePassengerRequest;
-import com.modsen.passengerservice.dto.PassengerResponse;
-import com.modsen.passengerservice.dto.UpdatePassengerRequest;
+import com.modsen.passengerservice.dto.passenger.CreatePassengerRequest;
+import com.modsen.passengerservice.dto.passenger.PassengerResponse;
+import com.modsen.passengerservice.dto.passenger.UpdatePassengerRequest;
 import com.modsen.passengerservice.entity.Passenger;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.List;
 

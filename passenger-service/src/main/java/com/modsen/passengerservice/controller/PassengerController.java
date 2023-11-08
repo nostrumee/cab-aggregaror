@@ -1,6 +1,9 @@
 package com.modsen.passengerservice.controller;
 
-import com.modsen.passengerservice.dto.*;
+import com.modsen.passengerservice.dto.passenger.CreatePassengerRequest;
+import com.modsen.passengerservice.dto.passenger.PassengerListResponse;
+import com.modsen.passengerservice.dto.passenger.PassengerResponse;
+import com.modsen.passengerservice.dto.passenger.UpdatePassengerRequest;
 import com.modsen.passengerservice.service.PassengerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -43,7 +46,7 @@ public class PassengerController {
                 .body(response);
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     @ResponseStatus(value = HttpStatus.OK)
     public PassengerResponse updatePassenger(
             @PathVariable Long id,
@@ -53,7 +56,7 @@ public class PassengerController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(value = HttpStatus.OK)
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void deletePassenger(@PathVariable Long id) {
         passengerService.deletePassenger(id);
     }

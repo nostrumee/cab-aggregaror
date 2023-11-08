@@ -1,4 +1,4 @@
-package com.modsen.passengerservice.dto;
+package com.modsen.passengerservice.dto.passenger;
 
 import java.util.List;
 
