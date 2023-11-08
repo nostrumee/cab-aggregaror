@@ -1,6 +1,8 @@
 package com.modsen.passengerservice.mapper;
 
-import com.modsen.passengerservice.dto.PassengerDTO;
+import com.modsen.passengerservice.dto.CreatePassengerRequest;
+import com.modsen.passengerservice.dto.PassengerResponse;
+import com.modsen.passengerservice.dto.UpdatePassengerRequest;
 import com.modsen.passengerservice.entity.Passenger;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -14,11 +16,11 @@ import java.util.List;
 )
 public interface PassengerMapper {
 
-    PassengerDTO toDTO(Passenger passenger);
+    PassengerResponse fromEntityToResponse(Passenger entity);
 
-    Passenger toEntity(PassengerDTO passengerDTO);
+    Passenger fromCreateRequestToEntity(CreatePassengerRequest createRequest);
 
-    void updatePassengerFromDTO(PassengerDTO passengerDTO, @MappingTarget Passenger passenger);
+    void updateEntityFromUpdateRequest(UpdatePassengerRequest updateRequest, @MappingTarget Passenger entity);
 
-    List<PassengerDTO> toListDTO(List<Passenger> passengers);
+    List<PassengerResponse> fromEntityListToResponseList(List<Passenger> passengers);
 }

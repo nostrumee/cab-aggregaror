@@ -5,6 +5,6 @@ import lombok.AllArgsConstructor;
 import java.util.List;
 
 @AllArgsConstructor
-public class PassengerListDTO {
-    private List<PassengerDTO> passengers;
+public class PassengerListResponse {
+    private List<PassengerResponse> passengers;
 }

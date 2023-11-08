@@ -1,17 +1,16 @@
 package com.modsen.passengerservice.service;
 
-import com.modsen.passengerservice.dto.PassengerDTO;
-import com.modsen.passengerservice.dto.PassengerListDTO;
+import com.modsen.passengerservice.dto.*;
 
 public interface PassengerService {
 
-    PassengerListDTO getAllPassengers();
+    PassengerListResponse getAllPassengers();
 
-    PassengerDTO getById(Long id);
+    PassengerResponse getById(Long id);
 
-    Long addPassenger(PassengerDTO passengerDTO);
+    PassengerResponse addPassenger(CreatePassengerRequest createRequest);
 
-    PassengerDTO updatePassenger(PassengerDTO passengerDTO, Long id);
+    PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, Long id);
 
     void deletePassenger(Long id);
 }

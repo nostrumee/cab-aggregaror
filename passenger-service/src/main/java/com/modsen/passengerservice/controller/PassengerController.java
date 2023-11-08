@@ -1,9 +1,9 @@
 package com.modsen.passengerservice.controller;
 
-import com.modsen.passengerservice.dto.PassengerDTO;
-import com.modsen.passengerservice.dto.PassengerListDTO;
+import com.modsen.passengerservice.dto.*;
 import com.modsen.passengerservice.service.PassengerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -18,34 +18,38 @@ public class PassengerController {
     private final PassengerService passengerService;
 
     @GetMapping
-    public PassengerListDTO getAllPassengers() {
+    @ResponseStatus(HttpStatus.OK)
+    public PassengerListResponse getAllPassengers() {
         return passengerService.getAllPassengers();
     }
 
     @GetMapping("/{id}")
-    public PassengerDTO getPassengerById(@PathVariable Long id) {
+    @ResponseStatus(HttpStatus.OK)
+    public PassengerResponse getPassengerById(@PathVariable Long id) {
         return passengerService.getById(id);
     }
 
     @PostMapping
-    public ResponseEntity<PassengerDTO> createPassenger(
-            @RequestBody PassengerDTO passengerDTO,
+    public ResponseEntity<PassengerResponse> createPassenger(
+            @RequestBody CreatePassengerRequest createRequest,
             UriComponentsBuilder uriComponentsBuilder
     ) {
-        Long id = passengerService.addPassenger(passengerDTO);
-        PassengerDTO passenger = passengerService.getById(id);
+        PassengerResponse response = passengerService.addPassenger(createRequest);
+        Long id = response.id();
 
         return ResponseEntity
                 .created(uriComponentsBuilder.path("api/v1/passengers/{id}").build(Map.of("id", id)))
-                .body(passenger);
+                .body(response);
     }
 
     @PatchMapping("/{id}")
-    public PassengerDTO updatePassenger(@PathVariable Long id, @RequestBody PassengerDTO passengerDTO) {
-        return passengerService.updatePassenger(passengerDTO, id);
+    @ResponseStatus(value = HttpStatus.OK)
+    public PassengerResponse updatePassenger(@PathVariable Long id, @RequestBody UpdatePassengerRequest updateRequest) {
+        return passengerService.updatePassenger(updateRequest, id);
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(value = HttpStatus.OK)
     public void deletePassenger(@PathVariable Long id) {
         passengerService.deletePassenger(id);
     }
