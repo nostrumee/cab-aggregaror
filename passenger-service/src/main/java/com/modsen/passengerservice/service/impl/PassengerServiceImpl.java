@@ -26,7 +26,11 @@ public class PassengerServiceImpl implements PassengerService {
     @Override
     public PassengerListResponse getAllPassengers() {
         log.info("Retrieving all passengers");
-        List<PassengerResponse> passengers = passengerMapper.fromEntityListToResponseList(passengerRepository.findAll());
+
+        List<Passenger> retrievedPassengers = passengerRepository.findAll();
+        List<PassengerResponse> passengers =
+                passengerMapper.fromEntityListToResponseList(retrievedPassengers);
+
         return new PassengerListResponse(passengers);
     }
 
