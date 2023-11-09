@@ -8,26 +8,38 @@
             <column name="id" type="bigserial" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false" />
             </column>
+
             <column name="first_name" type="varchar(25)">
                 <constraints nullable="false" />
             </column>
+
             <column name="last_name" type="varchar(25)">
                 <constraints nullable="false" />
             </column>
+
             <column name="email" type="varchar(255)">
                 <constraints unique="true" nullable="false" />
             </column>
+
             <column name="phone" type="varchar(10)">
                 <constraints unique="true" nullable="false" />
             </column>
         </createTable>
+
+        <rollback>
+            <dropTable tableName="passenger"/>
+        </rollback>
     </changeSet>
 
     <changeSet id="v1-2" author="Eduard Klygunov">
+        <preConditions onFail="WARN">
+            <tableExists tableName="passenger" />
+        </preConditions>
+        
         <insert tableName="passenger">
             <column name="first_name" value="John" />
             <column name="last_name" value="Doe" />
-            <column name="email" value="john.doe@example.com" />
+            <column name="email" value="johndoe@example.com" />
             <column name="phone" value="123-45-67" />
         </insert>
 
@@ -93,6 +105,10 @@
             <column name="email" value="roberttaylor@example.com" />
             <column name="phone" value="876-54-32" />
         </insert>
+
+        <rollback>
+            delete from passenger
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>
