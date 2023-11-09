@@ -15,10 +15,10 @@
                 <constraints nullable="false" />
             </column>
             <column name="email" type="varchar(255)">
-                <constraints nullable="false" />
+                <constraints unique="true" nullable="false" />
             </column>
             <column name="phone" type="varchar(10)">
-                <constraints unique="true"   nullable="false" />
+                <constraints unique="true" nullable="false" />
             </column>
         </createTable>
     </changeSet>

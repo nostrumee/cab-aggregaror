@@ -8,16 +8,18 @@ import com.modsen.passengerservice.service.PassengerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.Map;
 
 @RestController
 @RequestMapping("api/v1/passengers")
 @RequiredArgsConstructor
+@Validated
 public class PassengerController {
 
     private final PassengerService passengerService;
