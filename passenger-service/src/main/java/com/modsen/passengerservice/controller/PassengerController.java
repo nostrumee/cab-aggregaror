@@ -1,9 +1,9 @@
 package com.modsen.passengerservice.controller;
 
-import com.modsen.passengerservice.dto.passenger.request.CreatePassengerRequest;
-import com.modsen.passengerservice.dto.passenger.response.PassengerListResponse;
-import com.modsen.passengerservice.dto.passenger.response.PassengerResponse;
-import com.modsen.passengerservice.dto.passenger.request.UpdatePassengerRequest;
+import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
+import com.modsen.passengerservice.dto.response.PassengerListResponse;
+import com.modsen.passengerservice.dto.response.PassengerResponse;
+import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
 import com.modsen.passengerservice.service.PassengerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.Map;
 
 @RestController
@@ -39,10 +40,14 @@ public class PassengerController {
             UriComponentsBuilder uriComponentsBuilder
     ) {
         PassengerResponse response = passengerService.addPassenger(createRequest);
-        Long id = response.id();
+        Long passengerId = response.id();
+
+        URI location = uriComponentsBuilder
+                .path("api/v1/passengers/{id}")
+                .build(Map.of("id", passengerId));
 
         return ResponseEntity
-                .created(uriComponentsBuilder.path("api/v1/passengers/{id}").build(Map.of("id", id)))
+                .created(location)
                 .body(response);
     }
 

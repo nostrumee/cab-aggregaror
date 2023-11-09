@@ -1,4 +1,4 @@
-package com.modsen.passengerservice.dto.passenger.request;
+package com.modsen.passengerservice.dto.request;
 
 import org.hibernate.validator.constraints.Length;
 
@@ -6,7 +6,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
-public record CreatePassengerRequest(
+public record UpdatePassengerRequest(
         @NotBlank(message = "Passenger's first name must be defined")
         @Length(max = 25, message = "Passenger's first name must be shorter than 25 symbols")
         String firstName,

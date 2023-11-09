@@ -1,7 +1,7 @@
 package com.modsen.passengerservice.controller;
 
-import com.modsen.passengerservice.dto.error.response.ErrorResponse;
-import com.modsen.passengerservice.dto.error.response.ValidationErrorResponse;
+import com.modsen.passengerservice.dto.response.ErrorResponse;
+import com.modsen.passengerservice.dto.response.ValidationErrorResponse;
 import com.modsen.passengerservice.exception.PassengerNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;

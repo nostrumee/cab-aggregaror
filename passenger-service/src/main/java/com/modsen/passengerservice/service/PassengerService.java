@@ -1,9 +1,9 @@
 package com.modsen.passengerservice.service;
 
-import com.modsen.passengerservice.dto.passenger.request.CreatePassengerRequest;
-import com.modsen.passengerservice.dto.passenger.response.PassengerListResponse;
-import com.modsen.passengerservice.dto.passenger.response.PassengerResponse;
-import com.modsen.passengerservice.dto.passenger.request.UpdatePassengerRequest;
+import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
+import com.modsen.passengerservice.dto.response.PassengerListResponse;
+import com.modsen.passengerservice.dto.response.PassengerResponse;
+import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
 
 public interface PassengerService {
 

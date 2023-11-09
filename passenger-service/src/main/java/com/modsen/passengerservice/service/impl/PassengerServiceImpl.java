@@ -1,9 +1,9 @@
 package com.modsen.passengerservice.service.impl;
 
-import com.modsen.passengerservice.dto.passenger.request.CreatePassengerRequest;
-import com.modsen.passengerservice.dto.passenger.response.PassengerListResponse;
-import com.modsen.passengerservice.dto.passenger.response.PassengerResponse;
-import com.modsen.passengerservice.dto.passenger.request.UpdatePassengerRequest;
+import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
+import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
+import com.modsen.passengerservice.dto.response.PassengerListResponse;
+import com.modsen.passengerservice.dto.response.PassengerResponse;
 import com.modsen.passengerservice.entity.Passenger;
 import com.modsen.passengerservice.exception.PassengerNotFoundException;
 import com.modsen.passengerservice.mapper.PassengerMapper;
@@ -40,9 +40,9 @@ public class PassengerServiceImpl implements PassengerService {
 
         Passenger passenger = passengerRepository.findById(id)
                 .orElseThrow(() -> {
-            log.error("Passenger with id {} was not found", id);
-            return new PassengerNotFoundException(id);
-        });
+                    log.error("Passenger with id {} was not found", id);
+                    return new PassengerNotFoundException(id);
+                });
 
         return passengerMapper.fromEntityToResponse(passenger);
     }
@@ -63,9 +63,9 @@ public class PassengerServiceImpl implements PassengerService {
 
         Passenger passenger = passengerRepository.findById(id)
                 .orElseThrow(() -> {
-            log.error("Passenger with id {} was not found", id);
-            return new PassengerNotFoundException(id);
-        });
+                    log.error("Passenger with id {} was not found", id);
+                    return new PassengerNotFoundException(id);
+                });
 
         passengerMapper.updateEntityFromUpdateRequest(updateRequest, passenger);
         passengerRepository.save(passenger);
@@ -79,9 +79,9 @@ public class PassengerServiceImpl implements PassengerService {
 
         Passenger passenger = passengerRepository.findById(id)
                 .orElseThrow(() -> {
-            log.error("Passenger with id {} was not found", id);
-            return new PassengerNotFoundException(id);
-        });
+                    log.error("Passenger with id {} was not found", id);
+                    return new PassengerNotFoundException(id);
+                });
 
         passengerRepository.delete(passenger);
     }

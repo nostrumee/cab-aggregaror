@@ -1,4 +1,4 @@
-package com.modsen.passengerservice.dto.error.response;
+package com.modsen.passengerservice.dto.response;
 
 
 import lombok.Builder;
