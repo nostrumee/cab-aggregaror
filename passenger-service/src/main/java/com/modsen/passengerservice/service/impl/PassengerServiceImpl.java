@@ -1,9 +1,9 @@
 package com.modsen.passengerservice.service.impl;
 
-import com.modsen.passengerservice.dto.passenger.CreatePassengerRequest;
-import com.modsen.passengerservice.dto.passenger.PassengerListResponse;
-import com.modsen.passengerservice.dto.passenger.PassengerResponse;
-import com.modsen.passengerservice.dto.passenger.UpdatePassengerRequest;
+import com.modsen.passengerservice.dto.passenger.request.CreatePassengerRequest;
+import com.modsen.passengerservice.dto.passenger.response.PassengerListResponse;
+import com.modsen.passengerservice.dto.passenger.response.PassengerResponse;
+import com.modsen.passengerservice.dto.passenger.request.UpdatePassengerRequest;
 import com.modsen.passengerservice.entity.Passenger;
 import com.modsen.passengerservice.exception.PassengerNotFoundException;
 import com.modsen.passengerservice.mapper.PassengerMapper;

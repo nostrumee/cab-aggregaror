@@ -1,8 +1,8 @@
 package com.modsen.passengerservice.mapper;
 
-import com.modsen.passengerservice.dto.passenger.CreatePassengerRequest;
-import com.modsen.passengerservice.dto.passenger.PassengerResponse;
-import com.modsen.passengerservice.dto.passenger.UpdatePassengerRequest;
+import com.modsen.passengerservice.dto.passenger.request.CreatePassengerRequest;
+import com.modsen.passengerservice.dto.passenger.response.PassengerResponse;
+import com.modsen.passengerservice.dto.passenger.request.UpdatePassengerRequest;
 import com.modsen.passengerservice.entity.Passenger;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;

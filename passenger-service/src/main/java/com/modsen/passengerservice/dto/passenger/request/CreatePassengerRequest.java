@@ -1,4 +1,4 @@
-package com.modsen.passengerservice.dto.passenger;
+package com.modsen.passengerservice.dto.passenger.request;
 
 import org.hibernate.validator.constraints.Length;
 

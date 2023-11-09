@@ -1,7 +1,7 @@
 package com.modsen.passengerservice.controller;
 
-import com.modsen.passengerservice.dto.exception.ExceptionResponse;
-import com.modsen.passengerservice.dto.exception.ValidationErrorResponse;
+import com.modsen.passengerservice.dto.error.response.ErrorResponse;
+import com.modsen.passengerservice.dto.error.response.ValidationErrorResponse;
 import com.modsen.passengerservice.exception.PassengerNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -20,16 +20,16 @@ public class ControllerAdvice {
 
     @ExceptionHandler(PassengerNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ExceptionResponse handlePassengerNotFound(PassengerNotFoundException e) {
-        return new ExceptionResponse(HttpStatus.NOT_FOUND.value(), e.getMessage());
+    public ErrorResponse handlePassengerNotFound(PassengerNotFoundException e) {
+        return ErrorResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message(e.getMessage())
+                .build();
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ValidationErrorResponse handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
-        ValidationErrorResponse validationErrorResponse =
-                new ValidationErrorResponse(HttpStatus.BAD_REQUEST.value(), VALIDATION_FAILED_MESSAGE);
-
         var errors = new HashMap<String, String>();
         e.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
@@ -37,16 +37,16 @@ public class ControllerAdvice {
             errors.put(fieldName, errorMessage);
         });
 
-        validationErrorResponse.setErrors(errors);
-        return validationErrorResponse;
+        return ValidationErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message(VALIDATION_FAILED_MESSAGE)
+                .errors(errors)
+                .build();
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ValidationErrorResponse handleConstraintViolation(ConstraintViolationException e) {
-        ValidationErrorResponse validationErrorResponse =
-                new ValidationErrorResponse(HttpStatus.BAD_REQUEST.value(), VALIDATION_FAILED_MESSAGE);
-
         var errors = new HashMap<String, String>();
         e.getConstraintViolations().forEach(error -> {
             String fieldName = error.getPropertyPath().toString();
@@ -54,7 +54,10 @@ public class ControllerAdvice {
             errors.put(fieldName, errorMessage);
         });
 
-        validationErrorResponse.setErrors(errors);
-        return validationErrorResponse;
+        return ValidationErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message(VALIDATION_FAILED_MESSAGE)
+                .errors(errors)
+                .build();
     }
 }

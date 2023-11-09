@@ -1,4 +1,4 @@
-package com.modsen.passengerservice.dto.passenger;
+package com.modsen.passengerservice.dto.passenger.response;
 
 public record PassengerResponse(
         Long id,
