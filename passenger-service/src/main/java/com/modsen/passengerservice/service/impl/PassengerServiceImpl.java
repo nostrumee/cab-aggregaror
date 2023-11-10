@@ -2,7 +2,7 @@ package com.modsen.passengerservice.service.impl;
 
 import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
 import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
-import com.modsen.passengerservice.dto.response.PassengerListResponse;
+import com.modsen.passengerservice.dto.response.PassengerPageResponse;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
 import com.modsen.passengerservice.entity.Passenger;
 import com.modsen.passengerservice.exception.EmailTakenException;
@@ -28,18 +28,21 @@ public class PassengerServiceImpl implements PassengerService {
     private final PassengerMapper passengerMapper;
 
     @Override
-    public PassengerListResponse getAllPassengers(PageRequest pageRequest) {
-        log.info("Retrieving all passengers");
+    public PassengerPageResponse getAllPassengers(PageRequest pageRequest) {
+        log.info("Retrieving passengers page");
 
         Page<Passenger> passengersPage = passengerRepository.findAll(pageRequest);
+
         List<Passenger> retrievedPassengers = passengersPage.getContent();
         Long total = passengersPage.getTotalElements();
+        Integer pageNumber = passengersPage.getNumber();
 
         List<PassengerResponse> passengers =
                 passengerMapper.fromEntityListToResponseList(retrievedPassengers);
 
-        return PassengerListResponse.builder()
+        return PassengerPageResponse.builder()
                 .passengers(passengers)
+                .pageNumber(pageNumber)
                 .total(total)
                 .build();
     }

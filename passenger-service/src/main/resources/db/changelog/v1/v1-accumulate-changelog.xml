@@ -1,21 +1,9 @@
 <databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
-
-    <preConditions>
-        <dbms type="postgresql"/>
-    </preConditions>
-
-    <changeSet id="v1-0" author="Eduard Klygunov">
-        <tagDatabase tag="passenger-schema"/>
-    </changeSet>
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
 
     <include file="changeset/v1-passenger-schema.xml" relativeToChangelogFile="true"/>
-
-    <changeSet id="v1-2" author="Eduard Klygunov">
-        <tagDatabase tag="passenger-init"/>
-    </changeSet>
 
     <include file="changeset/v1-passenger-init.xml" relativeToChangelogFile="true"/>
 

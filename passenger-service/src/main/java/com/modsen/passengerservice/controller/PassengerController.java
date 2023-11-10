@@ -3,7 +3,7 @@ package com.modsen.passengerservice.controller;
 import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
 import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
 import com.modsen.passengerservice.dto.response.ErrorResponse;
-import com.modsen.passengerservice.dto.response.PassengerListResponse;
+import com.modsen.passengerservice.dto.response.PassengerPageResponse;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
 import com.modsen.passengerservice.dto.response.ValidationErrorResponse;
 import com.modsen.passengerservice.service.PassengerService;
@@ -37,16 +37,14 @@ public class PassengerController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get all passengers")
     @ApiResponse(responseCode = "200", description = "Passengers found")
-    public PassengerListResponse getAllPassengers(
+    public PassengerPageResponse getAllPassengers(
             @RequestParam(required = false, defaultValue = "0") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer size,
             @RequestParam(name = "order_by", required = false) String orderBy
     ) {
-
         PageRequest pageRequest = orderBy == null
                 ? PageRequest.of(page, size)
                 : PageRequest.of(page, size, Sort.by(orderBy));
-
 
         return passengerService.getAllPassengers(pageRequest);
     }
