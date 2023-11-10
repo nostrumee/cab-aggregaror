@@ -34,7 +34,17 @@ public class PassengerController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get passenger page")
-    @ApiResponse(responseCode = "200", description = "Passengers found")
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Passengers found",
+                    content = {
+                            @Content(schema = @Schema(implementation = PassengerPageResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Page number must be equal or greater than 1",
+                    content = {
+                            @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    })
+    })
     public PassengerPageResponse getPassengerPage(
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer size,

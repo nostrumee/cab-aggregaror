@@ -6,6 +6,7 @@ import com.modsen.passengerservice.dto.response.PassengerPageResponse;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
 import com.modsen.passengerservice.entity.Passenger;
 import com.modsen.passengerservice.exception.EmailTakenException;
+import com.modsen.passengerservice.exception.InvalidPageNumberException;
 import com.modsen.passengerservice.exception.PassengerNotFoundException;
 import com.modsen.passengerservice.exception.PhoneTakenException;
 import com.modsen.passengerservice.mapper.PassengerMapper;
@@ -31,6 +32,10 @@ public class PassengerServiceImpl implements PassengerService {
     @Override
     public PassengerPageResponse getPassengerPage(Integer page, Integer size, String orderBy) {
         log.info("Retrieving passengers page");
+
+        if (page <= 0) {
+            throw new InvalidPageNumberException();
+        }
 
         PageRequest pageRequest = orderBy == null
                 ? PageRequest.of(page - 1, size)
@@ -106,7 +111,7 @@ public class PassengerServiceImpl implements PassengerService {
 
         passengerRepository.delete(passenger);
     }
-    
+
     private void checkEmailAndPhoneUnique(String email, String phone) {
         passengerRepository.findByEmail(email)
                 .ifPresent(passenger -> {

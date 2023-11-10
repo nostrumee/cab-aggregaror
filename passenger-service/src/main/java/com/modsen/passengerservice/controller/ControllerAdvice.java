@@ -3,6 +3,7 @@ package com.modsen.passengerservice.controller;
 import com.modsen.passengerservice.dto.response.ErrorResponse;
 import com.modsen.passengerservice.dto.response.ValidationErrorResponse;
 import com.modsen.passengerservice.exception.EmailTakenException;
+import com.modsen.passengerservice.exception.InvalidPageNumberException;
 import com.modsen.passengerservice.exception.PassengerNotFoundException;
 import com.modsen.passengerservice.exception.PhoneTakenException;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,15 @@ public class ControllerAdvice {
     public ErrorResponse handlePassengerNotFound(PassengerNotFoundException e) {
         return ErrorResponse.builder()
                 .status(HttpStatus.NOT_FOUND.value())
+                .message(e.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler(InvalidPageNumberException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleInvalidPageNumber(InvalidPageNumberException e) {
+        return ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
                 .message(e.getMessage())
                 .build();
     }
