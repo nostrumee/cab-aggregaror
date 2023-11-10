@@ -15,6 +15,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,8 +37,18 @@ public class PassengerController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get all passengers")
     @ApiResponse(responseCode = "200", description = "Passengers found")
-    public PassengerListResponse getAllPassengers() {
-        return passengerService.getAllPassengers();
+    public PassengerListResponse getAllPassengers(
+            @RequestParam(required = false, defaultValue = "0") Integer page,
+            @RequestParam(required = false, defaultValue = "10") Integer size,
+            @RequestParam(name = "order_by", required = false) String orderBy
+    ) {
+
+        PageRequest pageRequest = orderBy == null
+                ? PageRequest.of(page, size)
+                : PageRequest.of(page, size, Sort.by(orderBy));
+
+
+        return passengerService.getAllPassengers(pageRequest);
     }
 
     @GetMapping("/{id}")

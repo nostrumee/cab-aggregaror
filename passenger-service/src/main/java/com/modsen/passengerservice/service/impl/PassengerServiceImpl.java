@@ -13,6 +13,8 @@ import com.modsen.passengerservice.repository.PassengerRepository;
 import com.modsen.passengerservice.service.PassengerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,14 +28,20 @@ public class PassengerServiceImpl implements PassengerService {
     private final PassengerMapper passengerMapper;
 
     @Override
-    public PassengerListResponse getAllPassengers() {
+    public PassengerListResponse getAllPassengers(PageRequest pageRequest) {
         log.info("Retrieving all passengers");
 
-        List<Passenger> retrievedPassengers = passengerRepository.findAll();
+        Page<Passenger> passengersPage = passengerRepository.findAll(pageRequest);
+        List<Passenger> retrievedPassengers = passengersPage.getContent();
+        Long total = passengersPage.getTotalElements();
+
         List<PassengerResponse> passengers =
                 passengerMapper.fromEntityListToResponseList(retrievedPassengers);
 
-        return new PassengerListResponse(passengers);
+        return PassengerListResponse.builder()
+                .passengers(passengers)
+                .total(total)
+                .build();
     }
 
     @Override

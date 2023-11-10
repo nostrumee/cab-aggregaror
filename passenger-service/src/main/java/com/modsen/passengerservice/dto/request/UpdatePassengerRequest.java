@@ -1,5 +1,6 @@
 package com.modsen.passengerservice.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.validator.constraints.Length;
 
@@ -12,11 +13,13 @@ public record UpdatePassengerRequest(
         @Schema(name = "First name", example = "John")
         @NotBlank(message = "Passenger's first name must be defined")
         @Length(max = 25, message = "Passenger's first name must be shorter than 25 symbols")
+        @JsonProperty("first_name")
         String firstName,
 
         @Schema(name = "Last name", example = "Doe")
         @NotBlank(message = "Passenger's last name must be defined")
         @Length(max = 25, message = "Passenger's last name must be shorter than 25 symbols")
+        @JsonProperty("last_name")
         String lastName,
 
         @Schema(name = "Email", example = "johndoe@example.com")
