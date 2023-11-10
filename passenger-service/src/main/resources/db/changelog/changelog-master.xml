@@ -7,13 +7,13 @@
         <dbms type="postgresql"/>
     </preConditions>
 
-    <changeSet id="v1-0" author="Eduard Klygunov">
+    <changeSet id="0" author="Eduard Klygunov">
         <tagDatabase tag="db_init"/>
     </changeSet>
 
     <include file="v1/v1-accumulate-changelog.xml" relativeToChangelogFile="true"/>
 
-    <changeSet id="v1-3" author="Eduard Klygunov">
+    <changeSet id="3" author="Eduard Klygunov">
         <tagDatabase tag="v.1.0"/>
     </changeSet>
 

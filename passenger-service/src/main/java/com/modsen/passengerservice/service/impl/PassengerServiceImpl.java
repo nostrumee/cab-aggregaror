@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,21 +29,24 @@ public class PassengerServiceImpl implements PassengerService {
     private final PassengerMapper passengerMapper;
 
     @Override
-    public PassengerPageResponse getAllPassengers(PageRequest pageRequest) {
+    public PassengerPageResponse getPassengerPage(Integer page, Integer size, String orderBy) {
         log.info("Retrieving passengers page");
+
+        PageRequest pageRequest = orderBy == null
+                ? PageRequest.of(page - 1, size)
+                : PageRequest.of(page - 1, size, Sort.by(orderBy));
 
         Page<Passenger> passengersPage = passengerRepository.findAll(pageRequest);
 
         List<Passenger> retrievedPassengers = passengersPage.getContent();
         Long total = passengersPage.getTotalElements();
-        Integer pageNumber = passengersPage.getNumber();
 
         List<PassengerResponse> passengers =
                 passengerMapper.fromEntityListToResponseList(retrievedPassengers);
 
         return PassengerPageResponse.builder()
                 .passengers(passengers)
-                .pageNumber(pageNumber)
+                .pageNumber(page)
                 .total(total)
                 .build();
     }
@@ -64,9 +68,7 @@ public class PassengerServiceImpl implements PassengerService {
     public PassengerResponse addPassenger(CreatePassengerRequest createRequest) {
         log.info("Adding passenger");
 
-        String email = createRequest.email();
-        String phone = createRequest.phone();
-        validateEmailAndPhone(email, phone);
+        checkEmailAndPhoneUnique(createRequest.email(), createRequest.phone());
 
         Passenger passengerToCreate = passengerMapper.fromCreateRequestToEntity(createRequest);
         Passenger createdPassenger = passengerRepository.save(passengerToCreate);
@@ -84,9 +86,7 @@ public class PassengerServiceImpl implements PassengerService {
                     return new PassengerNotFoundException(id);
                 });
 
-        String email = updateRequest.email();
-        String phone = updateRequest.phone();
-        validateEmailAndPhone(email, phone);
+        checkEmailAndPhoneUnique(updateRequest.email(), updateRequest.phone());
 
         passengerMapper.updateEntityFromUpdateRequest(updateRequest, passenger);
         passengerRepository.save(passenger);
@@ -106,8 +106,8 @@ public class PassengerServiceImpl implements PassengerService {
 
         passengerRepository.delete(passenger);
     }
-
-    private void validateEmailAndPhone(String email, String phone) {
+    
+    private void checkEmailAndPhoneUnique(String email, String phone) {
         passengerRepository.findByEmail(email)
                 .ifPresent(passenger -> {
                     log.error("Email {} is already taken", email);

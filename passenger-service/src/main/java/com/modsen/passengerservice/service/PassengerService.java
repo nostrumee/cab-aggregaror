@@ -8,7 +8,7 @@ import org.springframework.data.domain.PageRequest;
 
 public interface PassengerService {
 
-    PassengerPageResponse getAllPassengers(PageRequest pageRequest);
+    PassengerPageResponse getPassengerPage(Integer page, Integer size, String orderBy);
 
     PassengerResponse getById(Long id);
 

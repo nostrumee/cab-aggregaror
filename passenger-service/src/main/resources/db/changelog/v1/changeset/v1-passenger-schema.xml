@@ -3,7 +3,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
 
-    <changeSet id="v1-1" author="Eduard Klygunov">
+    <changeSet id="1" author="Eduard Klygunov">
         <sqlFile dbms="postgresql"
                  relativeToChangelogFile="true"
                  path="../sql/v1-create-passenger-table.sql" />
