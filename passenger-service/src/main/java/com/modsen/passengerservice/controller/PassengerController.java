@@ -66,6 +66,10 @@ public class PassengerController {
             @ApiResponse(responseCode = "400", description = "Invalid data provided",
                     content = {
                             @Content(schema = @Schema(implementation = ValidationErrorResponse.class))
+                    }),
+            @ApiResponse(responseCode = "409", description = "Email or phone already taken",
+                    content = {
+                            @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })
     })
     public ResponseEntity<PassengerResponse> createPassenger(
@@ -97,6 +101,10 @@ public class PassengerController {
                             @Content(schema = @Schema(implementation = ValidationErrorResponse.class))
                     }),
             @ApiResponse(responseCode = "404", description = "Passenger not found",
+                    content = {
+                            @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    }),
+            @ApiResponse(responseCode = "409", description = "Email or phone already taken",
                     content = {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })

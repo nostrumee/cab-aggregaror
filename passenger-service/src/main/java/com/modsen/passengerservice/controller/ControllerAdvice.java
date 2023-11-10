@@ -2,7 +2,9 @@ package com.modsen.passengerservice.controller;
 
 import com.modsen.passengerservice.dto.response.ErrorResponse;
 import com.modsen.passengerservice.dto.response.ValidationErrorResponse;
+import com.modsen.passengerservice.exception.EmailTakenException;
 import com.modsen.passengerservice.exception.PassengerNotFoundException;
+import com.modsen.passengerservice.exception.PhoneTakenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,6 +25,24 @@ public class ControllerAdvice {
     public ErrorResponse handlePassengerNotFound(PassengerNotFoundException e) {
         return ErrorResponse.builder()
                 .status(HttpStatus.NOT_FOUND.value())
+                .message(e.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler(EmailTakenException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleEmailTaken(EmailTakenException e) {
+        return ErrorResponse.builder()
+                .status(HttpStatus.CONFLICT.value())
+                .message(e.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler(PhoneTakenException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handlePhoneTaken(PhoneTakenException e) {
+        return ErrorResponse.builder()
+                .status(HttpStatus.CONFLICT.value())
                 .message(e.getMessage())
                 .build();
     }

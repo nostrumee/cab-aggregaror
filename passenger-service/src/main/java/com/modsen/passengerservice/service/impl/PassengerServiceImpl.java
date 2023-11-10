@@ -5,7 +5,9 @@ import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
 import com.modsen.passengerservice.dto.response.PassengerListResponse;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
 import com.modsen.passengerservice.entity.Passenger;
+import com.modsen.passengerservice.exception.EmailTakenException;
 import com.modsen.passengerservice.exception.PassengerNotFoundException;
+import com.modsen.passengerservice.exception.PhoneTakenException;
 import com.modsen.passengerservice.mapper.PassengerMapper;
 import com.modsen.passengerservice.repository.PassengerRepository;
 import com.modsen.passengerservice.service.PassengerService;
@@ -51,6 +53,10 @@ public class PassengerServiceImpl implements PassengerService {
     public PassengerResponse addPassenger(CreatePassengerRequest createRequest) {
         log.info("Adding passenger");
 
+        String email = createRequest.email();
+        String phone = createRequest.phone();
+        validateEmailAndPhone(email, phone);
+
         Passenger passengerToCreate = passengerMapper.fromCreateRequestToEntity(createRequest);
         Passenger createdPassenger = passengerRepository.save(passengerToCreate);
 
@@ -66,6 +72,10 @@ public class PassengerServiceImpl implements PassengerService {
                     log.error("Passenger with id {} was not found", id);
                     return new PassengerNotFoundException(id);
                 });
+
+        String email = updateRequest.email();
+        String phone = updateRequest.phone();
+        validateEmailAndPhone(email, phone);
 
         passengerMapper.updateEntityFromUpdateRequest(updateRequest, passenger);
         passengerRepository.save(passenger);
@@ -84,5 +94,19 @@ public class PassengerServiceImpl implements PassengerService {
                 });
 
         passengerRepository.delete(passenger);
+    }
+
+    private void validateEmailAndPhone(String email, String phone) {
+        passengerRepository.findByEmail(email)
+                .ifPresent(passenger -> {
+                    log.error("Email {} is already taken", email);
+                    throw new EmailTakenException(email);
+                });
+
+        passengerRepository.findByPhone(phone)
+                .ifPresent(passenger -> {
+                    log.error("Phone {} is already taken", phone);
+                    throw new PhoneTakenException(phone);
+                });
     }
 }
