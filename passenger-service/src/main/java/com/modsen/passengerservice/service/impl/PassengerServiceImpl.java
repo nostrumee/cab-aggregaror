@@ -16,7 +16,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -119,9 +121,11 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     private void validateSortingParameter(String orderBy) {
-        switch (orderBy) {
-            case "firstName", "lastName", "email", "phone": break;
-            default: throw new InvalidSortingParameterException(orderBy);
+        List<String> paramsList = Arrays.asList("firstName", "lastName", "email", "phone");
+
+        if (!paramsList.contains(orderBy)) {
+            String acceptableParams = String.join(", ", paramsList);
+            throw new InvalidSortingParameterException(orderBy, acceptableParams);
         }
     }
 
