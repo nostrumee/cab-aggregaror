@@ -9,7 +9,7 @@ import java.util.Optional;
 @Repository
 public interface PassengerRepository extends JpaRepository<Passenger, Long> {
 
-    Optional<Passenger> findByEmail(String email);
+    boolean existsByEmail(String email);
 
-    Optional<Passenger> findByPhone(String phone);
+    boolean existsByPhone(String phone);
 }

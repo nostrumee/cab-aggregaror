@@ -47,7 +47,7 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
-    public PassengerResponse getById(Long id) {
+    public PassengerResponse getById(long id) {
         log.info("Retrieving passenger by id {}", id);
 
         Passenger passenger = passengerRepository.findById(id)
@@ -72,7 +72,7 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
-    public PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, Long id) {
+    public PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, long id) {
         log.info("Updating passenger with id {}", id);
 
         Passenger passenger = passengerRepository.findById(id)
@@ -90,7 +90,7 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
-    public void deletePassenger(Long id) {
+    public void deletePassenger(long id) {
         log.info("Deleting passenger with id {}", id);
 
         Passenger passenger = passengerRepository.findById(id)
@@ -120,22 +120,20 @@ public class PassengerServiceImpl implements PassengerService {
 
     private void validateSortingParameter(String orderBy) {
         switch (orderBy) {
-            case "first_name", "last_name", "email", "phone": break;
+            case "firstName", "lastName", "email", "phone": break;
             default: throw new InvalidSortingParameterException(orderBy);
         }
     }
 
     private void checkEmailAndPhoneUnique(String email, String phone) {
-        passengerRepository.findByEmail(email)
-                .ifPresent(passenger -> {
-                    log.error("Email {} is already taken", email);
-                    throw new EmailTakenException(email);
-                });
+        if (passengerRepository.existsByEmail(email)) {
+            log.error("Email {} is already taken", email);
+            throw new EmailTakenException(email);
+        }
 
-        passengerRepository.findByPhone(phone)
-                .ifPresent(passenger -> {
-                    log.error("Phone {} is already taken", phone);
-                    throw new PhoneTakenException(phone);
-                });
+        if (passengerRepository.existsByPhone(phone)) {
+            log.error("Phone {} is already taken", phone);
+            throw new PhoneTakenException(phone);
+        }
     }
 }

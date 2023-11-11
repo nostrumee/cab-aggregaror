@@ -10,11 +10,11 @@ public interface PassengerService {
 
     PassengerPageResponse getPassengerPage(int page, int size, String orderBy);
 
-    PassengerResponse getById(Long id);
+    PassengerResponse getById(long id);
 
     PassengerResponse addPassenger(CreatePassengerRequest createRequest);
 
-    PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, Long id);
+    PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, long id);
 
-    void deletePassenger(Long id);
+    void deletePassenger(long id);
 }

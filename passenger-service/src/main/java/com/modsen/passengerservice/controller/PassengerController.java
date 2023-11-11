@@ -2,10 +2,7 @@ package com.modsen.passengerservice.controller;
 
 import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
 import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
-import com.modsen.passengerservice.dto.response.ErrorResponse;
-import com.modsen.passengerservice.dto.response.PassengerPageResponse;
-import com.modsen.passengerservice.dto.response.PassengerResponse;
-import com.modsen.passengerservice.dto.response.ValidationErrorResponse;
+import com.modsen.passengerservice.dto.response.*;
 import com.modsen.passengerservice.service.PassengerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -43,6 +40,10 @@ public class PassengerController {
             @ApiResponse(responseCode = "400", description = "Page number must be equal or greater than 1",
                     content = {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Invalid param",
+                    content = {
+                            @Content(schema = @Schema(implementation = ParamErrorResponse.class))
                     })
     })
     public PassengerPageResponse getPassengerPage(
@@ -66,7 +67,7 @@ public class PassengerController {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })
     })
-    public PassengerResponse getPassengerById(@PathVariable Long id) {
+    public PassengerResponse getPassengerById(@PathVariable long id) {
         return passengerService.getById(id);
     }
 
@@ -124,7 +125,7 @@ public class PassengerController {
                     })
     })
     public PassengerResponse updatePassenger(
-            @PathVariable Long id,
+            @PathVariable long id,
             @Valid @RequestBody UpdatePassengerRequest updateRequest
     ) {
         return passengerService.updatePassenger(updateRequest, id);
@@ -140,7 +141,7 @@ public class PassengerController {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })
     })
-    public void deletePassenger(@PathVariable Long id) {
+    public void deletePassenger(@PathVariable long id) {
         passengerService.deletePassenger(id);
     }
 }
