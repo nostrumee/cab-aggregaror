@@ -106,6 +106,7 @@ public class PassengerServiceImpl implements PassengerService {
 
     private PageRequest getPageRequest(int page, int size, String orderBy) {
         if (page < 1 || size < 1) {
+            log.error("Invalid request parameter passed: page: {}, size: {}", page, size);
             throw new InvalidPageParameterException();
         }
 
@@ -124,6 +125,8 @@ public class PassengerServiceImpl implements PassengerService {
         List<String> paramsList = Arrays.asList("firstName", "lastName", "email", "phone");
 
         if (!paramsList.contains(orderBy)) {
+            log.error("Invalid sorting parameter passed: {}", orderBy);
+
             String acceptableParams = String.join(", ", paramsList);
             throw new InvalidSortingParameterException(orderBy, acceptableParams);
         }
