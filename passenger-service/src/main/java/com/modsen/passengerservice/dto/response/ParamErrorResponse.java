@@ -7,13 +7,13 @@ import lombok.NonNull;
 import java.util.Map;
 
 @Builder
-@Schema(description = "Validation error response")
-public record ValidationErrorResponse(
+@Schema(description = "Param error response")
+public record ParamErrorResponse(
         @Schema(name = "Status", example = "400")
         @NonNull
         Integer status,
 
-        @Schema(name = "Message", example = "Validation failed")
+        @Schema(name = "Message", example = "Param invalid")
         @NonNull
         String message,
 

@@ -2,18 +2,24 @@ package com.modsen.passengerservice.service.impl;
 
 import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
 import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
-import com.modsen.passengerservice.dto.response.PassengerListResponse;
+import com.modsen.passengerservice.dto.response.PassengerPageResponse;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
 import com.modsen.passengerservice.entity.Passenger;
-import com.modsen.passengerservice.exception.PassengerNotFoundException;
+import com.modsen.passengerservice.exception.*;
 import com.modsen.passengerservice.mapper.PassengerMapper;
 import com.modsen.passengerservice.repository.PassengerRepository;
 import com.modsen.passengerservice.service.PassengerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,18 +30,27 @@ public class PassengerServiceImpl implements PassengerService {
     private final PassengerMapper passengerMapper;
 
     @Override
-    public PassengerListResponse getAllPassengers() {
-        log.info("Retrieving all passengers");
+    public PassengerPageResponse getPassengerPage(int page, int size, String orderBy) {
+        log.info("Retrieving passengers page");
 
-        List<Passenger> retrievedPassengers = passengerRepository.findAll();
+        PageRequest pageRequest = getPageRequest(page, size, orderBy);
+        Page<Passenger> passengersPage = passengerRepository.findAll(pageRequest);
+
+        List<Passenger> retrievedPassengers = passengersPage.getContent();
+        Long total = passengersPage.getTotalElements();
+
         List<PassengerResponse> passengers =
                 passengerMapper.fromEntityListToResponseList(retrievedPassengers);
 
-        return new PassengerListResponse(passengers);
+        return PassengerPageResponse.builder()
+                .passengers(passengers)
+                .pageNumber(page)
+                .total(total)
+                .build();
     }
 
     @Override
-    public PassengerResponse getById(Long id) {
+    public PassengerResponse getById(long id) {
         log.info("Retrieving passenger by id {}", id);
 
         Passenger passenger = passengerRepository.findById(id)
@@ -51,6 +66,8 @@ public class PassengerServiceImpl implements PassengerService {
     public PassengerResponse addPassenger(CreatePassengerRequest createRequest) {
         log.info("Adding passenger");
 
+        checkEmailAndPhoneUnique(createRequest.email(), createRequest.phone());
+
         Passenger passengerToCreate = passengerMapper.fromCreateRequestToEntity(createRequest);
         Passenger createdPassenger = passengerRepository.save(passengerToCreate);
 
@@ -58,7 +75,7 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
-    public PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, Long id) {
+    public PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, long id) {
         log.info("Updating passenger with id {}", id);
 
         Passenger passenger = passengerRepository.findById(id)
@@ -67,6 +84,8 @@ public class PassengerServiceImpl implements PassengerService {
                     return new PassengerNotFoundException(id);
                 });
 
+        checkEmailAndPhoneUnique(updateRequest.email(), updateRequest.phone());
+
         passengerMapper.updateEntityFromUpdateRequest(updateRequest, passenger);
         passengerRepository.save(passenger);
 
@@ -74,7 +93,7 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
-    public void deletePassenger(Long id) {
+    public void deletePassenger(long id) {
         log.info("Deleting passenger with id {}", id);
 
         Passenger passenger = passengerRepository.findById(id)
@@ -84,5 +103,44 @@ public class PassengerServiceImpl implements PassengerService {
                 });
 
         passengerRepository.delete(passenger);
+    }
+
+    private PageRequest getPageRequest(int page, int size, String orderBy) {
+        if (page < 1 || size < 1) {
+            log.error("Invalid request parameter passed: page: {}, size: {}", page, size);
+            throw new InvalidPageParameterException();
+        }
+
+        PageRequest pageRequest;
+        if (orderBy == null) {
+            pageRequest = PageRequest.of(page - 1, size);
+        } else {
+            validateSortingParameter(orderBy);
+            pageRequest = PageRequest.of(page - 1, size, Sort.by(orderBy));
+        }
+
+        return pageRequest;
+    }
+
+    private void validateSortingParameter(String orderBy) {
+        List<String> fieldNames = Arrays.stream(PassengerResponse.class.getDeclaredFields())
+                .map(Field::getName)
+                .toList();
+
+        if (!fieldNames.contains(orderBy)) {
+            throw new InvalidSortingParameterException(orderBy, String.join(", ", fieldNames));
+        }
+    }
+
+    private void checkEmailAndPhoneUnique(String email, String phone) {
+        if (passengerRepository.existsByEmail(email)) {
+            log.error("Email {} is already taken", email);
+            throw new EmailTakenException(email);
+        }
+
+        if (passengerRepository.existsByPhone(phone)) {
+            log.error("Phone {} is already taken", phone);
+            throw new PhoneTakenException(phone);
+        }
     }
 }

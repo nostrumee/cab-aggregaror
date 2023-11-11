@@ -1,19 +1,20 @@
 package com.modsen.passengerservice.service;
 
 import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
-import com.modsen.passengerservice.dto.response.PassengerListResponse;
+import com.modsen.passengerservice.dto.response.PassengerPageResponse;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
 import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
+import org.springframework.data.domain.PageRequest;
 
 public interface PassengerService {
 
-    PassengerListResponse getAllPassengers();
+    PassengerPageResponse getPassengerPage(int page, int size, String orderBy);
 
-    PassengerResponse getById(Long id);
+    PassengerResponse getById(long id);
 
     PassengerResponse addPassenger(CreatePassengerRequest createRequest);
 
-    PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, Long id);
+    PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, long id);
 
-    void deletePassenger(Long id);
+    void deletePassenger(long id);
 }
