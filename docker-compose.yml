@@ -1,15 +1,15 @@
 services:
-  passenger-db:
-    container_name: passenger-db
+  db:
+    container_name: postgres
     image: postgres
     ports:
       - 5432:5432
     volumes:
-      - passengerdb:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d
+      - postgres:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=passenger-db
 
 volumes:
-  passengerdb:
+  postgres:

@@ -6,7 +6,7 @@ spring:
     name: passenger-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/passenger-db
+    url: jdbc:postgresql://localhost:5432/passenger_db
     username: admin
     password: password
     driver-class-name: org.postgresql.Driver

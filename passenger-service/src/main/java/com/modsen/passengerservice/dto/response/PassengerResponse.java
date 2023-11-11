@@ -1,9 +1,11 @@
 package com.modsen.passengerservice.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.NonNull;
 
 @Schema(description = "Passenger response")
+@Builder
 public record PassengerResponse(
         @Schema(name = "id", example = "1")
         @NonNull

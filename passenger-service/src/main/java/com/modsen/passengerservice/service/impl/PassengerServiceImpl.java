@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -122,13 +123,12 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     private void validateSortingParameter(String orderBy) {
-        List<String> paramsList = Arrays.asList("firstName", "lastName", "email", "phone");
+        List<String> fieldNames = Arrays.stream(PassengerResponse.class.getDeclaredFields())
+                .map(Field::getName)
+                .toList();
 
-        if (!paramsList.contains(orderBy)) {
-            log.error("Invalid sorting parameter passed: {}", orderBy);
-
-            String acceptableParams = String.join(", ", paramsList);
-            throw new InvalidSortingParameterException(orderBy, acceptableParams);
+        if (!fieldNames.contains(orderBy)) {
+            throw new InvalidSortingParameterException(orderBy, String.join(", ", fieldNames));
         }
     }
 
