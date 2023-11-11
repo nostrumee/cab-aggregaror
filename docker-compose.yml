@@ -1,0 +1,15 @@
+services:
+  passenger-db:
+    container_name: passenger-db
+    image: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - passengerdb:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=passenger-db
+
+volumes:
+  passengerdb:
