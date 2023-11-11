@@ -5,10 +5,7 @@ import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
 import com.modsen.passengerservice.dto.response.PassengerPageResponse;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
 import com.modsen.passengerservice.entity.Passenger;
-import com.modsen.passengerservice.exception.EmailTakenException;
-import com.modsen.passengerservice.exception.InvalidPageNumberException;
-import com.modsen.passengerservice.exception.PassengerNotFoundException;
-import com.modsen.passengerservice.exception.PhoneTakenException;
+import com.modsen.passengerservice.exception.*;
 import com.modsen.passengerservice.mapper.PassengerMapper;
 import com.modsen.passengerservice.repository.PassengerRepository;
 import com.modsen.passengerservice.service.PassengerService;
@@ -30,17 +27,10 @@ public class PassengerServiceImpl implements PassengerService {
     private final PassengerMapper passengerMapper;
 
     @Override
-    public PassengerPageResponse getPassengerPage(Integer page, Integer size, String orderBy) {
+    public PassengerPageResponse getPassengerPage(int page, int size, String orderBy) {
         log.info("Retrieving passengers page");
 
-        if (page <= 0) {
-            throw new InvalidPageNumberException();
-        }
-
-        PageRequest pageRequest = orderBy == null
-                ? PageRequest.of(page - 1, size)
-                : PageRequest.of(page - 1, size, Sort.by(orderBy));
-
+        PageRequest pageRequest = getPageRequest(page, size, orderBy);
         Page<Passenger> passengersPage = passengerRepository.findAll(pageRequest);
 
         List<Passenger> retrievedPassengers = passengersPage.getContent();
@@ -110,6 +100,29 @@ public class PassengerServiceImpl implements PassengerService {
                 });
 
         passengerRepository.delete(passenger);
+    }
+
+    private PageRequest getPageRequest(int page, int size, String orderBy) {
+        if (page < 1 || size < 1) {
+            throw new InvalidPageParameterException();
+        }
+
+        PageRequest pageRequest;
+        if (orderBy == null) {
+            pageRequest = PageRequest.of(page - 1, size);
+        } else {
+            validateSortingParameter(orderBy);
+            pageRequest = PageRequest.of(page - 1, size, Sort.by(orderBy));
+        }
+
+        return pageRequest;
+    }
+
+    private void validateSortingParameter(String orderBy) {
+        switch (orderBy) {
+            case "first_name", "last_name", "email", "phone": break;
+            default: throw new InvalidSortingParameterException(orderBy);
+        }
     }
 
     private void checkEmailAndPhoneUnique(String email, String phone) {

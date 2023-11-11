@@ -46,8 +46,8 @@ public class PassengerController {
                     })
     })
     public PassengerPageResponse getPassengerPage(
-            @RequestParam(required = false, defaultValue = "1") Integer page,
-            @RequestParam(required = false, defaultValue = "10") Integer size,
+            @RequestParam(required = false, defaultValue = "1") int page,
+            @RequestParam(required = false, defaultValue = "10") int size,
             @RequestParam(name = "order_by", required = false) String orderBy
     ) {
         return passengerService.getPassengerPage(page, size, orderBy);
