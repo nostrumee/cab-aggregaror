@@ -8,6 +8,6 @@ import java.util.List;
 public record DriverPageResponse(
         List<DriverResponse> drivers,
         Integer pageNumber,
-        Integer total
+        Long total
 ) {
 }

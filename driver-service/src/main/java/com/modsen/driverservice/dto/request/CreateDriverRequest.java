@@ -1,4 +1,13 @@
 package com.modsen.driverservice.dto.request;
 
-public class CreateDriverRequest {
+import lombok.Builder;
+
+@Builder
+public record CreateDriverRequest(
+        String firstName,
+        String lastName,
+        String licenceNumber,
+        String email,
+        String phone
+) {
 }
