@@ -82,9 +82,9 @@ public class PassengerController {
                     content = {
                             @Content(schema = @Schema(implementation = ValidationErrorResponse.class))
                     }),
-            @ApiResponse(responseCode = "409", description = "Email or phone already taken",
+            @ApiResponse(responseCode = "409", description = "Passenger already exists",
                     content = {
-                            @Content(schema = @Schema(implementation = ErrorResponse.class))
+                            @Content(schema = @Schema(implementation = AlreadyExistsResponse.class))
                     })
     })
     public ResponseEntity<PassengerResponse> createPassenger(
@@ -119,9 +119,9 @@ public class PassengerController {
                     content = {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     }),
-            @ApiResponse(responseCode = "409", description = "Email or phone already taken",
+            @ApiResponse(responseCode = "409", description = "Passenger already exists",
                     content = {
-                            @Content(schema = @Schema(implementation = ErrorResponse.class))
+                            @Content(schema = @Schema(implementation = AlreadyExistsResponse.class))
                     })
     })
     public PassengerResponse updatePassenger(
