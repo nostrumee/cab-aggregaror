@@ -1,0 +1,21 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="2" author="Eduard Klygunov">
+        <preConditions onFail="WARN">
+            <tableExists tableName="driver" />
+        </preConditions>
+
+        <sqlFile dbms="postgresql"
+                 relativeToChangelogFile="true"
+                 path="../sql/v1-insert-driver-data.sql" />
+        <rollback>
+            <sqlFile dbms="postgresql"
+                     relativeToChangelogFile="true"
+                     path="../sql/v1-delete-driver-data.sql" />
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

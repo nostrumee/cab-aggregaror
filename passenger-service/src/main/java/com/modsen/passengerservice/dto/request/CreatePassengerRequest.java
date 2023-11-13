@@ -1,12 +1,10 @@
 package com.modsen.passengerservice.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.hibernate.validator.constraints.Length;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import org.hibernate.validator.constraints.Length;
 
 @Schema(description = "Create passenger request")
 public record CreatePassengerRequest(
