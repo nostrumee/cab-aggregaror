@@ -17,9 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static com.modsen.driverservice.util.ErrorMessages.*;
 
@@ -68,11 +66,7 @@ public class DriverServiceImpl implements DriverService {
     public DriverResponse addDriver(CreateDriverRequest createRequest) {
         log.info("Adding driver");
 
-        checkDriverDataUnique(
-                createRequest.licenceNumber(),
-                createRequest.email(),
-                createRequest.phone()
-        );
+        checkCreateDataUnique(createRequest);
 
         Driver driverToCreate = driverMapper.fromCreateRequestToEntity(createRequest);
         Driver createdDriver = driverRepository.save(driverToCreate);
@@ -90,11 +84,7 @@ public class DriverServiceImpl implements DriverService {
                     return new DriverNotFoundException(id);
                 });
 
-        checkDriverDataUnique(
-                updateRequest.licenceNumber(),
-                updateRequest.email(),
-                updateRequest.phone()
-        );
+        checkUpdateDataUnique(updateRequest, driver);
 
         driverMapper.updateEntityFromUpdateRequest(updateRequest, driver);
         driverRepository.save(driver);
@@ -144,9 +134,7 @@ public class DriverServiceImpl implements DriverService {
         }
     }
 
-    private void checkDriverDataUnique(String licenceNumber, String email, String phone) {
-        var errors = new HashMap<String, String>();
-
+    private void checkLicenceNumberUnique(String licenceNumber, Map<String, String> errors) {
         if (driverRepository.existsByLicenceNumber(licenceNumber)) {
             log.error("Driver with licence number {} already exists", licenceNumber);
             errors.put(
@@ -154,7 +142,9 @@ public class DriverServiceImpl implements DriverService {
                     String.format(DRIVER_WITH_LICENCE_NUMBER_EXISTS_MESSAGE, licenceNumber)
             );
         }
+    }
 
+    private void checkEmailUnique(String email, Map<String, String> errors) {
         if (driverRepository.existsByEmail(email)) {
             log.error("Driver with email {} already exists", email);
             errors.put(
@@ -162,13 +152,43 @@ public class DriverServiceImpl implements DriverService {
                     String.format(DRIVER_WITH_EMAIL_EXISTS_MESSAGE, email)
             );
         }
+    }
 
+    private void checkPhoneUnique(String phone, Map<String, String> errors) {
         if (driverRepository.existsByPhone(phone)) {
             log.error("Driver with phone {} already exists", phone);
             errors.put(
                     "phone",
                     String.format(DRIVER_WITH_PHONE_EXISTS_MESSAGE, phone)
             );
+        }
+    }
+
+    private void checkCreateDataUnique(CreateDriverRequest createRequest) {
+        var errors = new HashMap<String, String>();
+
+        checkLicenceNumberUnique(createRequest.licenceNumber(), errors);
+        checkEmailUnique(createRequest.email(), errors);
+        checkPhoneUnique(createRequest.phone(), errors);
+
+        if (!errors.isEmpty()) {
+            throw new DriverAlreadyExistsException(errors);
+        }
+    }
+
+    private void checkUpdateDataUnique(UpdateDriverRequest updateRequest, Driver driver) {
+        var errors = new HashMap<String, String>();
+
+        if (!Objects.equals(updateRequest.licenceNumber(), driver.getLicenceNumber())) {
+            checkLicenceNumberUnique(updateRequest.licenceNumber(), errors);
+        }
+
+        if (!Objects.equals(updateRequest.email(), driver.getEmail())) {
+            checkEmailUnique(updateRequest.email(), errors);
+        }
+
+        if (!Objects.equals(updateRequest.phone(), driver.getPhone())) {
+            checkPhoneUnique(updateRequest.phone(), errors);
         }
 
         if (!errors.isEmpty()) {
