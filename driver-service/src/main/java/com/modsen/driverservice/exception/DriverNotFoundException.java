@@ -1,8 +1,8 @@
 package com.modsen.driverservice.exception;
 
-public class DriverNotFoundException extends RuntimeException {
+import static com.modsen.driverservice.util.ErrorMessages.NOT_FOUND_WITH_ID_MESSAGE;
 
-    private static final String NOT_FOUND_WITH_ID_MESSAGE = "Driver with id %d was not found";
+public class DriverNotFoundException extends RuntimeException {
 
     public DriverNotFoundException(long id) {
         super(String.format(NOT_FOUND_WITH_ID_MESSAGE, id));

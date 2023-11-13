@@ -18,7 +18,10 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+
+import static com.modsen.driverservice.util.ErrorMessages.*;
 
 @Service
 @RequiredArgsConstructor
@@ -65,7 +68,11 @@ public class DriverServiceImpl implements DriverService {
     public DriverResponse addDriver(CreateDriverRequest createRequest) {
         log.info("Adding driver");
 
-        checkEmailAndPhoneUnique(createRequest.email(), createRequest.phone());
+        checkDriverDataUnique(
+                createRequest.licenceNumber(),
+                createRequest.email(),
+                createRequest.phone()
+        );
 
         Driver driverToCreate = driverMapper.fromCreateRequestToEntity(createRequest);
         Driver createdDriver = driverRepository.save(driverToCreate);
@@ -83,7 +90,11 @@ public class DriverServiceImpl implements DriverService {
                     return new DriverNotFoundException(id);
                 });
 
-        checkEmailAndPhoneUnique(updateRequest.email(), updateRequest.phone());
+        checkDriverDataUnique(
+                updateRequest.licenceNumber(),
+                updateRequest.email(),
+                updateRequest.phone()
+        );
 
         driverMapper.updateEntityFromUpdateRequest(updateRequest, driver);
         driverRepository.save(driver);
@@ -107,7 +118,7 @@ public class DriverServiceImpl implements DriverService {
     private PageRequest getPageRequest(int page, int size, String orderBy) {
         if (page < 1 || size < 1) {
             log.error("Invalid request parameter passed: page: {}, size: {}", page, size);
-            throw new InvalidPageParameterException();
+            throw new InvalidRequestParamException(INVALID_PAGE_PARAMETERS_MESSAGE);
         }
 
         PageRequest pageRequest;
@@ -127,19 +138,41 @@ public class DriverServiceImpl implements DriverService {
                 .toList();
 
         if (!fieldNames.contains(orderBy)) {
-            throw new InvalidSortingParameterException(orderBy, String.join(", ", fieldNames));
+            String acceptableParams = String.join(", ", fieldNames);
+            String errorMessage = String.format(INVALID_SORTING_PARAMETER_MESSAGE, orderBy, acceptableParams);
+            throw new InvalidRequestParamException(errorMessage);
         }
     }
 
-    private void checkEmailAndPhoneUnique(String email, String phone) {
+    private void checkDriverDataUnique(String licenceNumber, String email, String phone) {
+        var errors = new HashMap<String, String>();
+
+        if (driverRepository.existsByLicenceNumber(licenceNumber)) {
+            log.error("Driver with licence number {} already exists", licenceNumber);
+            errors.put(
+                    "licenceNumber",
+                    String.format(DRIVER_WITH_LICENCE_NUMBER_EXISTS_MESSAGE, licenceNumber)
+            );
+        }
+
         if (driverRepository.existsByEmail(email)) {
-            log.error("Email {} is already taken", email);
-            throw new EmailTakenException(email);
+            log.error("Driver with email {} already exists", email);
+            errors.put(
+                    "email",
+                    String.format(DRIVER_WITH_EMAIL_EXISTS_MESSAGE, email)
+            );
         }
 
         if (driverRepository.existsByPhone(phone)) {
-            log.error("Phone {} is already taken", phone);
-            throw new PhoneTakenException(phone);
+            log.error("Driver with phone {} already exists", phone);
+            errors.put(
+                    "phone",
+                    String.format(DRIVER_WITH_PHONE_EXISTS_MESSAGE, phone)
+            );
+        }
+
+        if (!errors.isEmpty()) {
+            throw new DriverAlreadyExistsException(errors);
         }
     }
 }

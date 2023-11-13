@@ -1,5 +1,6 @@
 package com.modsen.driverservice.controller;
 
+import com.modsen.driverservice.dto.response.AlreadyExistsResponse;
 import com.modsen.driverservice.dto.response.ErrorResponse;
 import com.modsen.driverservice.dto.response.ParamErrorResponse;
 import com.modsen.driverservice.dto.response.ValidationErrorResponse;
@@ -17,54 +18,35 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.modsen.driverservice.util.ErrorMessages.*;
+
 @RestControllerAdvice
 public class ControllerAdvice {
 
-    private static final String VALIDATION_FAILED_MESSAGE = "Validation failed";
-    private static final String REQUEST_PARAM_MISSING_MESSAGE = "Request param missing";
-    private static final String INVALID_PARAMETER_TYPE_MESSAGE = "Invalid parameter type";
-
     @ExceptionHandler(DriverNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handlePassengerNotFound(DriverNotFoundException e) {
+    public ErrorResponse handleDriverNotFound(DriverNotFoundException e) {
         return ErrorResponse.builder()
                 .status(HttpStatus.NOT_FOUND.value())
                 .message(e.getMessage())
                 .build();
     }
 
-    @ExceptionHandler(InvalidPageParameterException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleInvalidPageParameter(InvalidPageParameterException e) {
-        return ErrorResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
-                .message(e.getMessage())
-                .build();
-    }
-
-    @ExceptionHandler(InvalidSortingParameterException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleInvalidSortingParameter(InvalidSortingParameterException e) {
-        return ErrorResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
-                .message(e.getMessage())
-                .build();
-    }
-
-    @ExceptionHandler(EmailTakenException.class)
+    @ExceptionHandler(DriverAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleEmailTaken(EmailTakenException e) {
-        return ErrorResponse.builder()
+    public AlreadyExistsResponse handleDriverAlreadyExists(DriverAlreadyExistsException e) {
+        return AlreadyExistsResponse.builder()
                 .status(HttpStatus.CONFLICT.value())
                 .message(e.getMessage())
+                .errors(e.getErrors())
                 .build();
     }
 
-    @ExceptionHandler(PhoneTakenException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handlePhoneTaken(PhoneTakenException e) {
+    @ExceptionHandler(InvalidRequestParamException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleInvalidRequestParam(InvalidRequestParamException e) {
         return ErrorResponse.builder()
-                .status(HttpStatus.CONFLICT.value())
+                .status(HttpStatus.BAD_REQUEST.value())
                 .message(e.getMessage())
                 .build();
     }
