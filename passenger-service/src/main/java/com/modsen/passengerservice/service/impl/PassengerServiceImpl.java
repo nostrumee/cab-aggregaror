@@ -17,9 +17,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.modsen.passengerservice.util.ErrorMessages.*;
 
 @Service
 @RequiredArgsConstructor
@@ -66,7 +67,7 @@ public class PassengerServiceImpl implements PassengerService {
     public PassengerResponse addPassenger(CreatePassengerRequest createRequest) {
         log.info("Adding passenger");
 
-        checkEmailAndPhoneUnique(createRequest.email(), createRequest.phone());
+        checkCreateDataUnique(createRequest);
 
         Passenger passengerToCreate = passengerMapper.fromCreateRequestToEntity(createRequest);
         Passenger createdPassenger = passengerRepository.save(passengerToCreate);
@@ -84,7 +85,7 @@ public class PassengerServiceImpl implements PassengerService {
                     return new PassengerNotFoundException(id);
                 });
 
-        checkEmailAndPhoneUnique(updateRequest.email(), updateRequest.phone());
+        checkUpdateDataUnique(updateRequest, passenger);
 
         passengerMapper.updateEntityFromUpdateRequest(updateRequest, passenger);
         passengerRepository.save(passenger);
@@ -108,7 +109,7 @@ public class PassengerServiceImpl implements PassengerService {
     private PageRequest getPageRequest(int page, int size, String orderBy) {
         if (page < 1 || size < 1) {
             log.error("Invalid request parameter passed: page: {}, size: {}", page, size);
-            throw new InvalidPageParameterException();
+            throw new InvalidRequestParamException(INVALID_PAGE_PARAMETERS_MESSAGE);
         }
 
         PageRequest pageRequest;
@@ -128,19 +129,56 @@ public class PassengerServiceImpl implements PassengerService {
                 .toList();
 
         if (!fieldNames.contains(orderBy)) {
-            throw new InvalidSortingParameterException(orderBy, String.join(", ", fieldNames));
+            String acceptableParams = String.join(", ", fieldNames);
+            String errorMessage = String.format(INVALID_SORTING_PARAMETER_MESSAGE, orderBy, acceptableParams);
+            throw new InvalidRequestParamException(errorMessage);
         }
     }
 
-    private void checkEmailAndPhoneUnique(String email, String phone) {
+    private void checkEmailUnique(String email, Map<String, String> errors) {
         if (passengerRepository.existsByEmail(email)) {
-            log.error("Email {} is already taken", email);
-            throw new EmailTakenException(email);
+            log.error("Passenger with email {} already exists", email);
+            errors.put(
+                    "email",
+                    String.format(PASSENGER_WITH_EMAIL_EXISTS_MESSAGE, email)
+            );
+        }
+    }
+
+    private void checkPhoneUnique(String phone, Map<String, String> errors) {
+        if (passengerRepository.existsByPhone(phone)) {
+            log.error("Passenger with phone {} already exists", phone);
+            errors.put(
+                    "phone",
+                    String.format(PASSENGER_WITH_PHONE_EXISTS_MESSAGE, phone)
+            );
+        }
+    }
+
+    private void checkCreateDataUnique(CreatePassengerRequest createRequest) {
+        var errors = new HashMap<String, String>();
+
+        checkEmailUnique(createRequest.email(), errors);
+        checkPhoneUnique(createRequest.phone(), errors);
+
+        if (!errors.isEmpty()) {
+            throw new PassengerAlreadyExistsException(errors);
+        }
+    }
+
+    private void checkUpdateDataUnique(UpdatePassengerRequest updateRequest, Passenger passenger) {
+        var errors = new HashMap<String, String>();
+
+        if (!Objects.equals(updateRequest.email(), passenger.getEmail())) {
+            checkEmailUnique(updateRequest.email(), errors);
         }
 
-        if (passengerRepository.existsByPhone(phone)) {
-            log.error("Phone {} is already taken", phone);
-            throw new PhoneTakenException(phone);
+        if (!Objects.equals(updateRequest.phone(), passenger.getPhone())) {
+            checkPhoneUnique(updateRequest.phone(), errors);
+        }
+
+        if (!errors.isEmpty()) {
+            throw new PassengerAlreadyExistsException(errors);
         }
     }
 }
