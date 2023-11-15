@@ -6,7 +6,6 @@ import lombok.Builder;
 public record DriverRatingMessage(
         Long rideId,
         Long driverId,
-        Integer rating,
-        String comment
+        Integer rating
 ) {
 }

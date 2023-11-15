@@ -23,6 +23,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +40,7 @@ public class RideServiceImpl implements RideService {
     private final RideMapper rideMapper;
 
     @Override
-    public RidePageResponse getAllRides(int page, int size, String orderBy) {
+    public RidePageResponse getRidesPage(int page, int size, String orderBy) {
         log.info("Retrieving rides page");
 
         PageRequest pageRequest = getPageRequest(page, size, orderBy);
@@ -58,7 +60,7 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public RidePageResponse getAllRidesByDriverId(long driverId, int page, int size, String orderBy) {
+    public RidePageResponse getRidesByDriverId(long driverId, int page, int size, String orderBy) {
         log.info("Retrieving rides for driver with id {}", driverId);
 
         PageRequest pageRequest = getPageRequest(page, size, orderBy);
@@ -78,7 +80,7 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public RidePageResponse getAllRidesByPassengerId(long passengerId, int page, int size, String orderBy) {
+    public RidePageResponse getRidesByPassengerId(long passengerId, int page, int size, String orderBy) {
         log.info("Retrieving rides for passenger with id {}", passengerId);
 
         PageRequest pageRequest = getPageRequest(page, size, orderBy);
@@ -118,6 +120,7 @@ public class RideServiceImpl implements RideService {
         Ride orderToCreate = rideMapper.fromCreateRequestToEntity(createRequest);
         orderToCreate.setStatus(Status.CREATED);
         orderToCreate.setCreatedDate(LocalDateTime.now());
+        orderToCreate.setEstimatedCost(getRideCost());
 
         Ride createdOrder = rideRepository.save(orderToCreate);
 
@@ -202,7 +205,6 @@ public class RideServiceImpl implements RideService {
                                 .rideId(id)
                                 .driverId(ride.getDriverId())
                                 .rating(ratingRequest.rating())
-                                .comment(ratingRequest.comment())
                                 .build();
                         // TODO: send rating message to 'rate-driver' topic
                     } else {
@@ -224,7 +226,6 @@ public class RideServiceImpl implements RideService {
                                 .rideId(id)
                                 .passengerId(ride.getPassengerId())
                                 .rating(ratingRequest.rating())
-                                .comment(ratingRequest.comment())
                                 .build();
                         // TODO: send rating message to 'rate-passenger' topic
                     } else {
@@ -264,5 +265,13 @@ public class RideServiceImpl implements RideService {
             String errorMessage = String.format(INVALID_SORTING_PARAMETER_MESSAGE, orderBy, acceptableParams);
             throw new InvalidRequestParamException(errorMessage);
         }
+    }
+
+    private BigDecimal getRideCost() {
+        BigDecimal min = BigDecimal.valueOf(3.0);
+        BigDecimal max = BigDecimal.valueOf(20.0);
+
+        return min.add(BigDecimal.valueOf(Math.random()).multiply(max.subtract(min)))
+                .setScale(1, RoundingMode.HALF_UP);
     }
 }

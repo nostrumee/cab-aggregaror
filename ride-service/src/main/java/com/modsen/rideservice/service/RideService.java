@@ -8,11 +8,11 @@ import com.modsen.rideservice.dto.response.RideResponse;
 
 public interface RideService {
 
-    RidePageResponse getAllRides(int page, int size, String orderBy);
+    RidePageResponse getRidesPage(int page, int size, String orderBy);
 
-    RidePageResponse getAllRidesByDriverId(long driverId, int page, int size, String orderBy);
+    RidePageResponse getRidesByDriverId(long driverId, int page, int size, String orderBy);
 
-    RidePageResponse getAllRidesByPassengerId(long passengerId, int page, int size, String orderBy);
+    RidePageResponse getRidesByPassengerId(long passengerId, int page, int size, String orderBy);
 
     RideResponse getById(long id);
 
