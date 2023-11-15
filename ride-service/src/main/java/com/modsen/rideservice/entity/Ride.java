@@ -1,9 +1,6 @@
 package com.modsen.rideservice.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -27,6 +24,7 @@ public class Ride {
 
     private String destinationPoint;
 
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     private LocalDateTime createdDate;
