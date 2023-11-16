@@ -1,9 +1,9 @@
 server:
-  port: 8082
+  port: 8085
 
 spring:
   application:
-    name: driver-service
+    name: notification-service
 
   mail:
     host: smtp.gmail.com
