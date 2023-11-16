@@ -64,7 +64,7 @@ public class RideServiceImpl implements RideService {
         log.info("Retrieving rides for driver with id {}", driverId);
 
         PageRequest pageRequest = getPageRequest(page, size, orderBy);
-        Page<Ride> ridesPage = rideRepository.findAllByDriverId(driverId, pageRequest);
+        Page<Ride> ridesPage = rideRepository.findAllByDriverIdAndStatus(driverId, Status.FINISHED, pageRequest);
 
         List<Ride> retrievedRides = ridesPage.getContent();
         Long total = ridesPage.getTotalElements();
@@ -84,7 +84,7 @@ public class RideServiceImpl implements RideService {
         log.info("Retrieving rides for passenger with id {}", passengerId);
 
         PageRequest pageRequest = getPageRequest(page, size, orderBy);
-        Page<Ride> ridesPage = rideRepository.findAllByPassengerId(passengerId, pageRequest);
+        Page<Ride> ridesPage = rideRepository.findAllByPassengerIdAndStatus(passengerId, Status.FINISHED, pageRequest);
 
         List<Ride> retrievedRides = ridesPage.getContent();
         Long total = ridesPage.getTotalElements();

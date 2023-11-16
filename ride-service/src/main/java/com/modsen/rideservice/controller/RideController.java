@@ -28,6 +28,7 @@ public class RideController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get rides page")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Rides found",
                     content = {
@@ -52,6 +53,7 @@ public class RideController {
 
     @GetMapping("/driver/{driverId}")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get driver's rides history")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Rides found",
                     content = {
@@ -66,7 +68,7 @@ public class RideController {
                             @Content(schema = @Schema(implementation = ParamErrorResponse.class))
                     })
     })
-    public RidePageResponse getRidesByDriverId(
+    public RidePageResponse getDriverRideHistory(
             @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "10") int size,
             @RequestParam(name = "order_by", required = false) String orderBy,
@@ -77,6 +79,7 @@ public class RideController {
 
     @GetMapping("/passenger/{passengerId}")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get passenger's rides history")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Rides found",
                     content = {
@@ -91,7 +94,7 @@ public class RideController {
                             @Content(schema = @Schema(implementation = ParamErrorResponse.class))
                     })
     })
-    public RidePageResponse getRidesByPassengerId(
+    public RidePageResponse getPassengerRideHistory(
             @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "10") int size,
             @RequestParam(name = "order_by", required = false) String orderBy,
@@ -216,7 +219,7 @@ public class RideController {
 
     @PostMapping("/{rideId}/passenger/rate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Rate a driver")
+    @Operation(summary = "Rate a passenger")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Passenger rated"),
             @ApiResponse(responseCode = "404", description = "Ride not found",
