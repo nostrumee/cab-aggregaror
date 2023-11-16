@@ -158,7 +158,7 @@ public class RideController {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })
     })
-    public void deletePassenger(@PathVariable long id) {
+    public void deleteRide(@PathVariable long id) {
         rideService.deleteRide(id);
     }
 
