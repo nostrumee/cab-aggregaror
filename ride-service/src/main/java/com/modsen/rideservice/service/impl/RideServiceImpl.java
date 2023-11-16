@@ -2,9 +2,11 @@ package com.modsen.rideservice.service.impl;
 
 import com.modsen.rideservice.dto.message.PassengerRatingMessage;
 import com.modsen.rideservice.dto.message.AcceptRideMessage;
+import com.modsen.rideservice.dto.message.RideOrderMessage;
 import com.modsen.rideservice.dto.request.CreateRideRequest;
 import com.modsen.rideservice.dto.request.RatingRequest;
 import com.modsen.rideservice.dto.message.DriverRatingMessage;
+import com.modsen.rideservice.dto.response.DriverResponse;
 import com.modsen.rideservice.dto.response.RidePageResponse;
 import com.modsen.rideservice.dto.response.RideResponse;
 import com.modsen.rideservice.entity.Ride;
@@ -124,6 +126,12 @@ public class RideServiceImpl implements RideService {
 
         Ride createdOrder = rideRepository.save(orderToCreate);
 
+        RideOrderMessage orderMessage = RideOrderMessage.builder()
+                .rideId(createdOrder.getId())
+                .build();
+
+        // TODO: send order message to 'ride-order' topic
+
         return rideMapper.fromEntityToResponse(createdOrder);
     }
 
@@ -157,6 +165,8 @@ public class RideServiceImpl implements RideService {
         orderToAccept.setAcceptedDate(LocalDateTime.now());
         Ride acceptedOrder = rideRepository.save(orderToAccept);
 
+        // TODO: send message to notification-service about accepted order
+
         return rideMapper.fromEntityToResponse(acceptedOrder);
     }
 
@@ -173,6 +183,8 @@ public class RideServiceImpl implements RideService {
         rideToStart.setStatus(Status.STARTED);
         rideToStart.setStartDate(LocalDateTime.now());
         Ride startedRide = rideRepository.save(rideToStart);
+
+        // TODO: send message to notification-service about started ride
 
         return rideMapper.fromEntityToResponse(startedRide);
     }
@@ -191,6 +203,9 @@ public class RideServiceImpl implements RideService {
         rideToFinish.setFinishDate(LocalDateTime.now());
         Ride finishedRide = rideRepository.save(rideToFinish);
 
+        // TODO: send message to notification-service about finished ride
+        // TODO: send message to driver-service to make driver status available
+
         return rideMapper.fromEntityToResponse(finishedRide);
     }
 
@@ -198,44 +213,52 @@ public class RideServiceImpl implements RideService {
     public void rateDriver(RatingRequest ratingRequest, long id) {
         log.info("Rating a driver of ride with id {}", id);
 
-        rideRepository.findById(id).ifPresentOrElse(
-                ride -> {
-                    if (ride.getStatus().equals(Status.FINISHED)) {
-                        DriverRatingMessage ratingResponse = DriverRatingMessage.builder()
-                                .rideId(id)
-                                .driverId(ride.getDriverId())
-                                .rating(ratingRequest.rating())
-                                .build();
-                        // TODO: send rating message to 'rate-driver' topic
-                    } else {
-                        throw new RideNotFinishedException(id);
-                    }
-                },
-                () -> {
-                    throw new RideNotFoundException(id);
-                }
-        );
+        Ride ride = rideRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Ride order with id {} was not found", id);
+                    return new RideNotFoundException(id);
+                });
+
+        if (ride.getStatus().equals(Status.FINISHED)) {
+            DriverRatingMessage ratingResponse = DriverRatingMessage.builder()
+                    .rideId(id)
+                    .driverId(ride.getDriverId())
+                    .rating(ratingRequest.rating())
+                    .build();
+            // TODO: send rating message to 'rate-driver' topic
+        } else {
+            log.error("Ride order with id {} is not finished yet", id);
+            throw new RideNotFinishedException(id);
+        }
     }
 
     @Override
     public void ratePassenger(RatingRequest ratingRequest, long id) {
-        rideRepository.findById(id).ifPresentOrElse(
-                ride -> {
-                    if (ride.getStatus().equals(Status.FINISHED)) {
-                        PassengerRatingMessage driverRatingMessage = PassengerRatingMessage.builder()
-                                .rideId(id)
-                                .passengerId(ride.getPassengerId())
-                                .rating(ratingRequest.rating())
-                                .build();
-                        // TODO: send rating message to 'rate-passenger' topic
-                    } else {
-                        throw new RideNotFinishedException(id);
-                    }
-                },
-                () -> {
-                    throw new RideNotFoundException(id);
-                }
-        );
+        log.info("Rating a passenger of ride with id {}", id);
+
+        Ride ride = rideRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Ride order with id {} was not found", id);
+                    return new RideNotFoundException(id);
+                });
+
+        if (ride.getStatus().equals(Status.FINISHED)) {
+            PassengerRatingMessage ratingResponse = PassengerRatingMessage.builder()
+                    .rideId(id)
+                    .passengerId(ride.getDriverId())
+                    .rating(ratingRequest.rating())
+                    .build();
+            // TODO: send rating message to 'rate-passenger' topic
+        } else {
+            log.error("Ride order with id {} is not finished yet", id);
+            throw new RideNotFinishedException(id);
+        }
+    }
+
+    @Override
+    public DriverResponse getDriverProfile(long rideId) {
+        // TODO: call to driver-service to fetch driver profile
+        return null;
     }
 
     private PageRequest getPageRequest(int page, int size, String orderBy) {

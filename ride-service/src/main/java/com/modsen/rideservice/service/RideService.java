@@ -3,6 +3,7 @@ package com.modsen.rideservice.service;
 import com.modsen.rideservice.dto.message.AcceptRideMessage;
 import com.modsen.rideservice.dto.request.CreateRideRequest;
 import com.modsen.rideservice.dto.request.RatingRequest;
+import com.modsen.rideservice.dto.response.DriverResponse;
 import com.modsen.rideservice.dto.response.RidePageResponse;
 import com.modsen.rideservice.dto.response.RideResponse;
 
@@ -29,4 +30,6 @@ public interface RideService {
     void rateDriver(RatingRequest ratingRequest, long rideId);
 
     void ratePassenger(RatingRequest ratingRequest, long rideId);
+
+    DriverResponse getDriverProfile(long rideId);
 }

@@ -18,5 +18,5 @@ public interface DriverMapper {
 
     void updateEntityFromUpdateRequest(UpdateDriverRequest updateRequest, @MappingTarget Driver entity);
 
-    List<DriverResponse> fromEntityListToResponseList(List<Driver> passengers);
+    List<DriverResponse> fromEntityListToResponseList(List<Driver> drivers);
 }

@@ -5,6 +5,7 @@ import com.modsen.driverservice.dto.request.UpdateDriverRequest;
 import com.modsen.driverservice.dto.response.DriverPageResponse;
 import com.modsen.driverservice.dto.response.DriverResponse;
 import com.modsen.driverservice.entity.Driver;
+import com.modsen.driverservice.entity.Status;
 import com.modsen.driverservice.exception.*;
 import com.modsen.driverservice.mapper.DriverMapper;
 import com.modsen.driverservice.repository.DriverRepository;
@@ -47,6 +48,14 @@ public class DriverServiceImpl implements DriverService {
                 .pageNumber(page)
                 .total(total)
                 .build();
+    }
+
+    @Override
+    public List<DriverResponse> getAvailableDrivers() {
+        log.info("Retrieving available drivers");
+
+        List<Driver> availableDrivers = driverRepository.findAllByStatus(Status.AVAILABLE);
+        return driverMapper.fromEntityListToResponseList(availableDrivers);
     }
 
     @Override
@@ -103,6 +112,34 @@ public class DriverServiceImpl implements DriverService {
                 });
 
         driverRepository.delete(driver);
+    }
+
+    @Override
+    public void setAvailableStatus(long id) {
+        log.info("Changing driver with id {} status to available", id);
+
+        Driver driver = driverRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Driver with id {} was not found", id);
+                    return new DriverNotFoundException(id);
+                });
+
+        driver.setStatus(Status.AVAILABLE);
+        driverRepository.save(driver);
+    }
+
+    @Override
+    public void setUnavailableStatus(long id) {
+        log.info("Changing driver with id {} status to unavailable", id);
+
+        Driver driver = driverRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Driver with id {} was not found", id);
+                    return new DriverNotFoundException(id);
+                });
+
+        driver.setStatus(Status.UNAVAILABLE);
+        driverRepository.save(driver);
     }
 
     private PageRequest getPageRequest(int page, int size, String orderBy) {
