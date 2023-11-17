@@ -20,7 +20,7 @@ import java.net.URI;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/v1/rides")
+@RequestMapping("/api/v1/rides")
 @RequiredArgsConstructor
 public class RideController {
 

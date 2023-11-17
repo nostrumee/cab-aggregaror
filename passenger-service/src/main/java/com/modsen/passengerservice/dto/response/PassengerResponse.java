@@ -25,6 +25,10 @@ public record PassengerResponse(
 
         @Schema(name = "Phone number", example = "123-45-67")
         @NonNull
-        String phone
+        String phone,
+
+        @Schema(name = "Rating", example = "4.95")
+        @NonNull
+        Double rating
 ) {
 }

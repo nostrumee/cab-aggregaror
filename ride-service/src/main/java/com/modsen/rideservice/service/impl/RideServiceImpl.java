@@ -129,7 +129,7 @@ public class RideServiceImpl implements RideService {
         RideOrderMessage orderMessage = RideOrderMessage.builder()
                 .rideId(createdOrder.getId())
                 .build();
-
+        // TODO: send message to notification-service about created order
         // TODO: send order message to 'ride-order' topic
 
         return rideMapper.fromEntityToResponse(createdOrder);

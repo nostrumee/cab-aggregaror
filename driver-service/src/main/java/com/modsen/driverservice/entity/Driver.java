@@ -23,6 +23,8 @@ public class Driver {
 
     private String phone;
 
+    private Double rating;
+
     @Enumerated(EnumType.STRING)
     private Status status;
 }

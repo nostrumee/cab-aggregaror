@@ -1,11 +1,12 @@
 package com.modsen.ratingservice.service.impl;
 
-import com.modsen.ratingservice.dto.RatingResponse;
-import com.modsen.ratingservice.dto.message.DriverRatingMessage;
-import com.modsen.ratingservice.dto.message.PassengerRatingMessage;
+import com.modsen.ratingservice.message.DriverRatingMessage;
+import com.modsen.ratingservice.message.PassengerRatingMessage;
 import com.modsen.ratingservice.entity.DriverRating;
 import com.modsen.ratingservice.entity.PassengerRating;
 import com.modsen.ratingservice.mapper.RatingMapper;
+import com.modsen.ratingservice.message.UpdateDriverRatingMessage;
+import com.modsen.ratingservice.message.UpdatePassengerRatingMessage;
 import com.modsen.ratingservice.repository.DriverRatingRepository;
 import com.modsen.ratingservice.repository.PassengerRatingRepository;
 import com.modsen.ratingservice.service.RatingService;
@@ -29,31 +30,31 @@ public class RatingServiceImpl implements RatingService {
     public void ratePassenger(PassengerRatingMessage ratingMessage) {
         log.info("Rating a passenger with id {} for a ride with id {}", ratingMessage.passengerId(), ratingMessage.rideId());
 
-        PassengerRating ratingToCreate = ratingMapper.fromRatingMessageToPassengerRating(ratingMessage);
-        passengerRatingRepository.save(ratingToCreate);
+        PassengerRating ratingToAdd = ratingMapper.fromRatingMessageToPassengerRating(ratingMessage);
+        passengerRatingRepository.save(ratingToAdd);
+
+        BigDecimal updatedRating = passengerRatingRepository.findPassengerRating(ratingMessage.passengerId());
+        UpdatePassengerRatingMessage updateMessage = UpdatePassengerRatingMessage.builder()
+                .passengerId(ratingMessage.passengerId())
+                .rating(updatedRating.setScale(2, RoundingMode.HALF_UP).doubleValue())
+                .build();
+
+        // TODO: send it to update-passenger-rating topic
     }
 
     @Override
     public void rateDriver(DriverRatingMessage ratingMessage) {
         log.info("Rating a driver with id {} for a ride with id {}", ratingMessage.driverId(), ratingMessage.rideId());
 
-        DriverRating ratingToCreate = ratingMapper.fromRatingMessageToDriverRating(ratingMessage);
-        driverRatingRepository.save(ratingToCreate);
-    }
+        DriverRating ratingToAdd = ratingMapper.fromRatingMessageToDriverRating(ratingMessage);
+        driverRatingRepository.save(ratingToAdd);
 
-    @Override
-    public RatingResponse getPassengerRating(long passengerId) {
-        BigDecimal rating = passengerRatingRepository.findPassengerRating(passengerId);
-        return RatingResponse.builder()
-                .rating(rating.setScale(2, RoundingMode.HALF_UP).doubleValue())
+        BigDecimal updatedRating = driverRatingRepository.findDriverRating(ratingMessage.driverId());
+        UpdateDriverRatingMessage updateMessage = UpdateDriverRatingMessage.builder()
+                .driverId(ratingMessage.driverId())
+                .rating(updatedRating.setScale(2, RoundingMode.HALF_UP).doubleValue())
                 .build();
-    }
 
-    @Override
-    public RatingResponse getDriverRating(long driverId) {
-        BigDecimal rating = driverRatingRepository.findDriverRating(driverId);
-        return RatingResponse.builder()
-                .rating(rating.setScale(2, RoundingMode.HALF_UP).doubleValue())
-                .build();
+        // TODO: send it to update-driver-rating topic
     }
 }

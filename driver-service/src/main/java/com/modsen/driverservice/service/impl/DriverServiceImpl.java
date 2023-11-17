@@ -142,6 +142,19 @@ public class DriverServiceImpl implements DriverService {
         driverRepository.save(driver);
     }
 
+    @Override
+    public RatingResponse getDriverRating(long id) {
+        log.error("Retrieving driver's rating by id {}", id);
+
+        Driver driver = driverRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Driver with id {} was not found", id);
+                    return new DriverNotFoundException(id);
+                });
+        // TODO: make a call to rating-service
+        return null;
+    }
+
     private PageRequest getPageRequest(int page, int size, String orderBy) {
         if (page < 1 || size < 1) {
             log.error("Invalid request parameter passed: page: {}, size: {}", page, size);

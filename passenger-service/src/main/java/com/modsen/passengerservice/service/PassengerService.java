@@ -4,6 +4,7 @@ import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
 import com.modsen.passengerservice.dto.response.PassengerPageResponse;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
 import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
+import com.modsen.passengerservice.dto.response.RatingResponse;
 import org.springframework.data.domain.PageRequest;
 
 public interface PassengerService {
@@ -17,4 +18,6 @@ public interface PassengerService {
     PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, long id);
 
     void deletePassenger(long id);
+
+    RatingResponse getPassengerRating(long id);
 }

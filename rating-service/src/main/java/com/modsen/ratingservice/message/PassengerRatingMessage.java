@@ -1,4 +1,4 @@
-package com.modsen.ratingservice.dto.message;
+package com.modsen.ratingservice.message;
 
 public record PassengerRatingMessage(
         Long rideId,

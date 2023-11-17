@@ -6,5 +6,6 @@ create table driver
     licence_number varchar(10) unique  not null,
     email          varchar(255) unique not null,
     phone          varchar(10) unique  not null,
-    status         varchar(15)         not null default 'AVAILABLE'
+    status         varchar(15)         not null default 'AVAILABLE',
+    rating         numeric(3, 2)       not null default 5.0
 );
