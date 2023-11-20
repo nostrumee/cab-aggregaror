@@ -23,6 +23,7 @@ public class Driver {
 
     private String phone;
 
+    @Column(precision = 3, scale = 2, columnDefinition = "numeric")
     private Double rating;
 
     @Enumerated(EnumType.STRING)

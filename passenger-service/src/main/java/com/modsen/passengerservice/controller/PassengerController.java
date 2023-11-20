@@ -143,21 +143,4 @@ public class PassengerController {
     public void deletePassenger(@PathVariable long id) {
         passengerService.deletePassenger(id);
     }
-
-    @GetMapping("/{id}/rating")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Get passenger rating by passenger id")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Rating found",
-                    content = {
-                            @Content(schema = @Schema(implementation = RatingResponse.class))
-                    }),
-            @ApiResponse(responseCode = "404", description = "Passenger not found",
-                    content = {
-                            @Content(schema = @Schema(implementation = ErrorResponse.class))
-                    })
-    })
-    public RatingResponse getPassengerRating(@PathVariable long id) {
-        return passengerService.getPassengerRating(id);
-    }
 }

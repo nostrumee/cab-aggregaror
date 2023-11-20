@@ -4,7 +4,6 @@ import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
 import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
 import com.modsen.passengerservice.dto.response.PassengerPageResponse;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
-import com.modsen.passengerservice.dto.response.RatingResponse;
 import com.modsen.passengerservice.entity.Passenger;
 import com.modsen.passengerservice.exception.*;
 import com.modsen.passengerservice.mapper.PassengerMapper;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.modsen.passengerservice.util.ErrorMessages.*;
 
@@ -105,19 +103,6 @@ public class PassengerServiceImpl implements PassengerService {
                 });
 
         passengerRepository.delete(passenger);
-    }
-
-    @Override
-    public RatingResponse getPassengerRating(long id) {
-        log.error("Retrieving passenger's rating by id {}", id);
-
-        Passenger passenger = passengerRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Passenger with id {} was not found", id);
-                    return new PassengerNotFoundException(id);
-                });
-        // TODO: make a call to rating-service
-        return null;
     }
 
     private PageRequest getPageRequest(int page, int size, String orderBy) {

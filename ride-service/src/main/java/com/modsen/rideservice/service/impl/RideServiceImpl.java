@@ -219,17 +219,17 @@ public class RideServiceImpl implements RideService {
                     return new RideNotFoundException(id);
                 });
 
-        if (ride.getStatus().equals(Status.FINISHED)) {
-            DriverRatingMessage ratingResponse = DriverRatingMessage.builder()
-                    .rideId(id)
-                    .driverId(ride.getDriverId())
-                    .rating(ratingRequest.rating())
-                    .build();
-            // TODO: send rating message to 'rate-driver' topic
-        } else {
+        if (!ride.getStatus().equals(Status.FINISHED)) {
             log.error("Ride order with id {} is not finished yet", id);
             throw new RideNotFinishedException(id);
         }
+
+        DriverRatingMessage ratingMessage = DriverRatingMessage.builder()
+                .rideId(id)
+                .driverId(ride.getDriverId())
+                .rating(ratingRequest.rating())
+                .build();
+        // TODO: send rating message to 'rate-driver' topic
     }
 
     @Override
@@ -243,16 +243,16 @@ public class RideServiceImpl implements RideService {
                 });
 
         if (ride.getStatus().equals(Status.FINISHED)) {
-            PassengerRatingMessage ratingResponse = PassengerRatingMessage.builder()
-                    .rideId(id)
-                    .passengerId(ride.getDriverId())
-                    .rating(ratingRequest.rating())
-                    .build();
-            // TODO: send rating message to 'rate-passenger' topic
-        } else {
             log.error("Ride order with id {} is not finished yet", id);
             throw new RideNotFinishedException(id);
         }
+
+        PassengerRatingMessage ratingMessage = PassengerRatingMessage.builder()
+                .rideId(id)
+                .passengerId(ride.getDriverId())
+                .rating(ratingRequest.rating())
+                .build();
+        // TODO: send rating message to 'rate-passenger' topic
     }
 
     @Override

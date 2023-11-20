@@ -4,6 +4,7 @@ import com.modsen.driverservice.dto.message.AcceptRideMessage;
 import com.modsen.driverservice.dto.message.RideOrderMessage;
 import com.modsen.driverservice.dto.response.DriverResponse;
 import com.modsen.driverservice.entity.Driver;
+import com.modsen.driverservice.entity.Status;
 import com.modsen.driverservice.service.DriverService;
 import com.modsen.driverservice.service.RideOrderService;
 import lombok.RequiredArgsConstructor;
@@ -25,13 +26,11 @@ public class RideOrderServiceImpl implements RideOrderService {
         log.info("Searching for a driver to accept a ride order");
 
         List<DriverResponse> availableDrivers = driverService.getAvailableDrivers();
-
-
         if (!availableDrivers.isEmpty()) {
             Random random = new Random();
 
             DriverResponse driver = availableDrivers.get(random.nextInt(availableDrivers.size()));
-            driverService.setUnavailableStatus(driver.id());
+            driverService.setDriverStatus(driver.id(), Status.UNAVAILABLE);
 
             AcceptRideMessage acceptRideMessage = AcceptRideMessage.builder()
                     .rideId(orderMessage.rideId())

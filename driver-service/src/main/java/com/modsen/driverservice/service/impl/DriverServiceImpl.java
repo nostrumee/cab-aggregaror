@@ -115,8 +115,8 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public void setAvailableStatus(long id) {
-        log.info("Changing driver with id {} status to available", id);
+    public void setDriverStatus(long id, Status status) {
+        log.info("Changing status of driver with id {}", id);
 
         Driver driver = driverRepository.findById(id)
                 .orElseThrow(() -> {
@@ -124,35 +124,8 @@ public class DriverServiceImpl implements DriverService {
                     return new DriverNotFoundException(id);
                 });
 
-        driver.setStatus(Status.AVAILABLE);
+        driver.setStatus(status);
         driverRepository.save(driver);
-    }
-
-    @Override
-    public void setUnavailableStatus(long id) {
-        log.info("Changing driver with id {} status to unavailable", id);
-
-        Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Driver with id {} was not found", id);
-                    return new DriverNotFoundException(id);
-                });
-
-        driver.setStatus(Status.UNAVAILABLE);
-        driverRepository.save(driver);
-    }
-
-    @Override
-    public RatingResponse getDriverRating(long id) {
-        log.error("Retrieving driver's rating by id {}", id);
-
-        Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Driver with id {} was not found", id);
-                    return new DriverNotFoundException(id);
-                });
-        // TODO: make a call to rating-service
-        return null;
     }
 
     private PageRequest getPageRequest(int page, int size, String orderBy) {
