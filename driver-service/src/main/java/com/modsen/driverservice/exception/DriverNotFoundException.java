@@ -1,6 +1,6 @@
 package com.modsen.driverservice.exception;
 
-import static com.modsen.driverservice.util.ErrorMessages.NOT_FOUND_WITH_ID_MESSAGE;
+import static com.modsen.driverservice.util.ErrorMessages.*;
 
 public class DriverNotFoundException extends RuntimeException {
 

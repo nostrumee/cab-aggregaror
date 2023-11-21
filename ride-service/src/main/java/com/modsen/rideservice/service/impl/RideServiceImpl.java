@@ -1,21 +1,23 @@
 package com.modsen.rideservice.service.impl;
 
-import com.modsen.rideservice.dto.message.PassengerRatingMessage;
 import com.modsen.rideservice.dto.message.AcceptRideMessage;
+import com.modsen.rideservice.dto.message.DriverRatingMessage;
+import com.modsen.rideservice.dto.message.PassengerRatingMessage;
 import com.modsen.rideservice.dto.message.RideOrderMessage;
 import com.modsen.rideservice.dto.request.CreateRideRequest;
 import com.modsen.rideservice.dto.request.RatingRequest;
-import com.modsen.rideservice.dto.message.DriverRatingMessage;
 import com.modsen.rideservice.dto.response.DriverResponse;
 import com.modsen.rideservice.dto.response.RidePageResponse;
 import com.modsen.rideservice.dto.response.RideResponse;
 import com.modsen.rideservice.entity.Ride;
 import com.modsen.rideservice.entity.Status;
 import com.modsen.rideservice.exception.InvalidRequestParamException;
+import com.modsen.rideservice.exception.InvalidRideStatusException;
 import com.modsen.rideservice.exception.RideNotFinishedException;
 import com.modsen.rideservice.exception.RideNotFoundException;
 import com.modsen.rideservice.mapper.RideMapper;
 import com.modsen.rideservice.repository.RideRepository;
+import com.modsen.rideservice.service.DriverService;
 import com.modsen.rideservice.service.RideService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +42,8 @@ public class RideServiceImpl implements RideService {
 
     private final RideRepository rideRepository;
     private final RideMapper rideMapper;
+    private final DriverService driverService;
+
 
     @Override
     public RidePageResponse getRidesPage(int page, int size, String orderBy) {
@@ -155,15 +159,15 @@ public class RideServiceImpl implements RideService {
 
         log.info("Accepting ride order with id {} by driver with id {}", rideId, driverId);
 
-        Ride orderToAccept = rideRepository.findById(acceptRequest.rideId())
+        Ride rideToAccept = rideRepository.findById(acceptRequest.rideId())
                 .orElseThrow(() -> {
                     log.error("Ride order with id {} was not found", rideId);
                     return new RideNotFoundException(rideId);
                 });
 
-        orderToAccept.setStatus(Status.ACCEPTED);
-        orderToAccept.setAcceptedDate(LocalDateTime.now());
-        Ride acceptedOrder = rideRepository.save(orderToAccept);
+        rideToAccept.setStatus(Status.ACCEPTED);
+        rideToAccept.setAcceptedDate(LocalDateTime.now());
+        Ride acceptedOrder = rideRepository.save(rideToAccept);
 
         // TODO: send message to notification-service about accepted order
 
@@ -179,6 +183,11 @@ public class RideServiceImpl implements RideService {
                     log.error("Ride order with id {} was not found", id);
                     return new RideNotFoundException(id);
                 });
+
+        if (!rideToStart.getStatus().equals(Status.ACCEPTED)) {
+            log.error("Invalid ride status");
+            throw new InvalidRideStatusException(Status.ACCEPTED.name());
+        }
 
         rideToStart.setStatus(Status.STARTED);
         rideToStart.setStartDate(LocalDateTime.now());
@@ -198,6 +207,11 @@ public class RideServiceImpl implements RideService {
                     log.error("Ride order with id {} was not found", id);
                     return new RideNotFoundException(id);
                 });
+
+        if (!rideToFinish.getStatus().equals(Status.STARTED)) {
+            log.error("Invalid ride status");
+            throw new InvalidRideStatusException(Status.STARTED.name());
+        }
 
         rideToFinish.setStatus(Status.FINISHED);
         rideToFinish.setFinishDate(LocalDateTime.now());
@@ -257,8 +271,16 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public DriverResponse getDriverProfile(long rideId) {
-        // TODO: call to driver-service to fetch driver profile
-        return null;
+        log.info("Retrieving driver's profile from a ride with id {}", rideId);
+
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() -> {
+                    log.error("Ride order with id {} was not found", rideId);
+                    return new RideNotFoundException(rideId);
+                });
+        long driverId = ride.getDriverId();
+
+        return driverService.getDriverById(driverId);
     }
 
     private PageRequest getPageRequest(int page, int size, String orderBy) {

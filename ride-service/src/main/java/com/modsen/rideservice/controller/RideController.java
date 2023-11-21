@@ -237,4 +237,21 @@ public class RideController {
     ) {
         rideService.ratePassenger(ratingRequest, rideId);
     }
+
+    @GetMapping("/{rideId}/driver")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "View driver's profile from a ride by ride id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Driver found",
+                    content = {
+                            @Content(schema = @Schema(implementation = DriverResponse.class))
+                    }),
+            @ApiResponse(responseCode = "404", description = "Ride not found",
+                    content = {
+                            @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    })
+    })
+    public DriverResponse getDriverProfile(@PathVariable long rideId) {
+        return rideService.getDriverProfile(rideId);
+    }
 }

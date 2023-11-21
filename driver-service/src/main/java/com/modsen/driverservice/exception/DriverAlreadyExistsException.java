@@ -5,7 +5,7 @@ import lombok.Setter;
 
 import java.util.Map;
 
-import static com.modsen.driverservice.util.ErrorMessages.DRIVER_ALREADY_EXISTS_MESSAGE;
+import static com.modsen.driverservice.util.ErrorMessages.*;
 
 @Getter
 @Setter

@@ -7,7 +7,7 @@ import lombok.NonNull;
 @Schema(description = "Driver profile response")
 @Builder
 public record DriverResponse(
-        @Schema(name = "First name", example = "400")
+        @Schema(name = "First name", example = "John")
         @NonNull
         String firstName,
 
@@ -21,6 +21,10 @@ public record DriverResponse(
 
         @Schema(name = "Phone number", example = "123-45-67")
         @NonNull
-        String phone
+        String phone,
+
+        @Schema(name = "Rating", example = "4.95")
+        @NonNull
+        Double rating
 ) {
 }
