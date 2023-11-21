@@ -31,7 +31,6 @@ public class PassengerController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get passenger page")
-
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Passengers found",
                     content = {

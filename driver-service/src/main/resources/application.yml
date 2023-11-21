@@ -23,5 +23,20 @@ spring:
   liquibase:
     change-log: db/changelog/changelog-master.xml
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: cab.aggregator.notification@gmail.com
+    password: ftkhczeqidieyauo
+    properties:
+      mail:
+        debug: false
+        transport:
+          protocol: smtp
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 springdoc:
   override-with-generic-response: false

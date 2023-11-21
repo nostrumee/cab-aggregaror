@@ -141,7 +141,7 @@ public class DriverController {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })
     })
-    public void deletePassenger(@PathVariable long id) {
+    public void deleteDriver(@PathVariable long id) {
         driverService.deleteDriver(id);
     }
 }

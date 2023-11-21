@@ -6,10 +6,14 @@ import com.modsen.driverservice.dto.response.DriverResponse;
 import com.modsen.driverservice.entity.Driver;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public interface DriverMapper {
 
     DriverResponse fromEntityToResponse(Driver entity);
@@ -18,5 +22,5 @@ public interface DriverMapper {
 
     void updateEntityFromUpdateRequest(UpdateDriverRequest updateRequest, @MappingTarget Driver entity);
 
-    List<DriverResponse> fromEntityListToResponseList(List<Driver> passengers);
+    List<DriverResponse> fromEntityListToResponseList(List<Driver> drivers);
 }

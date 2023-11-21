@@ -1,0 +1,1 @@
+drop table passenger_rating;

@@ -6,10 +6,14 @@ import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
 import com.modsen.passengerservice.entity.Passenger;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public interface PassengerMapper {
 
     PassengerResponse fromEntityToResponse(Passenger entity);
