@@ -20,7 +20,7 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import java.util.Map;
 
-import static com.modsen.rideservice.util.IntegrationProperties.HANDLE_ACCEPT_RIDE_METHOD_NAME;
+import static com.modsen.rideservice.util.IntegrationProperties.*;
 
 @Configuration
 @RequiredArgsConstructor

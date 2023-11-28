@@ -1,10 +1,10 @@
 package com.modsen.rideservice.service.impl;
 
-import com.modsen.rideservice.config.kafka.KafkaProperties;
+import com.modsen.rideservice.client.PassengerClient;
 import com.modsen.rideservice.dto.message.AcceptRideMessage;
+import com.modsen.rideservice.dto.message.CreateRideMessage;
 import com.modsen.rideservice.dto.message.DriverRatingMessage;
 import com.modsen.rideservice.dto.message.PassengerRatingMessage;
-import com.modsen.rideservice.dto.message.CreateRideMessage;
 import com.modsen.rideservice.dto.request.CreateRideRequest;
 import com.modsen.rideservice.dto.request.RatingRequest;
 import com.modsen.rideservice.dto.response.DriverResponse;
@@ -25,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -35,8 +34,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.modsen.rideservice.util.ErrorMessages.INVALID_PAGE_PARAMETERS_MESSAGE;
-import static com.modsen.rideservice.util.ErrorMessages.INVALID_SORTING_PARAMETER_MESSAGE;
+import static com.modsen.rideservice.util.ErrorMessages.*;
 
 @Service
 @RequiredArgsConstructor
@@ -46,9 +44,8 @@ public class RideServiceImpl implements RideService {
     private final RideRepository rideRepository;
     private final RideMapper rideMapper;
     private final DriverService driverService;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final KafkaProperties kafkaProperties;
-    private final SendMessageHandler handler;
+    private final SendMessageHandler sendMessageHandler;
+    private final PassengerClient passengerClient;
 
     @Override
     public RidePageResponse getRidesPage(int page, int size, String orderBy) {
@@ -126,7 +123,9 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public RideResponse createRide(CreateRideRequest createRequest) {
-        log.info("Creating ride order");
+        log.info("Creating ride order for passenger with id {}", createRequest.passengerId());
+
+        passengerClient.getPassenger(createRequest.passengerId());
 
         Ride orderToCreate = rideMapper.fromCreateRequestToEntity(createRequest);
         orderToCreate.setStatus(Status.CREATED);
@@ -134,12 +133,11 @@ public class RideServiceImpl implements RideService {
         orderToCreate.setEstimatedCost(getRideCost());
 
         Ride createdOrder = rideRepository.save(orderToCreate);
-
         CreateRideMessage orderMessage = CreateRideMessage.builder()
                 .rideId(createdOrder.getId())
                 .build();
 
-        handler.handleRideOrderMessage(orderMessage);
+        sendMessageHandler.handleRideOrderMessage(orderMessage);
 
         // TODO: send message to notification-service about created order
 

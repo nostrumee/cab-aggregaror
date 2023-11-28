@@ -5,6 +5,7 @@ import com.modsen.rideservice.dto.response.ParamErrorResponse;
 import com.modsen.rideservice.dto.response.ValidationErrorResponse;
 import com.modsen.rideservice.exception.InvalidRequestParamException;
 import com.modsen.rideservice.exception.InvalidRideStatusException;
+import com.modsen.rideservice.exception.RideCreateException;
 import com.modsen.rideservice.exception.RideNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,15 @@ public class ControllerAdvice {
     public ErrorResponse handleRideNotFound(RideNotFoundException e) {
         return ErrorResponse.builder()
                 .status(HttpStatus.NOT_FOUND.value())
+                .message(e.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler(RideCreateException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handlePassengerNotFound(RideCreateException e) {
+        return ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
                 .message(e.getMessage())
                 .build();
     }
@@ -106,6 +116,15 @@ public class ControllerAdvice {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(INVALID_PARAMETER_TYPE_MESSAGE)
                 .errors(error)
+                .build();
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleException(Exception e) {
+        return ErrorResponse.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .message(e.getMessage())
                 .build();
     }
 }
