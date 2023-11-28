@@ -14,6 +14,7 @@ import com.modsen.rideservice.entity.Ride;
 import com.modsen.rideservice.entity.Status;
 import com.modsen.rideservice.exception.InvalidRequestParamException;
 import com.modsen.rideservice.exception.InvalidRideStatusException;
+import com.modsen.rideservice.exception.NoAvailableDriversException;
 import com.modsen.rideservice.exception.RideNotFoundException;
 import com.modsen.rideservice.mapper.RideMapper;
 import com.modsen.rideservice.repository.RideRepository;
@@ -158,13 +159,17 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public RideResponse acceptRide(AcceptRideMessage acceptRequest) {
-        long rideId = acceptRequest.rideId();
-        long driverId = acceptRequest.driverId();
+    public RideResponse acceptRide(AcceptRideMessage acceptRideMessage) {
+        if (acceptRideMessage.driverId() == null) {
+            throw new NoAvailableDriversException();
+        }
+
+        long rideId = acceptRideMessage.rideId();
+        long driverId = acceptRideMessage.driverId();
 
         log.info("Accepting ride order with id {} by driver with id {}", rideId, driverId);
 
-        Ride rideToAccept = rideRepository.findById(acceptRequest.rideId())
+        Ride rideToAccept = rideRepository.findById(acceptRideMessage.rideId())
                 .orElseThrow(() -> {
                     log.error("Ride order with id {} was not found", rideId);
                     return new RideNotFoundException(rideId);

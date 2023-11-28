@@ -3,10 +3,7 @@ package com.modsen.rideservice.controller;
 import com.modsen.rideservice.dto.response.ErrorResponse;
 import com.modsen.rideservice.dto.response.ParamErrorResponse;
 import com.modsen.rideservice.dto.response.ValidationErrorResponse;
-import com.modsen.rideservice.exception.InvalidRequestParamException;
-import com.modsen.rideservice.exception.InvalidRideStatusException;
-import com.modsen.rideservice.exception.RideCreateException;
-import com.modsen.rideservice.exception.RideNotFoundException;
+import com.modsen.rideservice.exception.*;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -36,9 +33,18 @@ public class ControllerAdvice {
 
     @ExceptionHandler(RideCreateException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handlePassengerNotFound(RideCreateException e) {
+    public ErrorResponse handleRideCreate(RideCreateException e) {
         return ErrorResponse.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
+                .message(e.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler(NoAvailableDriversException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleNoAvailableDrivers(NoAvailableDriversException e) {
+        return ErrorResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
                 .message(e.getMessage())
                 .build();
     }

@@ -15,4 +15,5 @@ public class ErrorMessages {
             "Sorting parameter %s is invalid. Acceptable parameters are: %s";
     public final String RIDE_CREATE_ERROR_MESSAGE = "Error creating a ride: %s";
     public final String RESPONSE_HANDLER_MISSING = "Response handler missing for status code: %d, url: %s";
+    public final String NO_AVAILABLE_DRIVERS_MESSAGE = "There are no available drivers. Try again later";
 }
