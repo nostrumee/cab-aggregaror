@@ -8,7 +8,6 @@ public class ErrorMessages {
     public final String REQUEST_PARAM_MISSING_MESSAGE = "Request param missing";
     public final String INVALID_PARAMETER_TYPE_MESSAGE = "Invalid parameter type";
     public final String NOT_FOUND_WITH_ID_MESSAGE = "Ride with id %d was not found";
-    public final String NOT_FINISHED_MESSAGE = "Ride with id %d is not finished yet";
     public final String INVALID_RIDE_STATUS_MESSAGE = "Invalid ride status. For this action ride status must be %s";
     public final String INVALID_PAGE_PARAMETERS_MESSAGE =
             "Page number and size must be equal or greater than 1";

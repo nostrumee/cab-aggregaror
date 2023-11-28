@@ -1,6 +1,6 @@
 package com.modsen.driverservice.dto.message;
 
-public record RideOrderMessage(
+public record CreateRideMessage(
         Long rideId
 ) {
 }

@@ -173,6 +173,10 @@ public class RideController {
             @ApiResponse(responseCode = "404", description = "Ride not found",
                     content = {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    }),
+            @ApiResponse(responseCode = "409", description = "Invalid ride status",
+                    content = {
+                            @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })
     })
     public RideResponse startRide(@PathVariable long id) {
@@ -190,6 +194,10 @@ public class RideController {
             @ApiResponse(responseCode = "404", description = "Ride not found",
                     content = {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    }),
+            @ApiResponse(responseCode = "409", description = "Invalid ride status",
+                    content = {
+                            @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })
     })
     public RideResponse finishRide(@PathVariable long id) {
@@ -205,7 +213,7 @@ public class RideController {
                     content = {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     }),
-            @ApiResponse(responseCode = "409", description = "Ride not finished yet",
+            @ApiResponse(responseCode = "409", description = "Invalid ride status",
                     content = {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })
@@ -226,7 +234,7 @@ public class RideController {
                     content = {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     }),
-            @ApiResponse(responseCode = "409", description = "Ride not finished yet",
+            @ApiResponse(responseCode = "409", description = "Invalid ride status",
                     content = {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })

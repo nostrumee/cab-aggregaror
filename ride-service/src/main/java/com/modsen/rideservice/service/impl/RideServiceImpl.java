@@ -1,9 +1,10 @@
 package com.modsen.rideservice.service.impl;
 
+import com.modsen.rideservice.config.kafka.KafkaProperties;
 import com.modsen.rideservice.dto.message.AcceptRideMessage;
 import com.modsen.rideservice.dto.message.DriverRatingMessage;
 import com.modsen.rideservice.dto.message.PassengerRatingMessage;
-import com.modsen.rideservice.dto.message.RideOrderMessage;
+import com.modsen.rideservice.dto.message.CreateRideMessage;
 import com.modsen.rideservice.dto.request.CreateRideRequest;
 import com.modsen.rideservice.dto.request.RatingRequest;
 import com.modsen.rideservice.dto.response.DriverResponse;
@@ -13,17 +14,18 @@ import com.modsen.rideservice.entity.Ride;
 import com.modsen.rideservice.entity.Status;
 import com.modsen.rideservice.exception.InvalidRequestParamException;
 import com.modsen.rideservice.exception.InvalidRideStatusException;
-import com.modsen.rideservice.exception.RideNotFinishedException;
 import com.modsen.rideservice.exception.RideNotFoundException;
 import com.modsen.rideservice.mapper.RideMapper;
 import com.modsen.rideservice.repository.RideRepository;
 import com.modsen.rideservice.service.DriverService;
 import com.modsen.rideservice.service.RideService;
+import com.modsen.rideservice.service.SendMessageHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -33,7 +35,8 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.modsen.rideservice.util.ErrorMessages.*;
+import static com.modsen.rideservice.util.ErrorMessages.INVALID_PAGE_PARAMETERS_MESSAGE;
+import static com.modsen.rideservice.util.ErrorMessages.INVALID_SORTING_PARAMETER_MESSAGE;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +46,9 @@ public class RideServiceImpl implements RideService {
     private final RideRepository rideRepository;
     private final RideMapper rideMapper;
     private final DriverService driverService;
-
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaProperties kafkaProperties;
+    private final SendMessageHandler handler;
 
     @Override
     public RidePageResponse getRidesPage(int page, int size, String orderBy) {
@@ -130,11 +135,13 @@ public class RideServiceImpl implements RideService {
 
         Ride createdOrder = rideRepository.save(orderToCreate);
 
-        RideOrderMessage orderMessage = RideOrderMessage.builder()
+        CreateRideMessage orderMessage = CreateRideMessage.builder()
                 .rideId(createdOrder.getId())
                 .build();
+
+        handler.handleRideOrderMessage(orderMessage);
+
         // TODO: send message to notification-service about created order
-        // TODO: send order message to 'ride-order' topic
 
         return rideMapper.fromEntityToResponse(createdOrder);
     }
@@ -235,7 +242,7 @@ public class RideServiceImpl implements RideService {
 
         if (!ride.getStatus().equals(Status.FINISHED)) {
             log.error("Ride order with id {} is not finished yet", id);
-            throw new RideNotFinishedException(id);
+            throw new InvalidRideStatusException(Status.FINISHED.name());
         }
 
         DriverRatingMessage ratingMessage = DriverRatingMessage.builder()
@@ -258,7 +265,7 @@ public class RideServiceImpl implements RideService {
 
         if (ride.getStatus().equals(Status.FINISHED)) {
             log.error("Ride order with id {} is not finished yet", id);
-            throw new RideNotFinishedException(id);
+            throw new InvalidRideStatusException(Status.FINISHED.name());
         }
 
         PassengerRatingMessage ratingMessage = PassengerRatingMessage.builder()

@@ -28,3 +28,9 @@ springdoc:
 
 driver-client:
   driver-service-uri: "http://localhost:8082"
+
+kafka:
+  create-ride-topic: create-ride-topic
+  accept-ride-topic: accept-ride-topic
+  bootstrap-servers: localhost:9092
+  group: ${spring.application.name}

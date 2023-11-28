@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.modsen.rideservice.entity.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.NonNull;
@@ -24,45 +27,44 @@ public record RideResponse(
         Long passengerId,
 
         @Schema(name = "Driver id", example = "1")
-        @NonNull
         Long driverId,
 
         @Schema(name = "Start point", example = "Yakuba Kolasa Street, 36")
         @NonNull
         String startPoint,
 
-        @Schema(name = "Destination point", example = "Nesavisimosti Avenue, 4")
+        @Schema(name = "Destination point", example = "Nezavisimosti Avenue, 4")
         @NonNull
         String destinationPoint,
 
+        @Schema(name = "Ride status", example = "FINISHED")
+        @NonNull
+        Status status,
+
         @Schema(name = "Created date", example = "2023-11-14 15:53")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-        @JsonDeserialize(using = LocalDateDeserializer.class)
-        @JsonSerialize(using = LocalDateSerializer.class)
+        @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+        @JsonSerialize(using = LocalDateTimeSerializer.class)
         @NonNull
         LocalDateTime createdDate,
 
         @Schema(name = "Accepted date", example = "2023-11-14 15:53")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-        @JsonDeserialize(using = LocalDateDeserializer.class)
-        @JsonSerialize(using = LocalDateSerializer.class)
-        @NonNull
+        @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+        @JsonSerialize(using = LocalDateTimeSerializer.class)
         LocalDateTime acceptedDate,
 
         @Schema(name = "Start date", example = "2023-11-14 15:53")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-        @JsonDeserialize(using = LocalDateDeserializer.class)
-        @JsonSerialize(using = LocalDateSerializer.class)
-        @NonNull
+        @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+        @JsonSerialize(using = LocalDateTimeSerializer.class)
         LocalDateTime startDate,
 
         @Schema(name = "Finish date", example = "2023-11-14 15:53")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-        @JsonDeserialize(using = LocalDateDeserializer.class)
-        @JsonSerialize(using = LocalDateSerializer.class)
-        @NonNull
+        @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+        @JsonSerialize(using = LocalDateTimeSerializer.class)
         LocalDateTime finishDate,
-
 
         @Schema(name = "Estimated cost", example = "5.3")
         @NonNull

@@ -4,7 +4,7 @@ import com.modsen.rideservice.dto.response.ErrorResponse;
 import com.modsen.rideservice.dto.response.ParamErrorResponse;
 import com.modsen.rideservice.dto.response.ValidationErrorResponse;
 import com.modsen.rideservice.exception.InvalidRequestParamException;
-import com.modsen.rideservice.exception.RideNotFinishedException;
+import com.modsen.rideservice.exception.InvalidRideStatusException;
 import com.modsen.rideservice.exception.RideNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -33,9 +33,9 @@ public class ControllerAdvice {
                 .build();
     }
 
-    @ExceptionHandler(RideNotFinishedException.class)
+    @ExceptionHandler(InvalidRideStatusException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleRideNotFinished(RideNotFinishedException e) {
+    public ErrorResponse handleInvalidRideStatus(InvalidRideStatusException e) {
         return ErrorResponse.builder()
                 .status(HttpStatus.CONFLICT.value())
                 .message(e.getMessage())

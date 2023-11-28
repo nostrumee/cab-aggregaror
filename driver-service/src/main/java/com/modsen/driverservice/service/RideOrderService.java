@@ -1,8 +1,9 @@
 package com.modsen.driverservice.service;
 
-import com.modsen.driverservice.dto.message.RideOrderMessage;
+import com.modsen.driverservice.dto.message.AcceptRideMessage;
+import com.modsen.driverservice.dto.message.CreateRideMessage;
 
 public interface RideOrderService {
 
-    void acceptRideOrder(RideOrderMessage orderMessage);
+    AcceptRideMessage acceptRideOrder(CreateRideMessage orderMessage);
 }

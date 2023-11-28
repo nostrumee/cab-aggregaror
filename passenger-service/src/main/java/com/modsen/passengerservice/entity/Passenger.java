@@ -23,5 +23,5 @@ public class Passenger {
     private String phone;
 
     @Column(precision = 3, scale = 2, columnDefinition = "numeric")
-    private Double rating;
+    private Double rating = 5.0;
 }
