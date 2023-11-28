@@ -31,9 +31,9 @@ public class ControllerAdvice {
                 .build();
     }
 
-    @ExceptionHandler(RideCreateException.class)
+    @ExceptionHandler(PassengerNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleRideCreate(RideCreateException e) {
+    public ErrorResponse handlePassengerNotFound(PassengerNotFoundException e) {
         return ErrorResponse.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(e.getMessage())

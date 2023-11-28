@@ -2,7 +2,7 @@ package com.modsen.rideservice.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.modsen.rideservice.dto.response.ErrorResponse;
-import com.modsen.rideservice.exception.RideCreateException;
+import com.modsen.rideservice.exception.PassengerNotFoundException;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import org.springframework.http.HttpStatus;
@@ -12,7 +12,7 @@ import java.io.InputStream;
 
 import static com.modsen.rideservice.util.ErrorMessages.*;
 
-public class PassengerServiceErrorDecoder implements ErrorDecoder {
+public class PassengerClientErrorDecoder implements ErrorDecoder {
 
     @Override
     public Exception decode(String methodKey, Response response) {
@@ -25,7 +25,7 @@ public class PassengerServiceErrorDecoder implements ErrorDecoder {
 
             if (responseStatus.equals(HttpStatus.NOT_FOUND)) {
                 ErrorResponse errorResponse = mapper.readValue(error, ErrorResponse.class);
-                return new RideCreateException(errorResponse.message());
+                return new PassengerNotFoundException(errorResponse.message());
             } else {
                 return new Exception(
                         String.format(RESPONSE_HANDLER_MISSING,
