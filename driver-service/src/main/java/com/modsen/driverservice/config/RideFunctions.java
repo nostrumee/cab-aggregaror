@@ -15,5 +15,4 @@ public class RideFunctions {
     Function<CreateRideMessage, AcceptRideMessage> acceptRideOrder(RideOrderService rideOrderService) {
         return rideOrderService::acceptRideOrder;
     }
-
 }
