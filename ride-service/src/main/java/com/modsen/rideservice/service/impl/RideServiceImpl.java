@@ -1,6 +1,5 @@
 package com.modsen.rideservice.service.impl;
 
-import com.modsen.rideservice.client.PassengerClient;
 import com.modsen.rideservice.dto.message.AcceptRideMessage;
 import com.modsen.rideservice.dto.message.CreateRideMessage;
 import com.modsen.rideservice.dto.message.DriverRatingMessage;
@@ -139,7 +138,7 @@ public class RideServiceImpl implements RideService {
                 .rideId(createdOrder.getId())
                 .build();
 
-        sendMessageHandler.handleRideOrderMessage(orderMessage);
+        sendMessageHandler.handleCreateRideMessage(orderMessage);
 
         // TODO: send message to notification-service about created order
 

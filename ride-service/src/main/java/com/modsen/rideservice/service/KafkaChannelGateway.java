@@ -11,5 +11,5 @@ public interface KafkaChannelGateway extends SendMessageHandler {
 
     @Override
     @Gateway(requestChannel = CREATE_RIDE_CHANNEL_NAME)
-    void handleRideOrderMessage(CreateRideMessage orderMessage);
+    void handleCreateRideMessage(CreateRideMessage orderMessage);
 }
