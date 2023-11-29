@@ -40,15 +40,6 @@ public class ControllerAdvice {
                 .build();
     }
 
-    @ExceptionHandler(NoAvailableDriversException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNoAvailableDrivers(NoAvailableDriversException e) {
-        return ErrorResponse.builder()
-                .status(HttpStatus.NOT_FOUND.value())
-                .message(e.getMessage())
-                .build();
-    }
-
     @ExceptionHandler(InvalidRideStatusException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleInvalidRideStatus(InvalidRideStatusException e) {

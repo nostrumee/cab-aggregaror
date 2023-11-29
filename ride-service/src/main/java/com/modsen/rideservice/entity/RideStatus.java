@@ -1,8 +1,9 @@
 package com.modsen.rideservice.entity;
 
-public enum Status {
+public enum RideStatus {
     CREATED,
     ACCEPTED,
     STARTED,
-    FINISHED
+    FINISHED,
+    REJECTED
 }

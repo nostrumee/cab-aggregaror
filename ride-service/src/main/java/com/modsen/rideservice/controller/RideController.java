@@ -1,7 +1,6 @@
 package com.modsen.rideservice.controller;
 
 import com.modsen.rideservice.dto.request.CreateRideRequest;
-import com.modsen.rideservice.dto.request.RatingRequest;
 import com.modsen.rideservice.dto.response.*;
 import com.modsen.rideservice.service.RideService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -202,48 +201,6 @@ public class RideController {
     })
     public RideResponse finishRide(@PathVariable long id) {
         return rideService.finishRide(id);
-    }
-
-    @PostMapping("/{rideId}/driver/rate")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Rate a driver")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Driver rated"),
-            @ApiResponse(responseCode = "404", description = "Ride not found",
-                    content = {
-                            @Content(schema = @Schema(implementation = ErrorResponse.class))
-                    }),
-            @ApiResponse(responseCode = "409", description = "Invalid ride status",
-                    content = {
-                            @Content(schema = @Schema(implementation = ErrorResponse.class))
-                    })
-    })
-    public void rateDriver(
-            @PathVariable long rideId,
-            @Valid @RequestBody RatingRequest ratingRequest
-    ) {
-        rideService.rateDriver(ratingRequest, rideId);
-    }
-
-    @PostMapping("/{rideId}/passenger/rate")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Rate a passenger")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Passenger rated"),
-            @ApiResponse(responseCode = "404", description = "Ride not found",
-                    content = {
-                            @Content(schema = @Schema(implementation = ErrorResponse.class))
-                    }),
-            @ApiResponse(responseCode = "409", description = "Invalid ride status",
-                    content = {
-                            @Content(schema = @Schema(implementation = ErrorResponse.class))
-                    })
-    })
-    public void ratePassenger(
-            @PathVariable long rideId,
-            @Valid @RequestBody RatingRequest ratingRequest
-    ) {
-        rideService.ratePassenger(ratingRequest, rideId);
     }
 
     @GetMapping("/{rideId}/driver")

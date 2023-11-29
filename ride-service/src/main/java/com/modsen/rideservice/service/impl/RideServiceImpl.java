@@ -2,18 +2,14 @@ package com.modsen.rideservice.service.impl;
 
 import com.modsen.rideservice.dto.message.AcceptRideMessage;
 import com.modsen.rideservice.dto.message.CreateRideMessage;
-import com.modsen.rideservice.dto.message.DriverRatingMessage;
-import com.modsen.rideservice.dto.message.PassengerRatingMessage;
 import com.modsen.rideservice.dto.request.CreateRideRequest;
-import com.modsen.rideservice.dto.request.RatingRequest;
 import com.modsen.rideservice.dto.response.DriverResponse;
 import com.modsen.rideservice.dto.response.RidePageResponse;
 import com.modsen.rideservice.dto.response.RideResponse;
 import com.modsen.rideservice.entity.Ride;
-import com.modsen.rideservice.entity.Status;
+import com.modsen.rideservice.entity.RideStatus;
 import com.modsen.rideservice.exception.InvalidRequestParamException;
 import com.modsen.rideservice.exception.InvalidRideStatusException;
-import com.modsen.rideservice.exception.NoAvailableDriversException;
 import com.modsen.rideservice.exception.RideNotFoundException;
 import com.modsen.rideservice.mapper.RideMapper;
 import com.modsen.rideservice.repository.RideRepository;
@@ -73,7 +69,7 @@ public class RideServiceImpl implements RideService {
         log.info("Retrieving rides for driver with id {}", driverId);
 
         PageRequest pageRequest = getPageRequest(page, size, orderBy);
-        Page<Ride> ridesPage = rideRepository.findAllByDriverIdAndStatus(driverId, Status.FINISHED, pageRequest);
+        Page<Ride> ridesPage = rideRepository.findAllByDriverIdAndStatus(driverId, RideStatus.FINISHED, pageRequest);
 
         List<Ride> retrievedRides = ridesPage.getContent();
         Long total = ridesPage.getTotalElements();
@@ -93,7 +89,7 @@ public class RideServiceImpl implements RideService {
         log.info("Retrieving rides for passenger with id {}", passengerId);
 
         PageRequest pageRequest = getPageRequest(page, size, orderBy);
-        Page<Ride> ridesPage = rideRepository.findAllByPassengerIdAndStatus(passengerId, Status.FINISHED, pageRequest);
+        Page<Ride> ridesPage = rideRepository.findAllByPassengerIdAndStatus(passengerId, RideStatus.FINISHED, pageRequest);
 
         List<Ride> retrievedRides = ridesPage.getContent();
         Long total = ridesPage.getTotalElements();
@@ -129,7 +125,7 @@ public class RideServiceImpl implements RideService {
         passengerService.getPassengerById(createRequest.passengerId());
 
         Ride orderToCreate = rideMapper.fromCreateRequestToEntity(createRequest);
-        orderToCreate.setStatus(Status.CREATED);
+        orderToCreate.setStatus(RideStatus.CREATED);
         orderToCreate.setCreatedDate(LocalDateTime.now());
         orderToCreate.setEstimatedCost(getRideCost());
 
@@ -159,29 +155,31 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public RideResponse acceptRide(AcceptRideMessage acceptRideMessage) {
-        if (acceptRideMessage.driverId() == null) {
-            throw new NoAvailableDriversException();
-        }
-
+    public void acceptRide(AcceptRideMessage acceptRideMessage) {
         long rideId = acceptRideMessage.rideId();
-        long driverId = acceptRideMessage.driverId();
 
-        log.info("Accepting ride order with id {} by driver with id {}", rideId, driverId);
-
-        Ride rideToAccept = rideRepository.findById(acceptRideMessage.rideId())
+        Ride ride = rideRepository.findById(rideId)
                 .orElseThrow(() -> {
                     log.error("Ride order with id {} was not found", rideId);
                     return new RideNotFoundException(rideId);
                 });
 
-        rideToAccept.setStatus(Status.ACCEPTED);
-        rideToAccept.setAcceptedDate(LocalDateTime.now());
-        Ride acceptedOrder = rideRepository.save(rideToAccept);
+        if (acceptRideMessage.driverId() == null) {
+            log.info("Rejecting a ride with id {} as there no available drivers", rideId);
 
-        // TODO: send message to notification-service about accepted order
+            ride.setStatus(RideStatus.REJECTED);
+            rideRepository.save(ride);
 
-        return rideMapper.fromEntityToResponse(acceptedOrder);
+            // TODO: send message to notification-service about rejected ride
+        } else {
+            log.info("Accepting ride order with id {} by driver with id {}", rideId, acceptRideMessage.driverId());
+
+            ride.setStatus(RideStatus.ACCEPTED);
+            ride.setAcceptedDate(LocalDateTime.now());
+            rideRepository.save(ride);
+
+            // TODO: send message to notification-service about accepted ride
+        }
     }
 
     @Override
@@ -194,12 +192,12 @@ public class RideServiceImpl implements RideService {
                     return new RideNotFoundException(id);
                 });
 
-        if (!rideToStart.getStatus().equals(Status.ACCEPTED)) {
+        if (!rideToStart.getStatus().equals(RideStatus.ACCEPTED)) {
             log.error("Invalid ride status");
-            throw new InvalidRideStatusException(Status.ACCEPTED.name());
+            throw new InvalidRideStatusException(RideStatus.ACCEPTED.name());
         }
 
-        rideToStart.setStatus(Status.STARTED);
+        rideToStart.setStatus(RideStatus.STARTED);
         rideToStart.setStartDate(LocalDateTime.now());
         Ride startedRide = rideRepository.save(rideToStart);
 
@@ -218,12 +216,12 @@ public class RideServiceImpl implements RideService {
                     return new RideNotFoundException(id);
                 });
 
-        if (!rideToFinish.getStatus().equals(Status.STARTED)) {
+        if (!rideToFinish.getStatus().equals(RideStatus.STARTED)) {
             log.error("Invalid ride status");
-            throw new InvalidRideStatusException(Status.STARTED.name());
+            throw new InvalidRideStatusException(RideStatus.STARTED.name());
         }
 
-        rideToFinish.setStatus(Status.FINISHED);
+        rideToFinish.setStatus(RideStatus.FINISHED);
         rideToFinish.setFinishDate(LocalDateTime.now());
         Ride finishedRide = rideRepository.save(rideToFinish);
 
@@ -231,52 +229,6 @@ public class RideServiceImpl implements RideService {
         // TODO: send message to driver-service to make driver status available
 
         return rideMapper.fromEntityToResponse(finishedRide);
-    }
-
-    @Override
-    public void rateDriver(RatingRequest ratingRequest, long id) {
-        log.info("Rating a driver of ride with id {}", id);
-
-        Ride ride = rideRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Ride order with id {} was not found", id);
-                    return new RideNotFoundException(id);
-                });
-
-        if (!ride.getStatus().equals(Status.FINISHED)) {
-            log.error("Ride order with id {} is not finished yet", id);
-            throw new InvalidRideStatusException(Status.FINISHED.name());
-        }
-
-        DriverRatingMessage ratingMessage = DriverRatingMessage.builder()
-                .rideId(id)
-                .driverId(ride.getDriverId())
-                .rating(ratingRequest.rating())
-                .build();
-        // TODO: send rating message to 'rate-driver' topic
-    }
-
-    @Override
-    public void ratePassenger(RatingRequest ratingRequest, long id) {
-        log.info("Rating a passenger of ride with id {}", id);
-
-        Ride ride = rideRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Ride order with id {} was not found", id);
-                    return new RideNotFoundException(id);
-                });
-
-        if (ride.getStatus().equals(Status.FINISHED)) {
-            log.error("Ride order with id {} is not finished yet", id);
-            throw new InvalidRideStatusException(Status.FINISHED.name());
-        }
-
-        PassengerRatingMessage ratingMessage = PassengerRatingMessage.builder()
-                .rideId(id)
-                .passengerId(ride.getDriverId())
-                .rating(ratingRequest.rating())
-                .build();
-        // TODO: send rating message to 'rate-passenger' topic
     }
 
     @Override

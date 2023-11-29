@@ -3,11 +3,9 @@ package com.modsen.rideservice.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.modsen.rideservice.entity.Status;
+import com.modsen.rideservice.entity.RideStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.NonNull;
@@ -39,7 +37,7 @@ public record RideResponse(
 
         @Schema(name = "Ride status", example = "FINISHED")
         @NonNull
-        Status status,
+        RideStatus status,
 
         @Schema(name = "Created date", example = "2023-11-14 15:53")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
