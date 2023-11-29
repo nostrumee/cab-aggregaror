@@ -19,6 +19,7 @@ import com.modsen.rideservice.exception.RideNotFoundException;
 import com.modsen.rideservice.mapper.RideMapper;
 import com.modsen.rideservice.repository.RideRepository;
 import com.modsen.rideservice.service.DriverService;
+import com.modsen.rideservice.service.PassengerService;
 import com.modsen.rideservice.service.RideService;
 import com.modsen.rideservice.service.SendMessageHandler;
 import lombok.RequiredArgsConstructor;
@@ -45,8 +46,8 @@ public class RideServiceImpl implements RideService {
     private final RideRepository rideRepository;
     private final RideMapper rideMapper;
     private final DriverService driverService;
+    private final PassengerService passengerService;
     private final SendMessageHandler sendMessageHandler;
-    private final PassengerClient passengerClient;
 
     @Override
     public RidePageResponse getRidesPage(int page, int size, String orderBy) {
@@ -126,7 +127,7 @@ public class RideServiceImpl implements RideService {
     public RideResponse createRide(CreateRideRequest createRequest) {
         log.info("Creating ride order for passenger with id {}", createRequest.passengerId());
 
-        passengerClient.getPassenger(createRequest.passengerId());
+        passengerService.getPassengerById(createRequest.passengerId());
 
         Ride orderToCreate = rideMapper.fromCreateRequestToEntity(createRequest);
         orderToCreate.setStatus(Status.CREATED);

@@ -34,17 +34,15 @@ spring:
         acceptRideOrder-out-0:
           destination: ${kafka.accept-ride-topic}
       kafka:
-        bindings:
-          acceptRideOrder-out-0:
-            producer:
-              configuration:
-                value:
-                  serializer: org.springframework.kafka.support.serializer.JsonSerializer
-                key:
-                  serializer: org.apache.kafka.common.serialization.StringSerializer
         binder:
           brokers:
             - ${kafka.bootstrap-servers}
+          configuration:
+            value:
+              serializer: org.springframework.kafka.support.serializer.JsonSerializer
+            key:
+              serializer: org.apache.kafka.common.serialization.StringSerializer
+
 
 springdoc:
   override-with-generic-response: false
