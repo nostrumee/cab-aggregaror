@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 public class PassengerClientConfig {
 
     @Bean
-    public ErrorDecoder passengerServiceErrorDecoder() {
+    public ErrorDecoder passengerClientErrorDecoder() {
         return new PassengerClientErrorDecoder();
     }
 }
