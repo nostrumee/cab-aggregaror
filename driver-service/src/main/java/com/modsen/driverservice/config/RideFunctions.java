@@ -18,9 +18,4 @@ public class RideFunctions {
     Function<CreateRideMessage, AcceptRideMessage> acceptRideOrder(RideOrderService rideOrderService) {
         return rideOrderService::acceptRideOrder;
     }
-
-    @Bean
-    Consumer<UpdateDriverRatingMessage> updateDriverRating(DriverService driverService) {
-        return driverService::updateDriverRating;
-    }
 }

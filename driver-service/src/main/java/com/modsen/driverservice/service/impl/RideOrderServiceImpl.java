@@ -33,7 +33,6 @@ public class RideOrderServiceImpl implements RideOrderService {
             DriverResponse driver = availableDrivers.get(random.nextInt(availableDrivers.size()));
             driverService.setDriverStatus(driver.id(), Status.UNAVAILABLE);
             driverId = driver.id();
-
         }
 
         return AcceptRideMessage.builder()
