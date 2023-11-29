@@ -14,6 +14,7 @@ import com.modsen.ratingservice.repository.DriverRatingRepository;
 import com.modsen.ratingservice.repository.PassengerRatingRepository;
 import com.modsen.ratingservice.service.RatingService;
 import com.modsen.ratingservice.service.RideService;
+import com.modsen.ratingservice.service.SendMessageHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class RatingServiceImpl implements RatingService {
     private final PassengerRatingRepository passengerRatingRepository;
     private final DriverRatingRepository driverRatingRepository;
     private final RideService rideService;
+    private final SendMessageHandler sendMessageHandler;
     private final RatingMapper ratingMapper;
 
     @Override
@@ -51,7 +53,7 @@ public class RatingServiceImpl implements RatingService {
                 .rating(updatedRating.setScale(2, RoundingMode.HALF_UP).doubleValue())
                 .build();
 
-        // TODO: send it to update-passenger-rating topic
+        sendMessageHandler.handleUpdatePassengerRatingMessage(updateRatingMessage);
     }
 
     @Override
@@ -69,6 +71,6 @@ public class RatingServiceImpl implements RatingService {
                 .rating(updatedRating.setScale(2, RoundingMode.HALF_UP).doubleValue())
                 .build();
 
-        // TODO: send it to update-driver-rating topic
+        sendMessageHandler.handleUpdateDriverRatingMessage(updateMessage);
     }
 }

@@ -19,4 +19,10 @@ public class KafkaTopicsConfig {
         return TopicBuilder.name(kafkaProperties.acceptRideTopic())
                 .build();
     }
+
+    @Bean
+    public NewTopic updateDriverRatingTopic(KafkaProperties kafkaProperties) {
+        return TopicBuilder.name(kafkaProperties.updateDriverRatingTopic())
+                .build();
+    }
 }

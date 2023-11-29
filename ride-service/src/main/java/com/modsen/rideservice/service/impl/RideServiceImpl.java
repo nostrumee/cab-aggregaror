@@ -174,6 +174,7 @@ public class RideServiceImpl implements RideService {
         } else {
             log.info("Accepting ride order with id {} by driver with id {}", rideId, acceptRideMessage.driverId());
 
+            ride.setDriverId(acceptRideMessage.driverId());
             ride.setStatus(RideStatus.ACCEPTED);
             ride.setAcceptedDate(LocalDateTime.now());
             rideRepository.save(ride);

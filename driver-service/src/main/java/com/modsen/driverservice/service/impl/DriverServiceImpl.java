@@ -1,5 +1,6 @@
 package com.modsen.driverservice.service.impl;
 
+import com.modsen.driverservice.dto.message.UpdateDriverRatingMessage;
 import com.modsen.driverservice.dto.request.CreateDriverRequest;
 import com.modsen.driverservice.dto.request.UpdateDriverRequest;
 import com.modsen.driverservice.dto.response.DriverPageResponse;
@@ -125,6 +126,22 @@ public class DriverServiceImpl implements DriverService {
                 });
 
         driver.setStatus(status);
+        driverRepository.save(driver);
+    }
+
+    @Override
+    public void updateDriverRating(UpdateDriverRatingMessage updateRatingMessage) {
+        long id = updateRatingMessage.driverId();
+
+        log.info("Updating rating of driver with id {}", id);
+
+        Driver driver = driverRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Driver with id {} was not found", id);
+                    return new DriverNotFoundException(id);
+                });
+
+        driver.setRating(updateRatingMessage.rating());
         driverRepository.save(driver);
     }
 
