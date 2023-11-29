@@ -1,4 +1,4 @@
-package com.modsen.ratingservice.message;
+package com.modsen.ratingservice.dto.message;
 
 import lombok.Builder;
 

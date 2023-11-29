@@ -1,11 +1,11 @@
 package com.modsen.ratingservice.service;
 
-import com.modsen.ratingservice.message.DriverRatingMessage;
-import com.modsen.ratingservice.message.PassengerRatingMessage;
+import com.modsen.ratingservice.dto.request.DriverRatingRequest;
+import com.modsen.ratingservice.dto.request.PassengerRatingRequest;
 
 public interface RatingService {
 
-    void ratePassenger(PassengerRatingMessage ratingMessage);
+    void ratePassenger(PassengerRatingRequest ratingRequest);
 
-    void rateDriver(DriverRatingMessage ratingMessage);
+    void rateDriver(DriverRatingRequest ratingMessage);
 }

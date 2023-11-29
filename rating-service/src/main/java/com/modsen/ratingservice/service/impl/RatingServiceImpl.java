@@ -1,15 +1,19 @@
 package com.modsen.ratingservice.service.impl;
 
-import com.modsen.ratingservice.message.DriverRatingMessage;
-import com.modsen.ratingservice.message.PassengerRatingMessage;
+import com.modsen.ratingservice.dto.request.DriverRatingRequest;
+import com.modsen.ratingservice.dto.request.PassengerRatingRequest;
+import com.modsen.ratingservice.dto.response.RideResponse;
 import com.modsen.ratingservice.entity.DriverRating;
 import com.modsen.ratingservice.entity.PassengerRating;
+import com.modsen.ratingservice.entity.RideStatus;
+import com.modsen.ratingservice.exception.InvalidRideStatusException;
 import com.modsen.ratingservice.mapper.RatingMapper;
-import com.modsen.ratingservice.message.UpdateDriverRatingMessage;
-import com.modsen.ratingservice.message.UpdatePassengerRatingMessage;
+import com.modsen.ratingservice.dto.message.UpdateDriverRatingMessage;
+import com.modsen.ratingservice.dto.message.UpdatePassengerRatingMessage;
 import com.modsen.ratingservice.repository.DriverRatingRepository;
 import com.modsen.ratingservice.repository.PassengerRatingRepository;
 import com.modsen.ratingservice.service.RatingService;
+import com.modsen.ratingservice.service.RideService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,18 +28,26 @@ public class RatingServiceImpl implements RatingService {
 
     private final PassengerRatingRepository passengerRatingRepository;
     private final DriverRatingRepository driverRatingRepository;
+    private final RideService rideService;
     private final RatingMapper ratingMapper;
 
     @Override
-    public void ratePassenger(PassengerRatingMessage ratingMessage) {
-        log.info("Rating a passenger with id {} for a ride with id {}", ratingMessage.passengerId(), ratingMessage.rideId());
+    public void ratePassenger(PassengerRatingRequest ratingRequest) {
+        log.info("Rating a passenger of a ride with id {}", ratingRequest.rideId());
 
-        PassengerRating ratingToAdd = ratingMapper.fromRatingMessageToPassengerRating(ratingMessage);
+        RideResponse rideResponse = rideService.getRideById(ratingRequest.rideId());
+
+        if (rideResponse.status().equals(RideStatus.FINISHED)) {
+            log.error("Ride order with id {} is not finished yet", ratingRequest.rideId());
+            throw new InvalidRideStatusException(RideStatus.FINISHED.name());
+        }
+
+        PassengerRating ratingToAdd = ratingMapper.fromRideResponseAndRatingRequest(rideResponse, ratingRequest);
         passengerRatingRepository.save(ratingToAdd);
 
-        BigDecimal updatedRating = passengerRatingRepository.findPassengerRating(ratingMessage.passengerId());
-        UpdatePassengerRatingMessage updateMessage = UpdatePassengerRatingMessage.builder()
-                .passengerId(ratingMessage.passengerId())
+        BigDecimal updatedRating = passengerRatingRepository.findPassengerRating(rideResponse.passengerId());
+        UpdatePassengerRatingMessage updateRatingMessage = UpdatePassengerRatingMessage.builder()
+                .passengerId(rideResponse.passengerId())
                 .rating(updatedRating.setScale(2, RoundingMode.HALF_UP).doubleValue())
                 .build();
 
@@ -43,15 +55,17 @@ public class RatingServiceImpl implements RatingService {
     }
 
     @Override
-    public void rateDriver(DriverRatingMessage ratingMessage) {
-        log.info("Rating a driver with id {} for a ride with id {}", ratingMessage.driverId(), ratingMessage.rideId());
+    public void rateDriver(DriverRatingRequest ratingRequest) {
+        log.info("Rating a driver of a ride with id {}", ratingRequest.rideId());
 
-        DriverRating ratingToAdd = ratingMapper.fromRatingMessageToDriverRating(ratingMessage);
+        RideResponse rideResponse = rideService.getRideById(ratingRequest.rideId());
+
+        DriverRating ratingToAdd = ratingMapper.fromRideResponseAndRatingRequest(rideResponse, ratingRequest);
         driverRatingRepository.save(ratingToAdd);
 
-        BigDecimal updatedRating = driverRatingRepository.findDriverRating(ratingMessage.driverId());
+        BigDecimal updatedRating = driverRatingRepository.findDriverRating(rideResponse.driverId());
         UpdateDriverRatingMessage updateMessage = UpdateDriverRatingMessage.builder()
-                .driverId(ratingMessage.driverId())
+                .driverId(rideResponse.driverId())
                 .rating(updatedRating.setScale(2, RoundingMode.HALF_UP).doubleValue())
                 .build();
 
