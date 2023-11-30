@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record KafkaProperties(
         String group,
         String bootstrapServers,
-        String createRideTopic,
-        String acceptRideTopic
+        String createRideTopicName,
+        String acceptRideTopicName
 ) {
 }

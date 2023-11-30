@@ -48,6 +48,6 @@ springdoc:
   override-with-generic-response: false
 
 kafka:
-  create-ride-topic: create-ride-topic
-  accept-ride-topic: accept-ride-topic
+  create-ride-topic-name: create-ride-topic
+  accept-ride-topic-name: accept-ride-topic
   bootstrap-servers: localhost:9092

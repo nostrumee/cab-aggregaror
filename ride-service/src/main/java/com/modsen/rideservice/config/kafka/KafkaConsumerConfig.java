@@ -35,7 +35,7 @@ public class KafkaConsumerConfig {
 
     @Bean
     public IntegrationFlow consumeFromKafka(ConsumerFactory<String, String> consumerFactory, RideService rideService) {
-        return IntegrationFlow.from(Kafka.messageDrivenChannelAdapter(consumerFactory, kafkaProperties.acceptRideTopic()))
+        return IntegrationFlow.from(Kafka.messageDrivenChannelAdapter(consumerFactory, kafkaProperties.acceptRideTopicName()))
                 .handle(receiveMessageHandler(rideService), HANDLE_ACCEPT_RIDE_METHOD_NAME)
                 .get();
     }

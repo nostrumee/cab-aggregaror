@@ -28,7 +28,7 @@ public class KafkaProducerConfig {
         return f -> f.channel(createRideChannel())
                 .handle(Kafka.outboundChannelAdapter(kafkaTemplate())
                         .messageKey(m -> m.getHeaders().get(IntegrationMessageHeaderAccessor.SEQUENCE_NUMBER))
-                        .topic(kafkaProperties.createRideTopic()));
+                        .topic(kafkaProperties.createRideTopicName()));
     }
 
     @Bean
