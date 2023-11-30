@@ -2,8 +2,10 @@ package com.modsen.rideservice.service.impl;
 
 import com.modsen.rideservice.dto.message.AcceptRideMessage;
 import com.modsen.rideservice.dto.message.CreateRideMessage;
+import com.modsen.rideservice.dto.message.RideStatusMessage;
 import com.modsen.rideservice.dto.request.CreateRideRequest;
 import com.modsen.rideservice.dto.response.DriverResponse;
+import com.modsen.rideservice.dto.response.PassengerResponse;
 import com.modsen.rideservice.dto.response.RidePageResponse;
 import com.modsen.rideservice.dto.response.RideResponse;
 import com.modsen.rideservice.entity.Ride;
@@ -11,6 +13,7 @@ import com.modsen.rideservice.entity.RideStatus;
 import com.modsen.rideservice.exception.InvalidRequestParamException;
 import com.modsen.rideservice.exception.InvalidRideStatusException;
 import com.modsen.rideservice.exception.RideNotFoundException;
+import com.modsen.rideservice.mapper.MessageMapper;
 import com.modsen.rideservice.mapper.RideMapper;
 import com.modsen.rideservice.repository.RideRepository;
 import com.modsen.rideservice.service.DriverService;
@@ -31,7 +34,8 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.modsen.rideservice.util.ErrorMessages.*;
+import static com.modsen.rideservice.util.ErrorMessages.INVALID_PAGE_PARAMETERS_MESSAGE;
+import static com.modsen.rideservice.util.ErrorMessages.INVALID_SORTING_PARAMETER_MESSAGE;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +44,7 @@ public class RideServiceImpl implements RideService {
 
     private final RideRepository rideRepository;
     private final RideMapper rideMapper;
+    private final MessageMapper messageMapper
     private final DriverService driverService;
     private final PassengerService passengerService;
     private final SendMessageHandler sendMessageHandler;
@@ -133,10 +138,7 @@ public class RideServiceImpl implements RideService {
         CreateRideMessage orderMessage = CreateRideMessage.builder()
                 .rideId(createdOrder.getId())
                 .build();
-
         sendMessageHandler.handleCreateRideMessage(orderMessage);
-
-        // TODO: send message to notification-service about created order
 
         return rideMapper.fromEntityToResponse(createdOrder);
     }
@@ -163,6 +165,15 @@ public class RideServiceImpl implements RideService {
                     log.error("Ride order with id {} was not found", rideId);
                     return new RideNotFoundException(rideId);
                 });
+        PassengerResponse passenger = passengerService.getPassengerById(ride.getPassengerId());
+
+        RideStatusMessage.RideStatusMessageBuilder rideStatusMessageBuilder = RideStatusMessage.builder()
+                .rideId(rideId)
+                .passengerEmail(passenger.email())
+                .passengerFirstName(passenger.firstName())
+                .startPoint(ride.getStartPoint())
+                .destinationPoint(ride.getDestinationPoint())
+                .estimatedCost(ride.getEstimatedCost());
 
         if (acceptRideMessage.driverId() == null) {
             log.info("Rejecting a ride with id {} as there no available drivers", rideId);
@@ -170,7 +181,10 @@ public class RideServiceImpl implements RideService {
             ride.setStatus(RideStatus.REJECTED);
             rideRepository.save(ride);
 
-            // TODO: send message to notification-service about rejected ride
+            RideStatusMessage rideStatusMessage = rideStatusMessageBuilder
+                    .status(RideStatus.REJECTED)
+                    .build();
+            sendMessageHandler.handleRideStatusMessage(rideStatusMessage);
         } else {
             log.info("Accepting ride order with id {} by driver with id {}", rideId, acceptRideMessage.driverId());
 
@@ -179,7 +193,10 @@ public class RideServiceImpl implements RideService {
             ride.setAcceptedDate(LocalDateTime.now());
             rideRepository.save(ride);
 
-            // TODO: send message to notification-service about accepted ride
+            RideStatusMessage rideStatusMessage = rideStatusMessageBuilder
+                    .status(RideStatus.ACCEPTED)
+                    .build();
+            sendMessageHandler.handleRideStatusMessage(rideStatusMessage);
         }
     }
 
@@ -198,11 +215,15 @@ public class RideServiceImpl implements RideService {
             throw new InvalidRideStatusException(RideStatus.ACCEPTED.name());
         }
 
+        PassengerResponse passenger = passengerService.getPassengerById(rideToStart.getPassengerId());
+
         rideToStart.setStatus(RideStatus.STARTED);
         rideToStart.setStartDate(LocalDateTime.now());
         Ride startedRide = rideRepository.save(rideToStart);
 
-        // TODO: send message to notification-service about started ride
+        RideStatusMessage rideStatusMessage =
+                messageMapper.fromRideAndPassengerResponse(rideToStart, passenger);
+        sendMessageHandler.handleRideStatusMessage(rideStatusMessage);
 
         return rideMapper.fromEntityToResponse(startedRide);
     }
@@ -222,11 +243,15 @@ public class RideServiceImpl implements RideService {
             throw new InvalidRideStatusException(RideStatus.STARTED.name());
         }
 
+        PassengerResponse passenger = passengerService.getPassengerById(rideToFinish.getPassengerId());
+
         rideToFinish.setStatus(RideStatus.FINISHED);
         rideToFinish.setFinishDate(LocalDateTime.now());
         Ride finishedRide = rideRepository.save(rideToFinish);
 
-        // TODO: send message to notification-service about finished ride
+        RideStatusMessage rideStatusMessage =
+                messageMapper.fromRideAndPassengerResponse(rideToFinish, passenger);
+        sendMessageHandler.handleRideStatusMessage(rideStatusMessage);
         // TODO: send message to driver-service to make driver status available
 
         return rideMapper.fromEntityToResponse(finishedRide);

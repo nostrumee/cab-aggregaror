@@ -7,6 +7,7 @@ public record KafkaProperties(
         String groupId,
         String bootstrapServers,
         String createRideTopicName,
-        String acceptRideTopicName
+        String acceptRideTopicName,
+        String rideStatusTopicName
 ) {
 }
