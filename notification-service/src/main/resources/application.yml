@@ -19,3 +19,8 @@ spring:
           auth: true
           starttls:
             enable: true
+
+kafka:
+  bootstrap-servers: localhost:9092
+  ride-status-topic-name: ride-status-topic
+  group-id: ${spring.application.name}
