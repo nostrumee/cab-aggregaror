@@ -34,6 +34,6 @@ springdoc:
   override-with-generic-response: false
 
 kafka:
-  update-passenger-rating-topic: update-passenger-rating-topic
-  update-driver-rating-topic: update-driver-rating-topic
+  update-passenger-rating-topic-name: update-passenger-rating-topic
+  update-driver-rating-topic-name: update-driver-rating-topic
   bootstrap-servers: localhost:9092

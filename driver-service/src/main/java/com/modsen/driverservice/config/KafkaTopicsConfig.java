@@ -10,19 +10,19 @@ public class KafkaTopicsConfig {
 
     @Bean
     public NewTopic createRideTopic(KafkaProperties kafkaProperties) {
-        return TopicBuilder.name(kafkaProperties.createRideTopic())
+        return TopicBuilder.name(kafkaProperties.createRideTopicName())
                 .build();
     }
 
     @Bean
     public NewTopic acceptRideTopic(KafkaProperties kafkaProperties) {
-        return TopicBuilder.name(kafkaProperties.acceptRideTopic())
+        return TopicBuilder.name(kafkaProperties.acceptRideTopicName())
                 .build();
     }
 
     @Bean
     public NewTopic updateDriverRatingTopic(KafkaProperties kafkaProperties) {
-        return TopicBuilder.name(kafkaProperties.updateDriverRatingTopic())
+        return TopicBuilder.name(kafkaProperties.updateDriverRatingTopicName())
                 .build();
     }
 }

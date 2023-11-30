@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "kafka")
 public record KafkaProperties(
         String bootstrapServers,
-        String updatePassengerRatingTopic,
-        String updateDriverRatingTopic
+        String updatePassengerRatingTopicName,
+        String updateDriverRatingTopicName
 ) {
 }

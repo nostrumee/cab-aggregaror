@@ -35,7 +35,7 @@ public class KafkaConsumerConfig {
 
     @Bean
     public IntegrationFlow consumeFromKafka(ConsumerFactory<String, String> consumerFactory, RideService rideService) {
-        return IntegrationFlow.from(Kafka.messageDrivenChannelAdapter(consumerFactory, kafkaProperties.acceptRideTopic()))
+        return IntegrationFlow.from(Kafka.messageDrivenChannelAdapter(consumerFactory, kafkaProperties.acceptRideTopicName()))
                 .handle(receiveMessageHandler(rideService), HANDLE_ACCEPT_RIDE_METHOD_NAME)
                 .get();
     }
@@ -51,7 +51,7 @@ public class KafkaConsumerConfig {
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.bootstrapServers(),
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class,
-                ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.group(),
+                ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.groupId(),
                 JsonDeserializer.TRUSTED_PACKAGES, "*"
         );
     }

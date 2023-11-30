@@ -10,7 +10,7 @@ public class KafkaTopicsConfig {
 
     @Bean
     public NewTopic updatePassengerRatingTopic(KafkaProperties kafkaProperties) {
-        return TopicBuilder.name(kafkaProperties.updatePassengerRatingTopic())
+        return TopicBuilder.name(kafkaProperties.updatePassengerRatingTopicName())
                 .build();
     }
 }

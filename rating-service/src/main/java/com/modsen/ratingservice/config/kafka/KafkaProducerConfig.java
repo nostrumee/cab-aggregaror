@@ -28,7 +28,7 @@ public class KafkaProducerConfig {
         return f -> f.channel(updatePassengerRatingChannel())
                 .handle(Kafka.outboundChannelAdapter(kafkaTemplate())
                         .messageKey(m -> m.getHeaders().get(IntegrationMessageHeaderAccessor.SEQUENCE_NUMBER))
-                        .topic(kafkaProperties.updatePassengerRatingTopic()));
+                        .topic(kafkaProperties.updatePassengerRatingTopicName()));
     }
 
     @Bean
@@ -36,7 +36,7 @@ public class KafkaProducerConfig {
         return f -> f.channel(updateDriverRatingChannel())
                 .handle(Kafka.outboundChannelAdapter(kafkaTemplate())
                         .messageKey(m -> m.getHeaders().get(IntegrationMessageHeaderAccessor.SEQUENCE_NUMBER))
-                        .topic(kafkaProperties.updateDriverRatingTopic()));
+                        .topic(kafkaProperties.updateDriverRatingTopicName()));
     }
 
     @Bean
