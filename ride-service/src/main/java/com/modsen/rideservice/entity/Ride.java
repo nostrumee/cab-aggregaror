@@ -25,7 +25,7 @@ public class Ride {
     private String destinationPoint;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private RideStatus status;
 
     private LocalDateTime createdDate;
 

@@ -24,8 +24,8 @@ public class Driver {
     private String phone;
 
     @Column(precision = 3, scale = 2, columnDefinition = "numeric")
-    private Double rating;
+    private Double rating = 5.0;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.AVAILABLE;
 }

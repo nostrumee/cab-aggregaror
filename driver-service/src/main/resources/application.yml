@@ -23,20 +23,31 @@ spring:
   liquibase:
     change-log: db/changelog/changelog-master.xml
 
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: cab.aggregator.notification@gmail.com
-    password: ftkhczeqidieyauo
-    properties:
-      mail:
-        debug: false
-        transport:
-          protocol: smtp
-        smtp:
-          auth: true
-          starttls:
-            enable: true
+  cloud:
+    function:
+      definition: acceptRideOrder
+    stream:
+      bindings:
+        acceptRideOrder-in-0:
+          destination: ${kafka.create-ride-topic}
+          group: ${spring.application.name}
+        acceptRideOrder-out-0:
+          destination: ${kafka.accept-ride-topic}
+      kafka:
+        binder:
+          brokers:
+            - ${kafka.bootstrap-servers}
+          configuration:
+            value:
+              serializer: org.springframework.kafka.support.serializer.JsonSerializer
+            key:
+              serializer: org.apache.kafka.common.serialization.StringSerializer
+
 
 springdoc:
   override-with-generic-response: false
+
+kafka:
+  create-ride-topic-name: create-ride-topic
+  accept-ride-topic-name: accept-ride-topic
+  bootstrap-servers: localhost:9092

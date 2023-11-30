@@ -23,8 +23,21 @@ spring:
   liquibase:
     change-log: db/changelog/changelog-master.xml
 
+  cloud:
+    openfeign:
+      client:
+        config:
+          passenger:
+            url: http://localhost:8081/api/v1/passengers
+
 springdoc:
   override-with-generic-response: false
 
 driver-client:
-  driver-service-uri: "http://localhost:8082"
+  driver-service-uri: http://localhost:8082
+
+kafka:
+  create-ride-topic-name: create-ride-topic
+  accept-ride-topic-name: accept-ride-topic
+  bootstrap-servers: localhost:9092
+  group: ${spring.application.name}

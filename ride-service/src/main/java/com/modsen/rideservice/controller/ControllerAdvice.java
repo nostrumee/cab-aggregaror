@@ -3,9 +3,7 @@ package com.modsen.rideservice.controller;
 import com.modsen.rideservice.dto.response.ErrorResponse;
 import com.modsen.rideservice.dto.response.ParamErrorResponse;
 import com.modsen.rideservice.dto.response.ValidationErrorResponse;
-import com.modsen.rideservice.exception.InvalidRequestParamException;
-import com.modsen.rideservice.exception.RideNotFinishedException;
-import com.modsen.rideservice.exception.RideNotFoundException;
+import com.modsen.rideservice.exception.*;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -33,9 +31,18 @@ public class ControllerAdvice {
                 .build();
     }
 
-    @ExceptionHandler(RideNotFinishedException.class)
+    @ExceptionHandler(PassengerNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handlePassengerNotFound(PassengerNotFoundException e) {
+        return ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message(e.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler(InvalidRideStatusException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleRideNotFinished(RideNotFinishedException e) {
+    public ErrorResponse handleInvalidRideStatus(InvalidRideStatusException e) {
         return ErrorResponse.builder()
                 .status(HttpStatus.CONFLICT.value())
                 .message(e.getMessage())
@@ -106,6 +113,15 @@ public class ControllerAdvice {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(INVALID_PARAMETER_TYPE_MESSAGE)
                 .errors(error)
+                .build();
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleException(Exception e) {
+        return ErrorResponse.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .message(e.getMessage())
                 .build();
     }
 }
