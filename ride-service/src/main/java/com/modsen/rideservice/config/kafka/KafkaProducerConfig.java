@@ -1,6 +1,5 @@
 package com.modsen.rideservice.config.kafka;
 
-import com.modsen.rideservice.dto.message.RideStatusMessage;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -17,6 +16,8 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.messaging.MessageChannel;
 
 import java.util.Map;
+
+import static com.modsen.rideservice.util.KafkaTypeMappings.*;
 
 @Configuration
 @RequiredArgsConstructor
@@ -79,7 +80,7 @@ public class KafkaProducerConfig {
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.bootstrapServers(),
                 ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
                 ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class,
-                JsonSerializer.TYPE_MAPPINGS, "rideStatusMessage:" + RideStatusMessage.class.getName()
+                JsonSerializer.TYPE_MAPPINGS, JSON_SERIALIZER_TYPE_MAPPING
         );
     }
 }
