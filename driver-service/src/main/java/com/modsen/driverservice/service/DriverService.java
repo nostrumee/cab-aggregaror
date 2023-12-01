@@ -1,6 +1,6 @@
 package com.modsen.driverservice.service;
 
-import com.modsen.driverservice.dto.message.UpdateDriverRatingMessage;
+import com.modsen.driverservice.dto.message.DriverRatingMessage;
 import com.modsen.driverservice.dto.request.CreateDriverRequest;
 import com.modsen.driverservice.dto.request.UpdateDriverRequest;
 import com.modsen.driverservice.dto.response.DriverPageResponse;
@@ -25,5 +25,5 @@ public interface DriverService {
 
     void setDriverStatus(long id, Status status);
 
-    void updateDriverRating(UpdateDriverRatingMessage updateRatingMessage);
+    void updateDriverRating(DriverRatingMessage updateRatingMessage);
 }

@@ -8,8 +8,8 @@ import com.modsen.ratingservice.entity.PassengerRating;
 import com.modsen.ratingservice.entity.RideStatus;
 import com.modsen.ratingservice.exception.InvalidRideStatusException;
 import com.modsen.ratingservice.mapper.RatingMapper;
-import com.modsen.ratingservice.dto.message.UpdateDriverRatingMessage;
-import com.modsen.ratingservice.dto.message.UpdatePassengerRatingMessage;
+import com.modsen.ratingservice.dto.message.DriverRatingMessage;
+import com.modsen.ratingservice.dto.message.PassengerRatingMessage;
 import com.modsen.ratingservice.repository.DriverRatingRepository;
 import com.modsen.ratingservice.repository.PassengerRatingRepository;
 import com.modsen.ratingservice.service.RatingService;
@@ -48,7 +48,7 @@ public class RatingServiceImpl implements RatingService {
         passengerRatingRepository.save(ratingToAdd);
 
         BigDecimal updatedRating = passengerRatingRepository.findPassengerRating(rideResponse.passengerId());
-        UpdatePassengerRatingMessage updateRatingMessage = UpdatePassengerRatingMessage.builder()
+        PassengerRatingMessage updateRatingMessage = PassengerRatingMessage.builder()
                 .passengerId(rideResponse.passengerId())
                 .rating(updatedRating.setScale(2, RoundingMode.HALF_UP).doubleValue())
                 .build();
@@ -66,7 +66,7 @@ public class RatingServiceImpl implements RatingService {
         driverRatingRepository.save(ratingToAdd);
 
         BigDecimal updatedRating = driverRatingRepository.findDriverRating(rideResponse.driverId());
-        UpdateDriverRatingMessage updateMessage = UpdateDriverRatingMessage.builder()
+        DriverRatingMessage updateMessage = DriverRatingMessage.builder()
                 .driverId(rideResponse.driverId())
                 .rating(updatedRating.setScale(2, RoundingMode.HALF_UP).doubleValue())
                 .build();

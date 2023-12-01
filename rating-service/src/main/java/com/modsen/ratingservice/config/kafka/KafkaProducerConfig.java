@@ -24,28 +24,28 @@ public class KafkaProducerConfig {
     private final KafkaProperties kafkaProperties;
 
     @Bean
-    public IntegrationFlow sendToUpdatePassengerRatingTopicFlow() {
-        return f -> f.channel(updatePassengerRatingChannel())
+    public IntegrationFlow sendToPassengerRatingTopicFlow() {
+        return f -> f.channel(passengerRatingChannel())
                 .handle(Kafka.outboundChannelAdapter(kafkaTemplate())
                         .messageKey(m -> m.getHeaders().get(IntegrationMessageHeaderAccessor.SEQUENCE_NUMBER))
-                        .topic(kafkaProperties.updatePassengerRatingTopicName()));
+                        .topic(kafkaProperties.passengerRatingTopicName()));
     }
 
     @Bean
-    public IntegrationFlow sendToUpdateDriverRatingTopicFlow() {
-        return f -> f.channel(updateDriverRatingChannel())
+    public IntegrationFlow sendToDriverRatingTopicFlow() {
+        return f -> f.channel(driverRatingChannel())
                 .handle(Kafka.outboundChannelAdapter(kafkaTemplate())
                         .messageKey(m -> m.getHeaders().get(IntegrationMessageHeaderAccessor.SEQUENCE_NUMBER))
-                        .topic(kafkaProperties.updateDriverRatingTopicName()));
+                        .topic(kafkaProperties.driverRatingTopicName()));
     }
 
     @Bean
-    public MessageChannel updatePassengerRatingChannel() {
+    public MessageChannel passengerRatingChannel() {
         return new DirectChannel();
     }
 
     @Bean
-    public MessageChannel updateDriverRatingChannel() {
+    public MessageChannel driverRatingChannel() {
         return new DirectChannel();
     }
 

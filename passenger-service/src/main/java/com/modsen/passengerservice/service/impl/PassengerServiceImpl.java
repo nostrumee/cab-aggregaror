@@ -1,6 +1,6 @@
 package com.modsen.passengerservice.service.impl;
 
-import com.modsen.passengerservice.dto.message.UpdatePassengerRatingMessage;
+import com.modsen.passengerservice.dto.message.PassengerRatingMessage;
 import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
 import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
 import com.modsen.passengerservice.dto.response.PassengerPageResponse;
@@ -107,7 +107,7 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
-    public void updatePassengerRating(UpdatePassengerRatingMessage updateRatingMessage) {
+    public void updatePassengerRating(PassengerRatingMessage updateRatingMessage) {
         long id = updateRatingMessage.passengerId();
 
         log.info("Updating rating of passenger with id {}", id);

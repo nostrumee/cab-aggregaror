@@ -1,6 +1,6 @@
 package com.modsen.driverservice.service.impl;
 
-import com.modsen.driverservice.dto.message.UpdateDriverRatingMessage;
+import com.modsen.driverservice.dto.message.DriverRatingMessage;
 import com.modsen.driverservice.dto.request.CreateDriverRequest;
 import com.modsen.driverservice.dto.request.UpdateDriverRequest;
 import com.modsen.driverservice.dto.response.DriverPageResponse;
@@ -130,7 +130,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public void updateDriverRating(UpdateDriverRatingMessage updateRatingMessage) {
+    public void updateDriverRating(DriverRatingMessage updateRatingMessage) {
         long id = updateRatingMessage.driverId();
 
         log.info("Updating rating of driver with id {}", id);

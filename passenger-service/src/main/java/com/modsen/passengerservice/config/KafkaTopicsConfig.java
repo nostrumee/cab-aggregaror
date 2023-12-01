@@ -9,8 +9,8 @@ import org.springframework.kafka.config.TopicBuilder;
 public class KafkaTopicsConfig {
 
     @Bean
-    public NewTopic updatePassengerRatingTopic(KafkaProperties kafkaProperties) {
-        return TopicBuilder.name(kafkaProperties.updatePassengerRatingTopicName())
+    public NewTopic passengerRatingTopic(KafkaProperties kafkaProperties) {
+        return TopicBuilder.name(kafkaProperties.passengerRatingTopicName())
                 .build();
     }
 }

@@ -1,7 +1,7 @@
 package com.modsen.ratingservice.service;
 
-import com.modsen.ratingservice.dto.message.UpdateDriverRatingMessage;
-import com.modsen.ratingservice.dto.message.UpdatePassengerRatingMessage;
+import com.modsen.ratingservice.dto.message.DriverRatingMessage;
+import com.modsen.ratingservice.dto.message.PassengerRatingMessage;
 import org.springframework.integration.annotation.Gateway;
 import org.springframework.integration.annotation.MessagingGateway;
 
@@ -11,10 +11,10 @@ import static com.modsen.ratingservice.util.IntegrationProperties.*;
 public interface KafkaChannelGateway extends SendMessageHandler {
 
     @Override
-    @Gateway(requestChannel = UPDATE_PASSENGER_RATING_CHANNEL_NAME)
-    void handleUpdatePassengerRatingMessage(UpdatePassengerRatingMessage updateRatingMessage);
+    @Gateway(requestChannel = PASSENGER_RATING_CHANNEL_NAME)
+    void handlePassengerRatingMessage(PassengerRatingMessage updateRatingMessage);
 
     @Override
-    @Gateway(requestChannel = UPDATE_DRIVER_RATING_CHANNEL_NAME)
-    void handleUpdateDriverRatingMessage(UpdateDriverRatingMessage updateRatingMessage);
+    @Gateway(requestChannel = DRIVER_RATING_CHANNEL_NAME)
+    void handleDriverRatingMessage(DriverRatingMessage updateRatingMessage);
 }

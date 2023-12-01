@@ -46,4 +46,4 @@ springdoc:
 
 kafka:
   bootstrap-servers: localhost:9092
-  update-passenger-rating-topic-name: update-passenger-rating-topic
+  passenger-rating-topic-name: passenger-rating-topic
