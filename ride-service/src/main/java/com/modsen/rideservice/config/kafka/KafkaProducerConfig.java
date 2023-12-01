@@ -40,12 +40,25 @@ public class KafkaProducerConfig {
     }
 
     @Bean
+    public IntegrationFlow sendToDriverStatusTopicFlow() {
+        return f -> f.channel(createRideChannel())
+                .handle(Kafka.outboundChannelAdapter(kafkaTemplate())
+                        .messageKey(m -> m.getHeaders().get(IntegrationMessageHeaderAccessor.SEQUENCE_NUMBER))
+                        .topic(kafkaProperties.driverStatusTopicName()));
+    }
+
+    @Bean
     public MessageChannel createRideChannel() {
         return new DirectChannel();
     }
 
     @Bean
     public MessageChannel rideStatusChannel() {
+        return new DirectChannel();
+    }
+
+    @Bean
+    public MessageChannel driverStatusChannel() {
         return new DirectChannel();
     }
 

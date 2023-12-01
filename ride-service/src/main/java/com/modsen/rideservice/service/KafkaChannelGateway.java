@@ -1,6 +1,7 @@
 package com.modsen.rideservice.service;
 
 import com.modsen.rideservice.dto.message.CreateRideMessage;
+import com.modsen.rideservice.dto.message.DriverStatusMessage;
 import com.modsen.rideservice.dto.message.RideStatusMessage;
 import org.springframework.integration.annotation.Gateway;
 import org.springframework.integration.annotation.MessagingGateway;
@@ -17,4 +18,8 @@ public interface KafkaChannelGateway extends SendMessageHandler {
     @Override
     @Gateway(requestChannel = RIDE_STATUS_CHANNEL_NAME)
     void handleRideStatusMessage(RideStatusMessage rideStatusMessage);
+
+    @Override
+    @Gateway(requestChannel = DRIVER_STATUS_CHANNEL_NAME)
+    void handleDriverStatusMessage(DriverStatusMessage driverStatusMessage);
 }

@@ -40,5 +40,6 @@ kafka:
   create-ride-topic-name: create-ride-topic
   accept-ride-topic-name: accept-ride-topic
   ride-status-topic-name: ride-status-topic
+  driver-status-topic-name: driver-status-topic
   bootstrap-servers: localhost:9092
   group-id: ${spring.application.name}

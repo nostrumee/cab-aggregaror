@@ -6,7 +6,7 @@ import com.modsen.driverservice.dto.request.UpdateDriverRequest;
 import com.modsen.driverservice.dto.response.DriverPageResponse;
 import com.modsen.driverservice.dto.response.DriverResponse;
 import com.modsen.driverservice.entity.Driver;
-import com.modsen.driverservice.entity.Status;
+import com.modsen.driverservice.entity.DriverStatus;
 import com.modsen.driverservice.exception.*;
 import com.modsen.driverservice.mapper.DriverMapper;
 import com.modsen.driverservice.repository.DriverRepository;
@@ -55,7 +55,7 @@ public class DriverServiceImpl implements DriverService {
     public List<DriverResponse> getAvailableDrivers() {
         log.info("Retrieving available drivers");
 
-        List<Driver> availableDrivers = driverRepository.findAllByStatus(Status.AVAILABLE);
+        List<Driver> availableDrivers = driverRepository.findAllByStatus(DriverStatus.AVAILABLE);
         return driverMapper.fromEntityListToResponseList(availableDrivers);
     }
 
@@ -116,7 +116,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public void setDriverStatus(long id, Status status) {
+    public void updateDriverStatus(long id, DriverStatus status) {
         log.info("Changing status of driver with id {}", id);
 
         Driver driver = driverRepository.findById(id)

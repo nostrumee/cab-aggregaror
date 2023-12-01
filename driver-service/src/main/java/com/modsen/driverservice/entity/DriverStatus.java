@@ -1,6 +1,6 @@
 package com.modsen.driverservice.entity;
 
-public enum Status {
+public enum DriverStatus {
     AVAILABLE,
     UNAVAILABLE
 }

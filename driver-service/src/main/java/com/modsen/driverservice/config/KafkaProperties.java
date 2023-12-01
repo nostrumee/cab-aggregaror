@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record KafkaProperties(
         String createRideTopicName,
         String acceptRideTopicName,
-        String driverRatingTopicName
+        String driverRatingTopicName,
+        String driverStatusTopicName
 ) {
 }

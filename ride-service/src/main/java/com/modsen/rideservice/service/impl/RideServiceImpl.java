@@ -2,12 +2,14 @@ package com.modsen.rideservice.service.impl;
 
 import com.modsen.rideservice.dto.message.AcceptRideMessage;
 import com.modsen.rideservice.dto.message.CreateRideMessage;
+import com.modsen.rideservice.dto.message.DriverStatusMessage;
 import com.modsen.rideservice.dto.message.RideStatusMessage;
 import com.modsen.rideservice.dto.request.CreateRideRequest;
 import com.modsen.rideservice.dto.response.DriverResponse;
 import com.modsen.rideservice.dto.response.PassengerResponse;
 import com.modsen.rideservice.dto.response.RidePageResponse;
 import com.modsen.rideservice.dto.response.RideResponse;
+import com.modsen.rideservice.entity.DriverStatus;
 import com.modsen.rideservice.entity.Ride;
 import com.modsen.rideservice.entity.RideStatus;
 import com.modsen.rideservice.exception.InvalidRequestParamException;
@@ -44,7 +46,7 @@ public class RideServiceImpl implements RideService {
 
     private final RideRepository rideRepository;
     private final RideMapper rideMapper;
-    private final MessageMapper messageMapper
+    private final MessageMapper messageMapper;
     private final DriverService driverService;
     private final PassengerService passengerService;
     private final SendMessageHandler sendMessageHandler;
@@ -167,24 +169,11 @@ public class RideServiceImpl implements RideService {
                 });
         PassengerResponse passenger = passengerService.getPassengerById(ride.getPassengerId());
 
-        RideStatusMessage.RideStatusMessageBuilder rideStatusMessageBuilder = RideStatusMessage.builder()
-                .rideId(rideId)
-                .passengerEmail(passenger.email())
-                .passengerFirstName(passenger.firstName())
-                .startPoint(ride.getStartPoint())
-                .destinationPoint(ride.getDestinationPoint())
-                .estimatedCost(ride.getEstimatedCost());
-
         if (acceptRideMessage.driverId() == null) {
             log.info("Rejecting a ride with id {} as there no available drivers", rideId);
 
             ride.setStatus(RideStatus.REJECTED);
             rideRepository.save(ride);
-
-            RideStatusMessage rideStatusMessage = rideStatusMessageBuilder
-                    .status(RideStatus.REJECTED)
-                    .build();
-            sendMessageHandler.handleRideStatusMessage(rideStatusMessage);
         } else {
             log.info("Accepting ride order with id {} by driver with id {}", rideId, acceptRideMessage.driverId());
 
@@ -192,12 +181,11 @@ public class RideServiceImpl implements RideService {
             ride.setStatus(RideStatus.ACCEPTED);
             ride.setAcceptedDate(LocalDateTime.now());
             rideRepository.save(ride);
-
-            RideStatusMessage rideStatusMessage = rideStatusMessageBuilder
-                    .status(RideStatus.ACCEPTED)
-                    .build();
-            sendMessageHandler.handleRideStatusMessage(rideStatusMessage);
         }
+
+        RideStatusMessage rideStatusMessage =
+                messageMapper.fromRideAndPassengerResponse(ride, passenger);
+        sendMessageHandler.handleRideStatusMessage(rideStatusMessage);
     }
 
     @Override
@@ -249,10 +237,15 @@ public class RideServiceImpl implements RideService {
         rideToFinish.setFinishDate(LocalDateTime.now());
         Ride finishedRide = rideRepository.save(rideToFinish);
 
+        DriverStatusMessage driverStatusMessage = DriverStatusMessage.builder()
+                .driverId(rideToFinish.getDriverId())
+                .status(DriverStatus.AVAILABLE)
+                .build();
+        sendMessageHandler.handleDriverStatusMessage(driverStatusMessage);
+
         RideStatusMessage rideStatusMessage =
                 messageMapper.fromRideAndPassengerResponse(rideToFinish, passenger);
         sendMessageHandler.handleRideStatusMessage(rideStatusMessage);
-        // TODO: send message to driver-service to make driver status available
 
         return rideMapper.fromEntityToResponse(finishedRide);
     }

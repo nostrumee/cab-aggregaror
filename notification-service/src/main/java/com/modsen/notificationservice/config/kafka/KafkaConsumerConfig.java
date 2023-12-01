@@ -1,10 +1,9 @@
-package com.modsen.notificationservice.config;
+package com.modsen.notificationservice.config.kafka;
 
 import com.modsen.notificationservice.service.impl.RideStatusToEmailTransformer;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;

@@ -25,7 +25,7 @@ spring:
 
   cloud:
     function:
-      definition: acceptRideOrder;updateDriverRating
+      definition: acceptRideOrder;updateDriverRating;updateDriverStatus
     stream:
       bindings:
         acceptRideOrder-in-0:
@@ -36,6 +36,10 @@ spring:
         updateDriverRating-in-0:
           destination: ${kafka.driver-rating-topic-name}
           group: ${spring.application.name}
+        updateDriverStatus-in-0:
+          destination: ${kafka.driver-status-topic-name}
+          group: ${spring.application.name}
+
       kafka:
         binder:
           brokers:
@@ -46,7 +50,6 @@ spring:
             key:
               serializer: org.apache.kafka.common.serialization.StringSerializer
 
-
 springdoc:
   override-with-generic-response: false
 
@@ -54,4 +57,5 @@ kafka:
   create-ride-topic-name: create-ride-topic
   accept-ride-topic-name: accept-ride-topic
   driver-rating-topic-name: driver-rating-topic
+  driver-status-topic-name: driver-status-topic
   bootstrap-servers: localhost:9092

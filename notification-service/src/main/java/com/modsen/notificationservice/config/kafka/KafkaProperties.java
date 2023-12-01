@@ -1,4 +1,4 @@
-package com.modsen.notificationservice.config;
+package com.modsen.notificationservice.config.kafka;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

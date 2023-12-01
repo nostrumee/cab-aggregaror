@@ -3,7 +3,7 @@ package com.modsen.driverservice.service.impl;
 import com.modsen.driverservice.dto.message.AcceptRideMessage;
 import com.modsen.driverservice.dto.message.CreateRideMessage;
 import com.modsen.driverservice.dto.response.DriverResponse;
-import com.modsen.driverservice.entity.Status;
+import com.modsen.driverservice.entity.DriverStatus;
 import com.modsen.driverservice.service.DriverService;
 import com.modsen.driverservice.service.RideOrderService;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ public class RideOrderServiceImpl implements RideOrderService {
             Random random = new Random();
 
             DriverResponse driver = availableDrivers.get(random.nextInt(availableDrivers.size()));
-            driverService.setDriverStatus(driver.id(), Status.UNAVAILABLE);
+            driverService.updateDriverStatus(driver.id(), DriverStatus.UNAVAILABLE);
             driverId = driver.id();
         }
 
