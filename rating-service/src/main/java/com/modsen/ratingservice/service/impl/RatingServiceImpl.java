@@ -39,7 +39,7 @@ public class RatingServiceImpl implements RatingService {
 
         RideResponse rideResponse = rideService.getRideById(ratingRequest.rideId());
 
-        if (rideResponse.status().equals(RideStatus.FINISHED)) {
+        if (!rideResponse.status().equals(RideStatus.FINISHED)) {
             log.error("Ride order with id {} is not finished yet", ratingRequest.rideId());
             throw new InvalidRideStatusException(RideStatus.FINISHED.name());
         }
@@ -48,12 +48,12 @@ public class RatingServiceImpl implements RatingService {
         passengerRatingRepository.save(ratingToAdd);
 
         BigDecimal updatedRating = passengerRatingRepository.findPassengerRating(rideResponse.passengerId());
-        PassengerRatingMessage updateRatingMessage = PassengerRatingMessage.builder()
+        PassengerRatingMessage ratingMessage = PassengerRatingMessage.builder()
                 .passengerId(rideResponse.passengerId())
                 .rating(updatedRating.setScale(2, RoundingMode.HALF_UP).doubleValue())
                 .build();
 
-        sendMessageHandler.handleUpdatePassengerRatingMessage(updateRatingMessage);
+        sendMessageHandler.handlePassengerRatingMessage(ratingMessage);
     }
 
     @Override
@@ -62,15 +62,20 @@ public class RatingServiceImpl implements RatingService {
 
         RideResponse rideResponse = rideService.getRideById(ratingRequest.rideId());
 
+        if (!rideResponse.status().equals(RideStatus.FINISHED)) {
+            log.error("Ride order with id {} is not finished yet", ratingRequest.rideId());
+            throw new InvalidRideStatusException(RideStatus.FINISHED.name());
+        }
+
         DriverRating ratingToAdd = ratingMapper.fromRideResponseAndRatingRequest(rideResponse, ratingRequest);
         driverRatingRepository.save(ratingToAdd);
 
         BigDecimal updatedRating = driverRatingRepository.findDriverRating(rideResponse.driverId());
-        DriverRatingMessage updateMessage = DriverRatingMessage.builder()
+        DriverRatingMessage ratingMessage = DriverRatingMessage.builder()
                 .driverId(rideResponse.driverId())
                 .rating(updatedRating.setScale(2, RoundingMode.HALF_UP).doubleValue())
                 .build();
 
-        sendMessageHandler.handleUpdateDriverRatingMessage(updateMessage);
+        sendMessageHandler.handleDriverRatingMessage(ratingMessage);
     }
 }

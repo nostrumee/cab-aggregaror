@@ -2,6 +2,7 @@ package com.modsen.ratingservice.conroller;
 
 import com.modsen.ratingservice.dto.response.ErrorResponse;
 import com.modsen.ratingservice.dto.response.ValidationErrorResponse;
+import com.modsen.ratingservice.exception.InvalidRideStatusException;
 import com.modsen.ratingservice.exception.RideNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -20,9 +21,18 @@ public class ControllerAdvice {
 
     @ExceptionHandler(RideNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleDriverNotFound(RideNotFoundException e) {
+    public ErrorResponse handleRideNotFound(RideNotFoundException e) {
         return ErrorResponse.builder()
                 .status(HttpStatus.NOT_FOUND.value())
+                .message(e.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler(InvalidRideStatusException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleInvalidRideStatus(InvalidRideStatusException e) {
+        return ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
                 .message(e.getMessage())
                 .build();
     }
