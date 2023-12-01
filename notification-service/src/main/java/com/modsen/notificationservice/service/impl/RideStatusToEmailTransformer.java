@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.modsen.notificationservice.util.MailParams.*;
