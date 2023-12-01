@@ -1,4 +1,4 @@
-package com.modsen.driverservice.config;
+package com.modsen.ratingservice.config.kafka;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;
@@ -9,14 +9,8 @@ import org.springframework.kafka.config.TopicBuilder;
 public class KafkaTopicsConfig {
 
     @Bean
-    public NewTopic createRideTopic(KafkaProperties kafkaProperties) {
-        return TopicBuilder.name(kafkaProperties.createRideTopicName())
-                .build();
-    }
-
-    @Bean
-    public NewTopic acceptRideTopic(KafkaProperties kafkaProperties) {
-        return TopicBuilder.name(kafkaProperties.acceptRideTopicName())
+    public NewTopic passengerRatingTopic(KafkaProperties kafkaProperties) {
+        return TopicBuilder.name(kafkaProperties.passengerRatingTopicName())
                 .build();
     }
 

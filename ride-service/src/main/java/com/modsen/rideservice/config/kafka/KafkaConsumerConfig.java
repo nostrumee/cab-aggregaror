@@ -51,7 +51,7 @@ public class KafkaConsumerConfig {
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.bootstrapServers(),
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class,
-                ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.group(),
+                ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.groupId(),
                 JsonDeserializer.TRUSTED_PACKAGES, "*"
         );
     }

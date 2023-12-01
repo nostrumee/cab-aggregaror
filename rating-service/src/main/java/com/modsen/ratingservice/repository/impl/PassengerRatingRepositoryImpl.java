@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
-import static com.modsen.ratingservice.util.Queries.FIND_PASSENGER_RATING_QUERY;
+import static com.modsen.ratingservice.util.Queries.*;
 
 @Component
 public class PassengerRatingRepositoryImpl {

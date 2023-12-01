@@ -1,5 +1,6 @@
 package com.modsen.passengerservice.service.impl;
 
+import com.modsen.passengerservice.dto.message.PassengerRatingMessage;
 import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
 import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
 import com.modsen.passengerservice.dto.response.PassengerPageResponse;
@@ -103,6 +104,22 @@ public class PassengerServiceImpl implements PassengerService {
                 });
 
         passengerRepository.delete(passenger);
+    }
+
+    @Override
+    public void updatePassengerRating(PassengerRatingMessage updateRatingMessage) {
+        long id = updateRatingMessage.passengerId();
+
+        log.info("Updating rating of passenger with id {}", id);
+
+        Passenger passenger = passengerRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Passenger with id {} was not found", id);
+                    return new PassengerNotFoundException(id);
+                });
+
+        passenger.setRating(updateRatingMessage.rating());
+        passengerRepository.save(passenger);
     }
 
     private PageRequest getPageRequest(int page, int size, String orderBy) {

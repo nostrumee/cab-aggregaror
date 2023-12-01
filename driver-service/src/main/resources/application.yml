@@ -25,14 +25,17 @@ spring:
 
   cloud:
     function:
-      definition: acceptRideOrder
+      definition: acceptRideOrder;updateDriverRating
     stream:
       bindings:
         acceptRideOrder-in-0:
-          destination: ${kafka.create-ride-topic}
+          destination: ${kafka.create-ride-topic-name}
           group: ${spring.application.name}
         acceptRideOrder-out-0:
-          destination: ${kafka.accept-ride-topic}
+          destination: ${kafka.accept-ride-topic-name}
+        updateDriverRating-in-0:
+          destination: ${kafka.driver-rating-topic-name}
+          group: ${spring.application.name}
       kafka:
         binder:
           brokers:
@@ -50,4 +53,5 @@ springdoc:
 kafka:
   create-ride-topic-name: create-ride-topic
   accept-ride-topic-name: accept-ride-topic
+  driver-rating-topic-name: driver-rating-topic
   bootstrap-servers: localhost:9092

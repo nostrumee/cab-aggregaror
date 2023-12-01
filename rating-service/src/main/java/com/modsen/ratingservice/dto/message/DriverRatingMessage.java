@@ -1,9 +1,9 @@
-package com.modsen.ratingservice.message;
+package com.modsen.ratingservice.dto.message;
 
 import lombok.Builder;
 
 @Builder
-public record UpdateDriverRatingMessage(
+public record DriverRatingMessage(
         Long driverId,
         Double rating
 ) {

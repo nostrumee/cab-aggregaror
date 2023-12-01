@@ -23,5 +23,27 @@ spring:
   liquibase:
     change-log: db/changelog/changelog-master.xml
 
+  cloud:
+    function:
+      definition: updatePassengerRating
+    stream:
+      bindings:
+        updatePassengerRating-in-0:
+          destination: ${kafka.passenger-rating-topic-name}
+          group: ${spring.application.name}
+      kafka:
+        binder:
+          brokers:
+            - ${kafka.bootstrap-servers}
+          configuration:
+            value:
+              serializer: org.springframework.kafka.support.serializer.JsonSerializer
+            key:
+              serializer: org.apache.kafka.common.serialization.StringSerializer
+
 springdoc:
   override-with-generic-response: false
+
+kafka:
+  bootstrap-servers: localhost:9092
+  passenger-rating-topic-name: passenger-rating-topic

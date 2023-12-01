@@ -1,5 +1,6 @@
 package com.modsen.passengerservice.service;
 
+import com.modsen.passengerservice.dto.message.PassengerRatingMessage;
 import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
 import com.modsen.passengerservice.dto.response.PassengerPageResponse;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
@@ -16,4 +17,6 @@ public interface PassengerService {
     PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, long id);
 
     void deletePassenger(long id);
+
+    void updatePassengerRating(PassengerRatingMessage updateRatingMessage);
 }

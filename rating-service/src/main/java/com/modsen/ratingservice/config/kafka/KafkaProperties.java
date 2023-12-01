@@ -1,11 +1,11 @@
-package com.modsen.driverservice.config;
+package com.modsen.ratingservice.config.kafka;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "kafka")
 public record KafkaProperties(
-        String createRideTopicName,
-        String acceptRideTopicName,
+        String bootstrapServers,
+        String passengerRatingTopicName,
         String driverRatingTopicName
 ) {
 }
