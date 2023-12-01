@@ -1,6 +1,7 @@
 package com.modsen.notificationservice.service.impl;
 
 import com.modsen.notificationservice.dto.message.RideStatusMessage;
+import com.modsen.notificationservice.exception.RideStatusTransformException;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import jakarta.mail.MessagingException;
@@ -39,7 +40,7 @@ public class RideStatusToEmailTransformer implements GenericTransformer<RideStat
             return mimeMessage;
         } catch (MessagingException | IOException | TemplateException e) {
             log.error("Error transforming rideStatusMessage with rideId {}", rideStatusMessage.rideId());
-            throw new RuntimeException(e);
+            throw new RideStatusTransformException(rideStatusMessage.rideId(), e.getMessage());
         }
     }
 
