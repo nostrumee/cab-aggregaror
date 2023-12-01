@@ -34,7 +34,7 @@ spring:
         acceptRideOrder-out-0:
           destination: ${kafka.accept-ride-topic}
         updateDriverRating-in-0:
-          destination: ${kafka.update-driver-rating-topic}
+          destination: ${kafka.driver-rating-topic}
           group: ${spring.application.name}
       kafka:
         binder:

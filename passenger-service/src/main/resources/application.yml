@@ -29,7 +29,7 @@ spring:
     stream:
       bindings:
         updatePassengerRating-in-0:
-          destination: ${kafka.update-passenger-rating-topic}
+          destination: ${kafka.passenger-rating-topic}
           group: ${spring.application.name}
       kafka:
         binder:
