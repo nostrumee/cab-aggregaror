@@ -1,5 +1,6 @@
 package com.modsen.notificationservice.config.kafka;
 
+import com.modsen.notificationservice.dto.message.RideStatusMessage;
 import com.modsen.notificationservice.service.impl.RideStatusToEmailTransformer;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -50,7 +51,8 @@ public class KafkaConsumerConfig {
                 JsonDeserializer.TRUSTED_PACKAGES, "*",
                 ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.groupId(),
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
-                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class,
+                JsonDeserializer.TYPE_MAPPINGS, "rideStatusMessage:" + RideStatusMessage.class.getName()
         );
     }
 

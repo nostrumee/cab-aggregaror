@@ -36,8 +36,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.modsen.rideservice.util.ErrorMessages.INVALID_PAGE_PARAMETERS_MESSAGE;
-import static com.modsen.rideservice.util.ErrorMessages.INVALID_SORTING_PARAMETER_MESSAGE;
+import static com.modsen.rideservice.util.ErrorMessages.*;
 
 @Service
 @RequiredArgsConstructor

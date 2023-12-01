@@ -1,5 +1,6 @@
 package com.modsen.rideservice.config.kafka;
 
+import com.modsen.rideservice.dto.message.RideStatusMessage;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -33,7 +34,7 @@ public class KafkaProducerConfig {
 
     @Bean
     public IntegrationFlow sendToRideStatusTopicFlow() {
-        return f -> f.channel(createRideChannel())
+        return f -> f.channel(rideStatusChannel())
                 .handle(Kafka.outboundChannelAdapter(kafkaTemplate())
                         .messageKey(m -> m.getHeaders().get(IntegrationMessageHeaderAccessor.SEQUENCE_NUMBER))
                         .topic(kafkaProperties.rideStatusTopicName()));
@@ -41,7 +42,7 @@ public class KafkaProducerConfig {
 
     @Bean
     public IntegrationFlow sendToDriverStatusTopicFlow() {
-        return f -> f.channel(createRideChannel())
+        return f -> f.channel(driverStatusChannel())
                 .handle(Kafka.outboundChannelAdapter(kafkaTemplate())
                         .messageKey(m -> m.getHeaders().get(IntegrationMessageHeaderAccessor.SEQUENCE_NUMBER))
                         .topic(kafkaProperties.driverStatusTopicName()));
@@ -77,7 +78,8 @@ public class KafkaProducerConfig {
         return Map.of(
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.bootstrapServers(),
                 ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
-                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class,
+                JsonSerializer.TYPE_MAPPINGS, "rideStatusMessage:" + RideStatusMessage.class.getName()
         );
     }
 }
