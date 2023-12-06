@@ -9,6 +9,7 @@ import com.modsen.driverservice.service.RideOrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Random;
@@ -16,6 +17,7 @@ import java.util.Random;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class RideOrderServiceImpl implements RideOrderService {
 
     private final DriverService driverService;

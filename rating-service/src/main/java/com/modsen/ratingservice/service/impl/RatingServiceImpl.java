@@ -18,6 +18,7 @@ import com.modsen.ratingservice.service.SendMessageHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -25,6 +26,7 @@ import java.math.RoundingMode;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class RatingServiceImpl implements RatingService {
 
     private final PassengerRatingRepository passengerRatingRepository;

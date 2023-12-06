@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -26,6 +27,7 @@ import static com.modsen.driverservice.util.ErrorMessages.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class DriverServiceImpl implements DriverService {
 
     private final DriverRepository driverRepository;

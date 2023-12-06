@@ -28,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -41,6 +42,7 @@ import static com.modsen.rideservice.util.ErrorMessages.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class RideServiceImpl implements RideService {
 
     private final RideRepository rideRepository;
@@ -114,11 +116,7 @@ public class RideServiceImpl implements RideService {
     public RideResponse getById(long id) {
         log.info("Retrieving ride by id {}", id);
 
-        Ride ride = rideRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Ride with id {} was not found", id);
-                    return new RideNotFoundException(id);
-                });
+        Ride ride = findRideById(id);
 
         return rideMapper.fromEntityToResponse(ride);
     }
@@ -148,12 +146,7 @@ public class RideServiceImpl implements RideService {
     public void deleteRide(long id) {
         log.info("Deleting ride by id {}", id);
 
-        Ride ride = rideRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Ride with id {} was not found", id);
-                    return new RideNotFoundException(id);
-                });
-
+        Ride ride = findRideById(id);
         rideRepository.delete(ride);
     }
 
@@ -161,11 +154,7 @@ public class RideServiceImpl implements RideService {
     public void acceptRide(AcceptRideMessage acceptRideMessage) {
         long rideId = acceptRideMessage.rideId();
 
-        Ride ride = rideRepository.findById(rideId)
-                .orElseThrow(() -> {
-                    log.error("Ride order with id {} was not found", rideId);
-                    return new RideNotFoundException(rideId);
-                });
+        Ride ride = findRideById(rideId);
         PassengerResponse passenger = passengerService.getPassengerById(ride.getPassengerId());
 
         if (acceptRideMessage.driverId() == null) {
@@ -191,11 +180,7 @@ public class RideServiceImpl implements RideService {
     public RideResponse startRide(long id) {
         log.info("Starting a ride with id {}", id);
 
-        Ride rideToStart = rideRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Ride order with id {} was not found", id);
-                    return new RideNotFoundException(id);
-                });
+        Ride rideToStart = findRideById(id);
 
         if (!rideToStart.getStatus().equals(RideStatus.ACCEPTED)) {
             log.error("Invalid ride status");
@@ -219,11 +204,7 @@ public class RideServiceImpl implements RideService {
     public RideResponse finishRide(long id) {
         log.info("Finishing a ride with id {}", id);
 
-        Ride rideToFinish = rideRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Ride order with id {} was not found", id);
-                    return new RideNotFoundException(id);
-                });
+        Ride rideToFinish = findRideById(id);
 
         if (!rideToFinish.getStatus().equals(RideStatus.STARTED)) {
             log.error("Invalid ride status");
@@ -253,14 +234,18 @@ public class RideServiceImpl implements RideService {
     public DriverResponse getDriverProfile(long rideId) {
         log.info("Retrieving driver's profile from a ride with id {}", rideId);
 
-        Ride ride = rideRepository.findById(rideId)
-                .orElseThrow(() -> {
-                    log.error("Ride order with id {} was not found", rideId);
-                    return new RideNotFoundException(rideId);
-                });
+        Ride ride = findRideById(rideId);
         long driverId = ride.getDriverId();
 
         return driverService.getDriverById(driverId);
+    }
+
+    private Ride findRideById(long id) {
+        return rideRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Ride order with id {} was not found", id);
+                    return new RideNotFoundException(id);
+                });
     }
 
     private PageRequest getPageRequest(int page, int size, String orderBy) {
