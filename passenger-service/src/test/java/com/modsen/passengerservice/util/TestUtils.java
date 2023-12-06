@@ -1,6 +1,8 @@
 package com.modsen.passengerservice.util;
 
+import com.modsen.passengerservice.dto.message.PassengerRatingMessage;
 import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
+import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
 import com.modsen.passengerservice.dto.response.PassengerPageResponse;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
 import com.modsen.passengerservice.entity.Passenger;
@@ -60,6 +62,15 @@ public class TestUtils {
                 .build();
     }
 
+    public Passenger getNotSavedPassenger() {
+        return Passenger.builder()
+                .firstName(DEFAULT_FIRST_NAME)
+                .lastName(DEFAULT_LAST_NAME)
+                .email(DEFAULT_EMAIL)
+                .phone(DEFAULT_PHONE)
+                .build();
+    }
+
     public PassengerResponse getDefaultPassengerResponse() {
         return PassengerResponse.builder()
                 .id(DEFAULT_ID)
@@ -114,4 +125,19 @@ public class TestUtils {
                 .build();
     }
 
+    public UpdatePassengerRequest getUpdatePassengerRequest() {
+        return UpdatePassengerRequest.builder()
+                .firstName(DEFAULT_FIRST_NAME)
+                .lastName(DEFAULT_LAST_NAME)
+                .email(OTHER_EMAIL)
+                .phone(OTHER_PHONE)
+                .build();
+    }
+
+    public PassengerRatingMessage getPassengerRatingMessage() {
+        return PassengerRatingMessage.builder()
+                .passengerId(DEFAULT_ID)
+                .rating(OTHER_RATING)
+                .build();
+    }
 }
