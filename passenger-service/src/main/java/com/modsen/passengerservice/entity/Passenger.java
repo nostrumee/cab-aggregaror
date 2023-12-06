@@ -1,13 +1,16 @@
 package com.modsen.passengerservice.entity;
 
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import jakarta.persistence.*;
 
 @Data
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Passenger {
 
     @Id
