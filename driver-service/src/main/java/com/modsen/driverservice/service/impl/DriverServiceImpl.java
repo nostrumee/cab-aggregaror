@@ -65,12 +65,7 @@ public class DriverServiceImpl implements DriverService {
     public DriverResponse getById(long id) {
         log.info("Retrieving driver by id {}", id);
 
-        Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Driver with id {} was not found", id);
-                    return new DriverNotFoundException(id);
-                });
-
+        Driver driver = findDriverById(id);
         return driverMapper.fromEntityToResponse(driver);
     }
 
@@ -90,11 +85,7 @@ public class DriverServiceImpl implements DriverService {
     public DriverResponse updateDriver(UpdateDriverRequest updateRequest, long id) {
         log.info("Updating driver with id {}", id);
 
-        Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Driver with id {} was not found", id);
-                    return new DriverNotFoundException(id);
-                });
+        Driver driver = findDriverById(id);
 
         checkUpdateDataUnique(updateRequest, driver);
 
@@ -108,12 +99,7 @@ public class DriverServiceImpl implements DriverService {
     public void deleteDriver(long id) {
         log.info("Deleting driver with id {}", id);
 
-        Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Driver with id {} was not found", id);
-                    return new DriverNotFoundException(id);
-                });
-
+        Driver driver = findDriverById(id);
         driverRepository.delete(driver);
     }
 
@@ -121,12 +107,7 @@ public class DriverServiceImpl implements DriverService {
     public void updateDriverStatus(long id, DriverStatus status) {
         log.info("Changing status of driver with id {}", id);
 
-        Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Driver with id {} was not found", id);
-                    return new DriverNotFoundException(id);
-                });
-
+        Driver driver = findDriverById(id);
         driver.setStatus(status);
         driverRepository.save(driver);
     }
@@ -137,14 +118,17 @@ public class DriverServiceImpl implements DriverService {
 
         log.info("Updating rating of driver with id {}", id);
 
-        Driver driver = driverRepository.findById(id)
+        Driver driver = findDriverById(id);
+        driver.setRating(updateRatingMessage.rating());
+        driverRepository.save(driver);
+    }
+
+    private Driver findDriverById(long id) {
+        return driverRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Driver with id {} was not found", id);
                     return new DriverNotFoundException(id);
                 });
-
-        driver.setRating(updateRatingMessage.rating());
-        driverRepository.save(driver);
     }
 
     private PageRequest getPageRequest(int page, int size, String orderBy) {

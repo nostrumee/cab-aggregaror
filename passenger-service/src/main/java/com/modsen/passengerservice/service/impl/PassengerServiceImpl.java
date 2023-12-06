@@ -56,12 +56,7 @@ public class PassengerServiceImpl implements PassengerService {
     public PassengerResponse getById(long id) {
         log.info("Retrieving passenger by id {}", id);
 
-        Passenger passenger = passengerRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Passenger with id {} was not found", id);
-                    return new PassengerNotFoundException(id);
-                });
-
+        Passenger passenger = findPassengerById(id);
         return passengerMapper.fromEntityToResponse(passenger);
     }
 
@@ -81,11 +76,7 @@ public class PassengerServiceImpl implements PassengerService {
     public PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, long id) {
         log.info("Updating passenger with id {}", id);
 
-        Passenger passenger = passengerRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Passenger with id {} was not found", id);
-                    return new PassengerNotFoundException(id);
-                });
+        Passenger passenger = findPassengerById(id);
 
         checkUpdateDataUnique(updateRequest, passenger);
 
@@ -99,12 +90,7 @@ public class PassengerServiceImpl implements PassengerService {
     public void deletePassenger(long id) {
         log.info("Deleting passenger with id {}", id);
 
-        Passenger passenger = passengerRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Passenger with id {} was not found", id);
-                    return new PassengerNotFoundException(id);
-                });
-
+        Passenger passenger = findPassengerById(id);
         passengerRepository.delete(passenger);
     }
 
@@ -114,14 +100,17 @@ public class PassengerServiceImpl implements PassengerService {
 
         log.info("Updating rating of passenger with id {}", id);
 
-        Passenger passenger = passengerRepository.findById(id)
+        Passenger passenger = findPassengerById(id);
+        passenger.setRating(updateRatingMessage.rating());
+        passengerRepository.save(passenger);
+    }
+
+    private Passenger findPassengerById(long id) {
+        return passengerRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Passenger with id {} was not found", id);
                     return new PassengerNotFoundException(id);
                 });
-
-        passenger.setRating(updateRatingMessage.rating());
-        passengerRepository.save(passenger);
     }
 
     private PageRequest getPageRequest(int page, int size, String orderBy) {
