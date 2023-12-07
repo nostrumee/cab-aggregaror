@@ -27,5 +27,5 @@ public class Driver {
     private Double rating = 5.0;
 
     @Enumerated(EnumType.STRING)
-    private Status status = Status.AVAILABLE;
+    private DriverStatus status = DriverStatus.AVAILABLE;
 }

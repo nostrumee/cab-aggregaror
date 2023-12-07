@@ -1,7 +1,7 @@
 package com.modsen.driverservice.repository;
 
 import com.modsen.driverservice.entity.Driver;
-import com.modsen.driverservice.entity.Status;
+import com.modsen.driverservice.entity.DriverStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,5 +16,5 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
 
     boolean existsByLicenceNumber(String licenceNumber);
 
-    List<Driver> findAllByStatus(Status status);
+    List<Driver> findAllByStatus(DriverStatus status);
 }

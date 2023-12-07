@@ -6,7 +6,7 @@ import com.modsen.driverservice.dto.request.UpdateDriverRequest;
 import com.modsen.driverservice.dto.response.DriverPageResponse;
 import com.modsen.driverservice.dto.response.DriverResponse;
 import com.modsen.driverservice.entity.Driver;
-import com.modsen.driverservice.entity.Status;
+import com.modsen.driverservice.entity.DriverStatus;
 import com.modsen.driverservice.exception.*;
 import com.modsen.driverservice.mapper.DriverMapper;
 import com.modsen.driverservice.repository.DriverRepository;
@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -32,6 +33,7 @@ public class DriverServiceImpl implements DriverService {
     private final DriverMapper driverMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public DriverPageResponse getDriverPage(int page, int size, String orderBy) {
         log.info("Retrieving drivers page");
 
@@ -52,27 +54,25 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<DriverResponse> getAvailableDrivers() {
         log.info("Retrieving available drivers");
 
-        List<Driver> availableDrivers = driverRepository.findAllByStatus(Status.AVAILABLE);
+        List<Driver> availableDrivers = driverRepository.findAllByStatus(DriverStatus.AVAILABLE);
         return driverMapper.fromEntityListToResponseList(availableDrivers);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DriverResponse getById(long id) {
         log.info("Retrieving driver by id {}", id);
 
-        Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Driver with id {} was not found", id);
-                    return new DriverNotFoundException(id);
-                });
-
+        Driver driver = findDriverById(id);
         return driverMapper.fromEntityToResponse(driver);
     }
 
     @Override
+    @Transactional
     public DriverResponse addDriver(CreateDriverRequest createRequest) {
         log.info("Adding driver");
 
@@ -85,14 +85,11 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
+    @Transactional
     public DriverResponse updateDriver(UpdateDriverRequest updateRequest, long id) {
         log.info("Updating driver with id {}", id);
 
-        Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Driver with id {} was not found", id);
-                    return new DriverNotFoundException(id);
-                });
+        Driver driver = findDriverById(id);
 
         checkUpdateDataUnique(updateRequest, driver);
 
@@ -103,46 +100,42 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
+    @Transactional
     public void deleteDriver(long id) {
         log.info("Deleting driver with id {}", id);
 
-        Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Driver with id {} was not found", id);
-                    return new DriverNotFoundException(id);
-                });
-
+        Driver driver = findDriverById(id);
         driverRepository.delete(driver);
     }
 
     @Override
-    public void setDriverStatus(long id, Status status) {
+    @Transactional
+    public void updateDriverStatus(long id, DriverStatus status) {
         log.info("Changing status of driver with id {}", id);
 
-        Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Driver with id {} was not found", id);
-                    return new DriverNotFoundException(id);
-                });
-
+        Driver driver = findDriverById(id);
         driver.setStatus(status);
         driverRepository.save(driver);
     }
 
     @Override
+    @Transactional
     public void updateDriverRating(DriverRatingMessage updateRatingMessage) {
         long id = updateRatingMessage.driverId();
 
         log.info("Updating rating of driver with id {}", id);
 
-        Driver driver = driverRepository.findById(id)
+        Driver driver = findDriverById(id);
+        driver.setRating(updateRatingMessage.rating());
+        driverRepository.save(driver);
+    }
+
+    private Driver findDriverById(long id) {
+        return driverRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Driver with id {} was not found", id);
                     return new DriverNotFoundException(id);
                 });
-
-        driver.setRating(updateRatingMessage.rating());
-        driverRepository.save(driver);
     }
 
     private PageRequest getPageRequest(int page, int size, String orderBy) {

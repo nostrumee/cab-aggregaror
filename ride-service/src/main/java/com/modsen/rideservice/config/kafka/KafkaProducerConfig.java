@@ -17,6 +17,8 @@ import org.springframework.messaging.MessageChannel;
 
 import java.util.Map;
 
+import static com.modsen.rideservice.util.KafkaTypeMappings.*;
+
 @Configuration
 @RequiredArgsConstructor
 public class KafkaProducerConfig {
@@ -32,7 +34,33 @@ public class KafkaProducerConfig {
     }
 
     @Bean
+    public IntegrationFlow sendToRideStatusTopicFlow() {
+        return f -> f.channel(rideStatusChannel())
+                .handle(Kafka.outboundChannelAdapter(kafkaTemplate())
+                        .messageKey(m -> m.getHeaders().get(IntegrationMessageHeaderAccessor.SEQUENCE_NUMBER))
+                        .topic(kafkaProperties.rideStatusTopicName()));
+    }
+
+    @Bean
+    public IntegrationFlow sendToDriverStatusTopicFlow() {
+        return f -> f.channel(driverStatusChannel())
+                .handle(Kafka.outboundChannelAdapter(kafkaTemplate())
+                        .messageKey(m -> m.getHeaders().get(IntegrationMessageHeaderAccessor.SEQUENCE_NUMBER))
+                        .topic(kafkaProperties.driverStatusTopicName()));
+    }
+
+    @Bean
     public MessageChannel createRideChannel() {
+        return new DirectChannel();
+    }
+
+    @Bean
+    public MessageChannel rideStatusChannel() {
+        return new DirectChannel();
+    }
+
+    @Bean
+    public MessageChannel driverStatusChannel() {
         return new DirectChannel();
     }
 
@@ -51,7 +79,8 @@ public class KafkaProducerConfig {
         return Map.of(
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.bootstrapServers(),
                 ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
-                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class,
+                JsonSerializer.TYPE_MAPPINGS, JSON_SERIALIZER_TYPE_MAPPING
         );
     }
 }

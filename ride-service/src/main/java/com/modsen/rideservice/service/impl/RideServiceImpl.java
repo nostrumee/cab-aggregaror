@@ -2,15 +2,20 @@ package com.modsen.rideservice.service.impl;
 
 import com.modsen.rideservice.dto.message.AcceptRideMessage;
 import com.modsen.rideservice.dto.message.CreateRideMessage;
+import com.modsen.rideservice.dto.message.DriverStatusMessage;
+import com.modsen.rideservice.dto.message.RideStatusMessage;
 import com.modsen.rideservice.dto.request.CreateRideRequest;
 import com.modsen.rideservice.dto.response.DriverResponse;
+import com.modsen.rideservice.dto.response.PassengerResponse;
 import com.modsen.rideservice.dto.response.RidePageResponse;
 import com.modsen.rideservice.dto.response.RideResponse;
+import com.modsen.rideservice.entity.DriverStatus;
 import com.modsen.rideservice.entity.Ride;
 import com.modsen.rideservice.entity.RideStatus;
 import com.modsen.rideservice.exception.InvalidRequestParamException;
 import com.modsen.rideservice.exception.InvalidRideStatusException;
 import com.modsen.rideservice.exception.RideNotFoundException;
+import com.modsen.rideservice.mapper.MessageMapper;
 import com.modsen.rideservice.mapper.RideMapper;
 import com.modsen.rideservice.repository.RideRepository;
 import com.modsen.rideservice.service.DriverService;
@@ -23,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -40,11 +46,13 @@ public class RideServiceImpl implements RideService {
 
     private final RideRepository rideRepository;
     private final RideMapper rideMapper;
+    private final MessageMapper messageMapper;
     private final DriverService driverService;
     private final PassengerService passengerService;
     private final SendMessageHandler sendMessageHandler;
 
     @Override
+    @Transactional(readOnly = true)
     public RidePageResponse getRidesPage(int page, int size, String orderBy) {
         log.info("Retrieving rides page");
 
@@ -65,6 +73,7 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public RidePageResponse getRidesByDriverId(long driverId, int page, int size, String orderBy) {
         log.info("Retrieving rides for driver with id {}", driverId);
 
@@ -85,6 +94,7 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public RidePageResponse getRidesByPassengerId(long passengerId, int page, int size, String orderBy) {
         log.info("Retrieving rides for passenger with id {}", passengerId);
 
@@ -105,20 +115,18 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public RideResponse getById(long id) {
         log.info("Retrieving ride by id {}", id);
 
-        Ride ride = rideRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Ride with id {} was not found", id);
-                    return new RideNotFoundException(id);
-                });
+        Ride ride = findRideById(id);
 
         return rideMapper.fromEntityToResponse(ride);
     }
 
 
     @Override
+    @Transactional
     public RideResponse createRide(CreateRideRequest createRequest) {
         log.info("Creating ride order for passenger with id {}", createRequest.passengerId());
 
@@ -133,44 +141,33 @@ public class RideServiceImpl implements RideService {
         CreateRideMessage orderMessage = CreateRideMessage.builder()
                 .rideId(createdOrder.getId())
                 .build();
-
         sendMessageHandler.handleCreateRideMessage(orderMessage);
-
-        // TODO: send message to notification-service about created order
 
         return rideMapper.fromEntityToResponse(createdOrder);
     }
 
     @Override
+    @Transactional
     public void deleteRide(long id) {
         log.info("Deleting ride by id {}", id);
 
-        Ride ride = rideRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Ride with id {} was not found", id);
-                    return new RideNotFoundException(id);
-                });
-
+        Ride ride = findRideById(id);
         rideRepository.delete(ride);
     }
 
     @Override
+    @Transactional
     public void acceptRide(AcceptRideMessage acceptRideMessage) {
         long rideId = acceptRideMessage.rideId();
 
-        Ride ride = rideRepository.findById(rideId)
-                .orElseThrow(() -> {
-                    log.error("Ride order with id {} was not found", rideId);
-                    return new RideNotFoundException(rideId);
-                });
+        Ride ride = findRideById(rideId);
+        PassengerResponse passenger = passengerService.getPassengerById(ride.getPassengerId());
 
         if (acceptRideMessage.driverId() == null) {
             log.info("Rejecting a ride with id {} as there no available drivers", rideId);
 
             ride.setStatus(RideStatus.REJECTED);
             rideRepository.save(ride);
-
-            // TODO: send message to notification-service about rejected ride
         } else {
             log.info("Accepting ride order with id {} by driver with id {}", rideId, acceptRideMessage.driverId());
 
@@ -178,72 +175,86 @@ public class RideServiceImpl implements RideService {
             ride.setStatus(RideStatus.ACCEPTED);
             ride.setAcceptedDate(LocalDateTime.now());
             rideRepository.save(ride);
-
-            // TODO: send message to notification-service about accepted ride
         }
+
+        RideStatusMessage rideStatusMessage =
+                messageMapper.fromRideAndPassengerResponse(ride, passenger);
+        sendMessageHandler.handleRideStatusMessage(rideStatusMessage);
     }
 
     @Override
+    @Transactional
     public RideResponse startRide(long id) {
         log.info("Starting a ride with id {}", id);
 
-        Ride rideToStart = rideRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Ride order with id {} was not found", id);
-                    return new RideNotFoundException(id);
-                });
+        Ride rideToStart = findRideById(id);
 
         if (!rideToStart.getStatus().equals(RideStatus.ACCEPTED)) {
             log.error("Invalid ride status");
             throw new InvalidRideStatusException(RideStatus.ACCEPTED.name());
         }
 
+        PassengerResponse passenger = passengerService.getPassengerById(rideToStart.getPassengerId());
+
         rideToStart.setStatus(RideStatus.STARTED);
         rideToStart.setStartDate(LocalDateTime.now());
         Ride startedRide = rideRepository.save(rideToStart);
 
-        // TODO: send message to notification-service about started ride
+        RideStatusMessage rideStatusMessage =
+                messageMapper.fromRideAndPassengerResponse(rideToStart, passenger);
+        sendMessageHandler.handleRideStatusMessage(rideStatusMessage);
 
         return rideMapper.fromEntityToResponse(startedRide);
     }
 
     @Override
+    @Transactional
     public RideResponse finishRide(long id) {
         log.info("Finishing a ride with id {}", id);
 
-        Ride rideToFinish = rideRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Ride order with id {} was not found", id);
-                    return new RideNotFoundException(id);
-                });
+        Ride rideToFinish = findRideById(id);
 
         if (!rideToFinish.getStatus().equals(RideStatus.STARTED)) {
             log.error("Invalid ride status");
             throw new InvalidRideStatusException(RideStatus.STARTED.name());
         }
 
+        PassengerResponse passenger = passengerService.getPassengerById(rideToFinish.getPassengerId());
+
         rideToFinish.setStatus(RideStatus.FINISHED);
         rideToFinish.setFinishDate(LocalDateTime.now());
         Ride finishedRide = rideRepository.save(rideToFinish);
 
-        // TODO: send message to notification-service about finished ride
-        // TODO: send message to driver-service to make driver status available
+        DriverStatusMessage driverStatusMessage = DriverStatusMessage.builder()
+                .driverId(rideToFinish.getDriverId())
+                .status(DriverStatus.AVAILABLE)
+                .build();
+        sendMessageHandler.handleDriverStatusMessage(driverStatusMessage);
+
+        RideStatusMessage rideStatusMessage =
+                messageMapper.fromRideAndPassengerResponse(rideToFinish, passenger);
+        sendMessageHandler.handleRideStatusMessage(rideStatusMessage);
 
         return rideMapper.fromEntityToResponse(finishedRide);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DriverResponse getDriverProfile(long rideId) {
         log.info("Retrieving driver's profile from a ride with id {}", rideId);
 
-        Ride ride = rideRepository.findById(rideId)
-                .orElseThrow(() -> {
-                    log.error("Ride order with id {} was not found", rideId);
-                    return new RideNotFoundException(rideId);
-                });
+        Ride ride = findRideById(rideId);
         long driverId = ride.getDriverId();
 
         return driverService.getDriverById(driverId);
+    }
+
+    private Ride findRideById(long id) {
+        return rideRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Ride order with id {} was not found", id);
+                    return new RideNotFoundException(id);
+                });
     }
 
     private PageRequest getPageRequest(int page, int size, String orderBy) {

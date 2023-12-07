@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -31,6 +32,7 @@ public class PassengerServiceImpl implements PassengerService {
     private final PassengerMapper passengerMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public PassengerPageResponse getPassengerPage(int page, int size, String orderBy) {
         log.info("Retrieving passengers page");
 
@@ -51,19 +53,16 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PassengerResponse getById(long id) {
         log.info("Retrieving passenger by id {}", id);
 
-        Passenger passenger = passengerRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Passenger with id {} was not found", id);
-                    return new PassengerNotFoundException(id);
-                });
-
+        Passenger passenger = findPassengerById(id);
         return passengerMapper.fromEntityToResponse(passenger);
     }
 
     @Override
+    @Transactional
     public PassengerResponse addPassenger(CreatePassengerRequest createRequest) {
         log.info("Adding passenger");
 
@@ -76,14 +75,11 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
+    @Transactional
     public PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, long id) {
         log.info("Updating passenger with id {}", id);
 
-        Passenger passenger = passengerRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Passenger with id {} was not found", id);
-                    return new PassengerNotFoundException(id);
-                });
+        Passenger passenger = findPassengerById(id);
 
         checkUpdateDataUnique(updateRequest, passenger);
 
@@ -94,32 +90,32 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
+    @Transactional
     public void deletePassenger(long id) {
         log.info("Deleting passenger with id {}", id);
 
-        Passenger passenger = passengerRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Passenger with id {} was not found", id);
-                    return new PassengerNotFoundException(id);
-                });
-
+        Passenger passenger = findPassengerById(id);
         passengerRepository.delete(passenger);
     }
 
     @Override
+    @Transactional
     public void updatePassengerRating(PassengerRatingMessage updateRatingMessage) {
         long id = updateRatingMessage.passengerId();
 
         log.info("Updating rating of passenger with id {}", id);
 
-        Passenger passenger = passengerRepository.findById(id)
+        Passenger passenger = findPassengerById(id);
+        passenger.setRating(updateRatingMessage.rating());
+        passengerRepository.save(passenger);
+    }
+
+    private Passenger findPassengerById(long id) {
+        return passengerRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Passenger with id {} was not found", id);
                     return new PassengerNotFoundException(id);
                 });
-
-        passenger.setRating(updateRatingMessage.rating());
-        passengerRepository.save(passenger);
     }
 
     private PageRequest getPageRequest(int page, int size, String orderBy) {

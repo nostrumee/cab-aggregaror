@@ -18,6 +18,7 @@ import com.modsen.ratingservice.service.SendMessageHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -34,6 +35,7 @@ public class RatingServiceImpl implements RatingService {
     private final RatingMapper ratingMapper;
 
     @Override
+    @Transactional
     public void ratePassenger(PassengerRatingRequest ratingRequest) {
         log.info("Rating a passenger of a ride with id {}", ratingRequest.rideId());
 
@@ -57,6 +59,7 @@ public class RatingServiceImpl implements RatingService {
     }
 
     @Override
+    @Transactional
     public void rateDriver(DriverRatingRequest ratingRequest) {
         log.info("Rating a driver of a ride with id {}", ratingRequest.rideId());
 

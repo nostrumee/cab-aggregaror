@@ -5,7 +5,7 @@ import com.modsen.driverservice.dto.request.CreateDriverRequest;
 import com.modsen.driverservice.dto.request.UpdateDriverRequest;
 import com.modsen.driverservice.dto.response.DriverPageResponse;
 import com.modsen.driverservice.dto.response.DriverResponse;
-import com.modsen.driverservice.entity.Status;
+import com.modsen.driverservice.entity.DriverStatus;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ public interface DriverService {
 
     void deleteDriver(long id);
 
-    void setDriverStatus(long id, Status status);
+    void updateDriverStatus(long id, DriverStatus status);
 
     void updateDriverRating(DriverRatingMessage updateRatingMessage);
 }

@@ -1,4 +1,4 @@
-package com.modsen.rideservice.config.kafka;
+package com.modsen.notificationservice.config.kafka;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -6,9 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record KafkaProperties(
         String groupId,
         String bootstrapServers,
-        String createRideTopicName,
-        String acceptRideTopicName,
-        String rideStatusTopicName,
-        String driverStatusTopicName
+        String rideStatusTopicName
 ) {
 }
