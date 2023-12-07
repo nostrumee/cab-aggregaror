@@ -26,13 +26,13 @@ import static com.modsen.passengerservice.util.ErrorMessages.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class PassengerServiceImpl implements PassengerService {
 
     private final PassengerRepository passengerRepository;
     private final PassengerMapper passengerMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public PassengerPageResponse getPassengerPage(int page, int size, String orderBy) {
         log.info("Retrieving passengers page");
 
@@ -53,6 +53,7 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PassengerResponse getById(long id) {
         log.info("Retrieving passenger by id {}", id);
 
@@ -61,6 +62,7 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
+    @Transactional
     public PassengerResponse addPassenger(CreatePassengerRequest createRequest) {
         log.info("Adding passenger");
 
@@ -73,6 +75,7 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
+    @Transactional
     public PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, long id) {
         log.info("Updating passenger with id {}", id);
 
@@ -87,6 +90,7 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
+    @Transactional
     public void deletePassenger(long id) {
         log.info("Deleting passenger with id {}", id);
 
@@ -95,6 +99,7 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
+    @Transactional
     public void updatePassengerRating(PassengerRatingMessage updateRatingMessage) {
         long id = updateRatingMessage.passengerId();
 

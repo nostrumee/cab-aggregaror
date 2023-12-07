@@ -42,7 +42,6 @@ import static com.modsen.rideservice.util.ErrorMessages.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class RideServiceImpl implements RideService {
 
     private final RideRepository rideRepository;
@@ -53,6 +52,7 @@ public class RideServiceImpl implements RideService {
     private final SendMessageHandler sendMessageHandler;
 
     @Override
+    @Transactional(readOnly = true)
     public RidePageResponse getRidesPage(int page, int size, String orderBy) {
         log.info("Retrieving rides page");
 
@@ -73,6 +73,7 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public RidePageResponse getRidesByDriverId(long driverId, int page, int size, String orderBy) {
         log.info("Retrieving rides for driver with id {}", driverId);
 
@@ -93,6 +94,7 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public RidePageResponse getRidesByPassengerId(long passengerId, int page, int size, String orderBy) {
         log.info("Retrieving rides for passenger with id {}", passengerId);
 
@@ -113,6 +115,7 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public RideResponse getById(long id) {
         log.info("Retrieving ride by id {}", id);
 
@@ -123,6 +126,7 @@ public class RideServiceImpl implements RideService {
 
 
     @Override
+    @Transactional
     public RideResponse createRide(CreateRideRequest createRequest) {
         log.info("Creating ride order for passenger with id {}", createRequest.passengerId());
 
@@ -143,6 +147,7 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
+    @Transactional
     public void deleteRide(long id) {
         log.info("Deleting ride by id {}", id);
 
@@ -151,6 +156,7 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
+    @Transactional
     public void acceptRide(AcceptRideMessage acceptRideMessage) {
         long rideId = acceptRideMessage.rideId();
 
@@ -177,6 +183,7 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
+    @Transactional
     public RideResponse startRide(long id) {
         log.info("Starting a ride with id {}", id);
 
@@ -201,6 +208,7 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
+    @Transactional
     public RideResponse finishRide(long id) {
         log.info("Finishing a ride with id {}", id);
 
@@ -231,6 +239,7 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DriverResponse getDriverProfile(long rideId) {
         log.info("Retrieving driver's profile from a ride with id {}", rideId);
 

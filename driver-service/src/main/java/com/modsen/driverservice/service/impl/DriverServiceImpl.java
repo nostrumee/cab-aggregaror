@@ -27,13 +27,13 @@ import static com.modsen.driverservice.util.ErrorMessages.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class DriverServiceImpl implements DriverService {
 
     private final DriverRepository driverRepository;
     private final DriverMapper driverMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public DriverPageResponse getDriverPage(int page, int size, String orderBy) {
         log.info("Retrieving drivers page");
 
@@ -54,6 +54,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<DriverResponse> getAvailableDrivers() {
         log.info("Retrieving available drivers");
 
@@ -62,6 +63,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DriverResponse getById(long id) {
         log.info("Retrieving driver by id {}", id);
 
@@ -70,6 +72,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
+    @Transactional
     public DriverResponse addDriver(CreateDriverRequest createRequest) {
         log.info("Adding driver");
 
@@ -82,6 +85,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
+    @Transactional
     public DriverResponse updateDriver(UpdateDriverRequest updateRequest, long id) {
         log.info("Updating driver with id {}", id);
 
@@ -96,6 +100,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
+    @Transactional
     public void deleteDriver(long id) {
         log.info("Deleting driver with id {}", id);
 
@@ -104,6 +109,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
+    @Transactional
     public void updateDriverStatus(long id, DriverStatus status) {
         log.info("Changing status of driver with id {}", id);
 
@@ -113,6 +119,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
+    @Transactional
     public void updateDriverRating(DriverRatingMessage updateRatingMessage) {
         long id = updateRatingMessage.driverId();
 

@@ -26,7 +26,6 @@ import java.math.RoundingMode;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 public class RatingServiceImpl implements RatingService {
 
     private final PassengerRatingRepository passengerRatingRepository;
@@ -36,6 +35,7 @@ public class RatingServiceImpl implements RatingService {
     private final RatingMapper ratingMapper;
 
     @Override
+    @Transactional
     public void ratePassenger(PassengerRatingRequest ratingRequest) {
         log.info("Rating a passenger of a ride with id {}", ratingRequest.rideId());
 
@@ -59,6 +59,7 @@ public class RatingServiceImpl implements RatingService {
     }
 
     @Override
+    @Transactional
     public void rateDriver(DriverRatingRequest ratingRequest) {
         log.info("Rating a driver of a ride with id {}", ratingRequest.rideId());
 
