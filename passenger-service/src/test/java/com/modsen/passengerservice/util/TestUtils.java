@@ -49,6 +49,7 @@ public class TestUtils {
                 .lastName(DEFAULT_LAST_NAME)
                 .email(DEFAULT_EMAIL)
                 .phone(DEFAULT_PHONE)
+                .rating(DEFAULT_RATING)
                 .build();
     }
 
@@ -59,6 +60,7 @@ public class TestUtils {
                 .lastName(OTHER_LAST_NAME)
                 .email(OTHER_EMAIL)
                 .phone(OTHER_PHONE)
+                .rating(OTHER_RATING)
                 .build();
     }
 
@@ -68,6 +70,7 @@ public class TestUtils {
                 .lastName(DEFAULT_LAST_NAME)
                 .email(DEFAULT_EMAIL)
                 .phone(DEFAULT_PHONE)
+                .rating(DEFAULT_RATING)
                 .build();
     }
 

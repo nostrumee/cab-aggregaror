@@ -1,6 +1,7 @@
 package com.modsen.passengerservice.service.impl;
 
 import com.modsen.passengerservice.dto.response.PassengerPageResponse;
+import com.modsen.passengerservice.dto.response.PassengerResponse;
 import com.modsen.passengerservice.entity.Passenger;
 import com.modsen.passengerservice.exception.InvalidRequestParamException;
 import com.modsen.passengerservice.exception.PassengerAlreadyExistsException;
@@ -37,18 +38,19 @@ public class PassengerServiceImplTest {
     @Test
     void getById_shouldReturnPassenger_whenPassengerExists() {
         var expected = getDefaultPassengerResponse();
+        var retrievedPassenger = getDefaultPassenger();
 
-        doReturn(Optional.of(getDefaultPassenger()))
+        doReturn(Optional.of(retrievedPassenger))
                 .when(passengerRepository)
                 .findById(DEFAULT_ID);
-        doReturn(getDefaultPassengerResponse())
+        doReturn(expected)
                 .when(passengerMapper)
-                .fromEntityToResponse(getDefaultPassenger());
+                .fromEntityToResponse(retrievedPassenger);
 
         var actual = passengerService.getById(DEFAULT_ID);
 
         verify(passengerRepository).findById(DEFAULT_ID);
-        verify(passengerMapper).fromEntityToResponse(getDefaultPassenger());
+        verify(passengerMapper).fromEntityToResponse(retrievedPassenger);
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -68,23 +70,28 @@ public class PassengerServiceImplTest {
 
     @Test
     void getPassengerPage_shouldReturnPassengerPage_whenValidParamsPassed() {
+        var passengerResponseList = getPassengerResponseList();
+        var passengersPage = getPassengerPage();
+        var retrievedPassengers = getPassengerList();
+        var pageRequest = getPageRequest(VALID_PAGE, VALID_SIZE, VALID_ORDER_BY);
+
         var expected = PassengerPageResponse.builder()
-                .passengers(getPassengerResponseList())
+                .passengers(passengerResponseList)
                 .pageNumber(PAGE_NUMBER)
                 .total(TOTAL)
                 .build();
 
-        doReturn(getPassengerPage())
+        doReturn(passengersPage)
                 .when(passengerRepository)
-                .findAll(getPageRequest(VALID_PAGE, VALID_SIZE, VALID_ORDER_BY));
-        doReturn(getPassengerResponseList())
+                .findAll(pageRequest);
+        doReturn(passengerResponseList)
                 .when(passengerMapper)
-                .fromEntityListToResponseList(getPassengerList());
+                .fromEntityListToResponseList(retrievedPassengers);
 
         var actual = passengerService.getPassengerPage(VALID_PAGE, VALID_SIZE, VALID_ORDER_BY);
 
-        verify(passengerRepository).findAll(getPageRequest(VALID_PAGE, VALID_SIZE, VALID_ORDER_BY));
-        verify(passengerMapper).fromEntityListToResponseList(getPassengerList());
+        verify(passengerRepository).findAll(pageRequest);
+        verify(passengerMapper).fromEntityListToResponseList(retrievedPassengers);
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -109,35 +116,41 @@ public class PassengerServiceImplTest {
     void addPassenger_shouldReturnPassengerResponse_whenEmailAndPhoneUnique() {
         var expected = getDefaultPassengerResponse();
 
+        var passengerToSave = getNotSavedPassenger();
+        var savedPassenger = getDefaultPassenger();
+        var createRequest = getCreatePassengerRequest();
+
         doReturn(false)
                 .when(passengerRepository)
                 .existsByEmail(DEFAULT_EMAIL);
         doReturn(false)
                 .when(passengerRepository)
                 .existsByPhone(DEFAULT_PHONE);
-        doReturn(getDefaultPassenger())
+        doReturn(passengerToSave)
                 .when(passengerMapper)
-                .fromCreateRequestToEntity(getCreatePassengerRequest());
-        doReturn(getDefaultPassenger())
+                .fromCreateRequestToEntity(createRequest);
+        doReturn(savedPassenger)
                 .when(passengerRepository)
-                .save(getDefaultPassenger());
-        doReturn(getDefaultPassengerResponse())
+                .save(passengerToSave);
+        doReturn(expected)
                 .when(passengerMapper)
-                .fromEntityToResponse(getDefaultPassenger());
+                .fromEntityToResponse(savedPassenger);
 
         var actual = passengerService.addPassenger(getCreatePassengerRequest());
 
         verify(passengerRepository).existsByEmail(DEFAULT_EMAIL);
         verify(passengerRepository).existsByPhone(DEFAULT_PHONE);
-        verify(passengerRepository).save(getDefaultPassenger());
-        verify(passengerMapper).fromCreateRequestToEntity(getCreatePassengerRequest());
-        verify(passengerMapper).fromEntityToResponse(getDefaultPassenger());
+        verify(passengerRepository).save(passengerToSave);
+        verify(passengerMapper).fromCreateRequestToEntity(createRequest);
+        verify(passengerMapper).fromEntityToResponse(savedPassenger);
 
         assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     void addPassenger_shouldThrowPassengerAlreadyExistsException_whenEmailOrPhoneNotUnique() {
+        var createRequest = getCreatePassengerRequest();
+
         doReturn(true)
                 .when(passengerRepository)
                 .existsByEmail(DEFAULT_EMAIL);
@@ -147,7 +160,7 @@ public class PassengerServiceImplTest {
 
         assertThrows(
                 PassengerAlreadyExistsException.class,
-                () -> passengerService.addPassenger(getCreatePassengerRequest())
+                () -> passengerService.addPassenger(createRequest)
         );
 
         doReturn(false)
@@ -159,7 +172,7 @@ public class PassengerServiceImplTest {
 
         assertThrows(
                 PassengerAlreadyExistsException.class,
-                () -> passengerService.addPassenger(getCreatePassengerRequest())
+                () -> passengerService.addPassenger(createRequest)
         );
 
         verify(passengerRepository, times(2)).existsByEmail(DEFAULT_EMAIL);
@@ -168,48 +181,63 @@ public class PassengerServiceImplTest {
 
     @Test
     void updatePassenger_shouldReturnPassengerResponse_whenPassengerExistsAndDataUnique() {
-        var expected = getDefaultPassengerResponse();
+        var expected = PassengerResponse.builder()
+                .id(DEFAULT_ID)
+                .firstName(DEFAULT_FIRST_NAME)
+                .lastName(DEFAULT_LAST_NAME)
+                .email(OTHER_EMAIL)
+                .phone(OTHER_PHONE)
+                .rating(DEFAULT_RATING)
+                .build();
+        var passenger = getDefaultPassenger();
+        var updateRequest = getUpdatePassengerRequest();
 
-        doReturn(Optional.of(getDefaultPassenger()))
+        doReturn(Optional.of(passenger))
                 .when(passengerRepository)
                 .findById(DEFAULT_ID);
         doReturn(false)
                 .when(passengerRepository)
-                .existsByEmail(OTHER_EMAIL);
+                .existsByEmail(updateRequest.email());
         doReturn(false)
                 .when(passengerRepository)
-                .existsByPhone(OTHER_PHONE);
-        doReturn(getDefaultPassengerResponse())
+                .existsByPhone(updateRequest.phone());
+        doReturn(expected)
                 .when(passengerMapper)
-                .fromEntityToResponse(getDefaultPassenger());
+                .fromEntityToResponse(passenger);
 
-        var actual = passengerService.updatePassenger(getUpdatePassengerRequest(), DEFAULT_ID);
+        var actual = passengerService.updatePassenger(updateRequest, DEFAULT_ID);
 
         verify(passengerRepository).findById(DEFAULT_ID);
-        verify(passengerRepository).existsByEmail(OTHER_EMAIL);
-        verify(passengerRepository).existsByPhone(OTHER_PHONE);
-        verify(passengerRepository).save(getDefaultPassenger());
-        verify(passengerMapper).updateEntityFromUpdateRequest(getUpdatePassengerRequest(), getDefaultPassenger());
-        verify(passengerMapper).fromEntityToResponse(getDefaultPassenger());
+        verify(passengerRepository).existsByEmail(updateRequest.email());
+        verify(passengerRepository).existsByPhone(updateRequest.phone());
+        verify(passengerRepository).save(passenger);
+        verify(passengerMapper).updateEntityFromUpdateRequest(updateRequest, passenger);
+        verify(passengerMapper).fromEntityToResponse(passenger);
 
         assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     void updatePassenger_shouldThrowPassengerNotFoundException_whenPassengerNotExist() {
+        var updateRequest = getUpdatePassengerRequest();
+
         doReturn(Optional.empty())
                 .when(passengerRepository)
                 .findById(DEFAULT_ID);
 
         assertThrows(
                 PassengerNotFoundException.class,
-                () -> passengerService.updatePassenger(getUpdatePassengerRequest(), DEFAULT_ID)
+                () -> passengerService.updatePassenger(updateRequest, DEFAULT_ID)
         );
     }
 
     @Test
     void updatePassenger_shouldThrowPassengerAlreadyExistsException_whenDataNotUnique() {
-        doReturn(Optional.of(getDefaultPassenger()))
+        var passenger = getDefaultPassenger();
+        var updateRequest = getUpdatePassengerRequest();
+
+
+        doReturn(Optional.of(passenger))
                 .when(passengerRepository)
                 .findById(DEFAULT_ID);
         doReturn(true)
@@ -221,7 +249,7 @@ public class PassengerServiceImplTest {
 
         assertThrows(
                 PassengerAlreadyExistsException.class,
-                () -> passengerService.updatePassenger(getUpdatePassengerRequest(), DEFAULT_ID)
+                () -> passengerService.updatePassenger(updateRequest, DEFAULT_ID)
         );
 
         doReturn(false)
@@ -233,7 +261,7 @@ public class PassengerServiceImplTest {
 
         assertThrows(
                 PassengerAlreadyExistsException.class,
-                () -> passengerService.updatePassenger(getUpdatePassengerRequest(), DEFAULT_ID)
+                () -> passengerService.updatePassenger(updateRequest, DEFAULT_ID)
         );
 
         verify(passengerRepository, times(2)).findById(DEFAULT_ID);
@@ -243,14 +271,16 @@ public class PassengerServiceImplTest {
 
     @Test
     void deletePassenger_shouldDeletePassenger_whenPassengerExists() {
-        doReturn(Optional.of(getDefaultPassenger()))
+        var passenger = getDefaultPassenger();
+
+        doReturn(Optional.of(passenger))
                 .when(passengerRepository)
                 .findById(DEFAULT_ID);
 
         passengerService.deletePassenger(DEFAULT_ID);
 
         verify(passengerRepository).findById(DEFAULT_ID);
-        verify(passengerRepository).delete(getDefaultPassenger());
+        verify(passengerRepository).delete(passenger);
     }
 
     @Test
@@ -268,12 +298,14 @@ public class PassengerServiceImplTest {
 
     @Test
     void updatePassengerRating_shouldUpdateRating_whenPassengerExists() {
+        var ratingMessage = getPassengerRatingMessage();
+
         Passenger passenger = getDefaultPassenger();
         doReturn(Optional.of(passenger))
                 .when(passengerRepository)
                 .findById(DEFAULT_ID);
 
-        passengerService.updatePassengerRating(getPassengerRatingMessage());
+        passengerService.updatePassengerRating(ratingMessage);
 
         verify(passengerRepository).findById(DEFAULT_ID);
         assertEquals(OTHER_RATING, passenger.getRating());
@@ -281,13 +313,15 @@ public class PassengerServiceImplTest {
 
     @Test
     void updatePassengerRating_shouldThrowPassengerNotFoundException_whenPassengerNotExist() {
+        var ratingMessage = getPassengerRatingMessage();
+
         doReturn(Optional.empty())
                 .when(passengerRepository)
                 .findById(DEFAULT_ID);
 
         assertThrows(
                 PassengerNotFoundException.class,
-                () -> passengerService.updatePassengerRating(getPassengerRatingMessage())
+                () -> passengerService.updatePassengerRating(ratingMessage)
         );
         verify(passengerRepository).findById(DEFAULT_ID);
     }
