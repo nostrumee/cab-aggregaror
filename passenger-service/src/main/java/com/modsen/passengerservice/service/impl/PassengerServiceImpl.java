@@ -141,6 +141,8 @@ public class PassengerServiceImpl implements PassengerService {
                 .toList();
 
         if (!fieldNames.contains(orderBy)) {
+            log.error("Invalid sorting parameter passed: {}", orderBy);
+
             String acceptableParams = String.join(", ", fieldNames);
             String errorMessage = String.format(INVALID_SORTING_PARAMETER_MESSAGE, orderBy, acceptableParams);
             throw new InvalidRequestParamException(errorMessage);

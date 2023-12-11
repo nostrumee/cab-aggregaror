@@ -120,7 +120,6 @@ public class RideServiceImpl implements RideService {
         log.info("Retrieving ride by id {}", id);
 
         Ride ride = findRideById(id);
-
         return rideMapper.fromEntityToResponse(ride);
     }
 
