@@ -1,5 +1,6 @@
 package com.modsen.driverservice.dto.response;
 
+import com.modsen.driverservice.entity.DriverStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.NonNull;
@@ -33,6 +34,10 @@ public record DriverResponse(
 
         @Schema(name = "Rating", example = "4.95")
         @NonNull
-        Double rating
+        Double rating,
+
+        @Schema(name = "Status", example = "AVAILABLE")
+        @NonNull
+        DriverStatus status
 ) {
 }

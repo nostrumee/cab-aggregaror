@@ -97,15 +97,23 @@ public class PassengerServiceImplTest {
     }
 
     @Test
-    void getPassengerPage_shouldThrowInvalidRequestParamException_whenInvalidParamsPassed() {
+    void getPassengerPage_shouldThrowInvalidRequestParamException_whenInvalidPagePassed() {
         assertThrows(
                 InvalidRequestParamException.class,
                 () -> passengerService.getPassengerPage(INVALID_PAGE, VALID_SIZE, VALID_ORDER_BY)
         );
+    }
+
+    @Test
+    void getPassengerPage_shouldThrowInvalidRequestParamException_whenInvalidSizePassed() {
         assertThrows(
                 InvalidRequestParamException.class,
                 () -> passengerService.getPassengerPage(VALID_PAGE, INVALID_SIZE, VALID_ORDER_BY)
         );
+    }
+
+    @Test
+    void getPassengerPage_shouldThrowInvalidRequestParamException_whenInvalidOrderByParamPassed() {
         assertThrows(
                 InvalidRequestParamException.class,
                 () -> passengerService.getPassengerPage(VALID_PAGE, VALID_SIZE, INVALID_ORDER_BY)
@@ -148,7 +156,7 @@ public class PassengerServiceImplTest {
     }
 
     @Test
-    void addPassenger_shouldThrowPassengerAlreadyExistsException_whenEmailOrPhoneNotUnique() {
+    void addPassenger_shouldThrowPassengerAlreadyExistsException_whenEmailNotUnique() {
         var createRequest = getCreatePassengerRequest();
 
         doReturn(true)
@@ -163,6 +171,14 @@ public class PassengerServiceImplTest {
                 () -> passengerService.addPassenger(createRequest)
         );
 
+        verify(passengerRepository).existsByEmail(DEFAULT_EMAIL);
+        verify(passengerRepository).existsByPhone(DEFAULT_PHONE);
+    }
+
+    @Test
+    void addPassenger_shouldThrowPassengerAlreadyExistsException_whenPhoneNotUnique() {
+        var createRequest = getCreatePassengerRequest();
+
         doReturn(false)
                 .when(passengerRepository)
                 .existsByEmail(DEFAULT_EMAIL);
@@ -175,8 +191,8 @@ public class PassengerServiceImplTest {
                 () -> passengerService.addPassenger(createRequest)
         );
 
-        verify(passengerRepository, times(2)).existsByEmail(DEFAULT_EMAIL);
-        verify(passengerRepository, times(2)).existsByPhone(DEFAULT_PHONE);
+        verify(passengerRepository).existsByEmail(DEFAULT_EMAIL);
+        verify(passengerRepository).existsByPhone(DEFAULT_PHONE);
     }
 
     @Test
@@ -232,10 +248,9 @@ public class PassengerServiceImplTest {
     }
 
     @Test
-    void updatePassenger_shouldThrowPassengerAlreadyExistsException_whenDataNotUnique() {
+    void updatePassenger_shouldThrowPassengerAlreadyExistsException_whenEmailNotUnique() {
         var passenger = getDefaultPassenger();
         var updateRequest = getUpdatePassengerRequest();
-
 
         doReturn(Optional.of(passenger))
                 .when(passengerRepository)
@@ -252,6 +267,19 @@ public class PassengerServiceImplTest {
                 () -> passengerService.updatePassenger(updateRequest, DEFAULT_ID)
         );
 
+        verify(passengerRepository).findById(DEFAULT_ID);
+        verify(passengerRepository).existsByEmail(OTHER_EMAIL);
+        verify(passengerRepository).existsByPhone(OTHER_PHONE);
+    }
+
+    @Test
+    void updatePassenger_shouldThrowPassengerAlreadyExistsException_whenPhoneNotUnique() {
+        var passenger = getDefaultPassenger();
+        var updateRequest = getUpdatePassengerRequest();
+
+        doReturn(Optional.of(passenger))
+                .when(passengerRepository)
+                .findById(DEFAULT_ID);
         doReturn(false)
                 .when(passengerRepository)
                 .existsByEmail(OTHER_EMAIL);
@@ -264,9 +292,9 @@ public class PassengerServiceImplTest {
                 () -> passengerService.updatePassenger(updateRequest, DEFAULT_ID)
         );
 
-        verify(passengerRepository, times(2)).findById(DEFAULT_ID);
-        verify(passengerRepository, times(2)).existsByEmail(OTHER_EMAIL);
-        verify(passengerRepository, times(2)).existsByPhone(OTHER_PHONE);
+        verify(passengerRepository).findById(DEFAULT_ID);
+        verify(passengerRepository).existsByEmail(OTHER_EMAIL);
+        verify(passengerRepository).existsByPhone(OTHER_PHONE);
     }
 
     @Test
