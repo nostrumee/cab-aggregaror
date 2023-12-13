@@ -44,18 +44,6 @@ public class PassengerControllerIT extends TestcontainersBase {
     @LocalServerPort
     private int port;
 
-    @BeforeAll
-    static void beforeAll() {
-        postgres.start();
-        kafka.start();
-    }
-
-    @AfterAll
-    static void afterAll() {
-        postgres.stop();
-        kafka.stop();
-    }
-
     @Test
     void getPassengerById_shouldReturnPassengerResponse_whenPassengerExists() {
         var passenger = passengerRepository.findById(DEFAULT_ID);

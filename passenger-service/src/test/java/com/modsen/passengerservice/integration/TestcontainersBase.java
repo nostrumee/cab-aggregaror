@@ -33,4 +33,9 @@ public class TestcontainersBase {
     private static void kafkaProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
     }
+
+    static {
+        postgres.start();
+        kafka.start();
+    }
 }

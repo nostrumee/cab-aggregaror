@@ -26,18 +26,6 @@ public class KafkaConsumerIT extends TestcontainersBase {
     private final PassengerRepository passengerRepository;
     private final TestSender testSender;
 
-    @BeforeAll
-    static void beforeAll() {
-        postgres.start();
-        kafka.start();
-    }
-
-    @AfterAll
-    static void afterAll() {
-        postgres.stop();
-        kafka.stop();
-    }
-
     @Test
     void updatePassengerRating_shouldUpdatePassengerRating_whenMessageConsumed() {
         var ratingMessage = PassengerRatingMessage.builder()
