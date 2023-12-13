@@ -78,7 +78,7 @@ public class PassengerServiceImplTest {
         var expected = PassengerPageResponse.builder()
                 .passengers(passengerResponseList)
                 .pageNumber(PAGE_NUMBER)
-                .total(TOTAL)
+                .total(MOCK_TOTAL)
                 .build();
 
         doReturn(passengersPage)
