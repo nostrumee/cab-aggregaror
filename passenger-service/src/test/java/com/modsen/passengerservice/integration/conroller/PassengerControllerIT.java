@@ -3,6 +3,7 @@ package com.modsen.passengerservice.integration.conroller;
 import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
 import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
 import com.modsen.passengerservice.dto.response.*;
+import com.modsen.passengerservice.integration.TestcontainersBase;
 import com.modsen.passengerservice.mapper.PassengerMapper;
 import com.modsen.passengerservice.repository.PassengerRepository;
 import io.restassured.http.ContentType;
@@ -15,15 +16,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.jdbc.Sql;
-import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import java.util.Map;
 
@@ -33,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Testcontainers
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @Sql(
         scripts = {
@@ -43,36 +36,13 @@ import static org.hamcrest.Matchers.equalTo;
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
 )
 @RequiredArgsConstructor
-public class PassengerControllerIT {
-
-    @LocalServerPort
-    private int port;
+public class PassengerControllerIT extends TestcontainersBase {
 
     private final PassengerRepository passengerRepository;
     private final PassengerMapper passengerMapper;
 
-    @Container
-    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
-            "postgres:15-alpine"
-    );
-
-    @Container
-    private static final KafkaContainer kafka = new KafkaContainer(
-            DockerImageName.parse("confluentinc/cp-kafka:7.3.3")
-    );
-
-    @DynamicPropertySource
-    private static void postgresProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-        registry.add("postgresql.driver", postgres::getDriverClassName);
-    }
-
-    @DynamicPropertySource
-    private static void kafkaProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
-    }
+    @LocalServerPort
+    private int port;
 
     @BeforeAll
     static void beforeAll() {
