@@ -5,6 +5,8 @@ import com.modsen.passengerservice.integration.TestcontainersBase;
 import com.modsen.passengerservice.repository.PassengerRepository;
 import com.modsen.passengerservice.service.TestSender;
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestConstructor;
@@ -16,13 +18,25 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @RequiredArgsConstructor
 public class KafkaConsumerIntegrationTest extends TestcontainersBase {
 
     private final PassengerRepository passengerRepository;
     private final TestSender testSender;
+
+    @BeforeAll
+    static void beforeAll() {
+        postgres.start();
+        kafka.start();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        postgres.stop();
+        kafka.stop();
+    }
 
     @Test
     void updatePassengerRating_shouldUpdatePassengerRating_whenMessageConsumed() {

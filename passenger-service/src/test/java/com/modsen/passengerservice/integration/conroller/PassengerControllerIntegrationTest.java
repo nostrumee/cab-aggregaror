@@ -9,6 +9,8 @@ import com.modsen.passengerservice.repository.PassengerRepository;
 import com.modsen.passengerservice.service.MessageService;
 import io.restassured.http.ContentType;
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -47,6 +49,18 @@ public class PassengerControllerIntegrationTest extends TestcontainersBase {
 
     @LocalServerPort
     private int port;
+
+    @BeforeAll
+    static void beforeAll() {
+        postgres.start();
+        kafka.start();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        postgres.stop();
+        kafka.stop();
+    }
 
     @Test
     void getPassengerById_shouldReturnPassengerResponse_whenPassengerExists() {
