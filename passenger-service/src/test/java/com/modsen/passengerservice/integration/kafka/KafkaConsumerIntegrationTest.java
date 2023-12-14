@@ -5,8 +5,6 @@ import com.modsen.passengerservice.integration.TestcontainersBase;
 import com.modsen.passengerservice.repository.PassengerRepository;
 import com.modsen.passengerservice.service.TestSender;
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestConstructor;
@@ -21,7 +19,7 @@ import static org.awaitility.Awaitility.await;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @RequiredArgsConstructor
-public class KafkaConsumerIT extends TestcontainersBase {
+public class KafkaConsumerIntegrationTest extends TestcontainersBase {
 
     private final PassengerRepository passengerRepository;
     private final TestSender testSender;

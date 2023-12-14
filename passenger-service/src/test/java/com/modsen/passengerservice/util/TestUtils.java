@@ -54,20 +54,10 @@ public class TestUtils {
     public final long NON_EXISTING_ID = 256;
     public final long TOTAL = 10L;
 
-    public final String NOT_FOUND_WITH_ID_MESSAGE = "Passenger with id %d was not found";
-    public final String INVALID_PAGE_PARAMETERS_MESSAGE =
-            "Page number and size must be equal or greater than 1";
-    public final String INVALID_SORTING_PARAMETER_MESSAGE =
-            "Sorting parameter %s is invalid. Acceptable parameters are: id, firstName, lastName, email, phone, rating";
-    public final String INVALID_PARAMETER_TYPE_MESSAGE = "Invalid parameter type";
-    public final String PASSENGER_ALREADY_EXISTS_MESSAGE = "Passenger already exists";
-    public final String VALIDATION_FAILED_MESSAGE = "Validation failed";
-    public final String FIRST_NAME_VALIDATION_MESSAGE = "Passenger's first name must be defined";
-    public final String LAST_NAME_VALIDATION_MESSAGE = "Passenger's last name must be defined";
-    public final String EMAIL_VALIDATION_MESSAGE = "Email is not valid";
-    public final String PHONE_VALIDATION_MESSAGE = "Phone number is not valid";
-    public final String PASSENGER_WITH_EMAIL_EXISTS_MESSAGE = "Passenger with email %s already exists";
-    public final String PASSENGER_WITH_PHONE_EXISTS_MESSAGE = "Passenger with phone %s already exists";
+    public final String FIRST_NAME_VALIDATION_MESSAGE_KEY = "firstname.not.blank";
+    public final String LAST_NAME_VALIDATION_MESSAGE_KEY = "lastname.not.blank";
+    public final String EMAIL_VALIDATION_MESSAGE_KEY = "email.valid";
+    public final String PHONE_VALIDATION_MESSAGE_KEY = "phone.valid";
 
     public final String GET_PASSENGER_BY_ID_PATH = "/api/v1/passengers/{id}";
     public final String GET_PASSENGER_PAGE_PATH = "/api/v1/passengers";

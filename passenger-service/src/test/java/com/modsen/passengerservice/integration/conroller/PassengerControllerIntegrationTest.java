@@ -6,10 +6,9 @@ import com.modsen.passengerservice.dto.response.*;
 import com.modsen.passengerservice.integration.TestcontainersBase;
 import com.modsen.passengerservice.mapper.PassengerMapper;
 import com.modsen.passengerservice.repository.PassengerRepository;
+import com.modsen.passengerservice.service.MessageService;
 import io.restassured.http.ContentType;
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -19,8 +18,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import static com.modsen.passengerservice.util.ErrorMessages.*;
 import static com.modsen.passengerservice.util.TestUtils.*;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,10 +39,11 @@ import static org.hamcrest.Matchers.equalTo;
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
 )
 @RequiredArgsConstructor
-public class PassengerControllerIT extends TestcontainersBase {
+public class PassengerControllerIntegrationTest extends TestcontainersBase {
 
     private final PassengerRepository passengerRepository;
     private final PassengerMapper passengerMapper;
+    private final MessageService messageService;
 
     @LocalServerPort
     private int port;
@@ -163,9 +167,10 @@ public class PassengerControllerIT extends TestcontainersBase {
 
     @Test
     void getPassengerPage_shouldReturnBadRequestResponse_whenInvalidOrderByParamPassed() {
+        String errorMessage = getInvalidSortingParameterMessage();
         var expected = ErrorResponse.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
-                .message(String.format(INVALID_SORTING_PARAMETER_MESSAGE, INVALID_ORDER_BY))
+                .message(errorMessage)
                 .build();
 
         var actual = given()
@@ -285,6 +290,11 @@ public class PassengerControllerIT extends TestcontainersBase {
 
     @Test
     void addPassenger_shouldReturnBadRequestResponse_whenDataNotValid() {
+        String firstNameValidationMessage = messageService.getMessage(FIRST_NAME_VALIDATION_MESSAGE_KEY);
+        String lastNameValidationMessage = messageService.getMessage(LAST_NAME_VALIDATION_MESSAGE_KEY);
+        String emailValidationMessage = messageService.getMessage(EMAIL_VALIDATION_MESSAGE_KEY);
+        String phoneValidationMessage = messageService.getMessage(PHONE_VALIDATION_MESSAGE_KEY);
+
         var createRequest = CreatePassengerRequest.builder()
                 .firstName(null)
                 .lastName(null)
@@ -296,10 +306,10 @@ public class PassengerControllerIT extends TestcontainersBase {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(VALIDATION_FAILED_MESSAGE)
                 .errors(Map.of(
-                        FIRST_NAME_FIELD_NAME, FIRST_NAME_VALIDATION_MESSAGE,
-                        LAST_NAME_FIELD_NAME, LAST_NAME_VALIDATION_MESSAGE,
-                        EMAIL_FIELD_NAME, EMAIL_VALIDATION_MESSAGE,
-                        PHONE_FIELD_NAME, PHONE_VALIDATION_MESSAGE
+                        FIRST_NAME_FIELD_NAME, firstNameValidationMessage,
+                        LAST_NAME_FIELD_NAME, lastNameValidationMessage,
+                        EMAIL_FIELD_NAME, emailValidationMessage,
+                        PHONE_FIELD_NAME, phoneValidationMessage
                 ))
                 .build();
 
@@ -414,6 +424,11 @@ public class PassengerControllerIT extends TestcontainersBase {
 
     @Test
     void updatePassenger_shouldReturnBadRequestResponse_whenDataNotValid() {
+        String firstNameValidationMessage = messageService.getMessage(FIRST_NAME_VALIDATION_MESSAGE_KEY);
+        String lastNameValidationMessage = messageService.getMessage(LAST_NAME_VALIDATION_MESSAGE_KEY);
+        String emailValidationMessage = messageService.getMessage(EMAIL_VALIDATION_MESSAGE_KEY);
+        String phoneValidationMessage = messageService.getMessage(PHONE_VALIDATION_MESSAGE_KEY);
+
         var updateRequest = UpdatePassengerRequest.builder()
                 .firstName(null)
                 .lastName(null)
@@ -425,10 +440,10 @@ public class PassengerControllerIT extends TestcontainersBase {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(VALIDATION_FAILED_MESSAGE)
                 .errors(Map.of(
-                        FIRST_NAME_FIELD_NAME, FIRST_NAME_VALIDATION_MESSAGE,
-                        LAST_NAME_FIELD_NAME, LAST_NAME_VALIDATION_MESSAGE,
-                        EMAIL_FIELD_NAME, EMAIL_VALIDATION_MESSAGE,
-                        PHONE_FIELD_NAME, PHONE_VALIDATION_MESSAGE
+                        FIRST_NAME_FIELD_NAME, firstNameValidationMessage,
+                        LAST_NAME_FIELD_NAME, lastNameValidationMessage,
+                        EMAIL_FIELD_NAME, emailValidationMessage,
+                        PHONE_FIELD_NAME, phoneValidationMessage
                 ))
                 .build();
 
@@ -493,5 +508,14 @@ public class PassengerControllerIT extends TestcontainersBase {
                 .as(ErrorResponse.class);
 
         assertThat(actual).isEqualTo(expected);
+    }
+
+    private String getInvalidSortingParameterMessage() {
+        List<String> fieldNames = Arrays.stream(PassengerResponse.class.getDeclaredFields())
+                .map(Field::getName)
+                .toList();
+
+        String acceptableParams = String.join(", ", fieldNames);
+        return String.format(INVALID_SORTING_PARAMETER_MESSAGE, INVALID_ORDER_BY, acceptableParams);
     }
 }
