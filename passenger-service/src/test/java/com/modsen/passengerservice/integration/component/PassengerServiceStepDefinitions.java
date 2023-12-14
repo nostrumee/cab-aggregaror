@@ -1,7 +1,9 @@
 package com.modsen.passengerservice.integration.component;
 
+import com.modsen.passengerservice.PassengerServiceApplication;
 import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
+import com.modsen.passengerservice.exception.PassengerNotFoundException;
 import com.modsen.passengerservice.integration.TestcontainersBase;
 import com.modsen.passengerservice.mapper.PassengerMapper;
 import com.modsen.passengerservice.repository.PassengerRepository;
@@ -14,13 +16,16 @@ import io.cucumber.spring.CucumberContextConfiguration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static com.modsen.passengerservice.util.ErrorMessages.*;
 import static com.modsen.passengerservice.util.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
 
 
 @RequiredArgsConstructor
-@SpringBootTest
+@SpringBootTest(classes = {
+        ComponentIntegrationTest.class,
+        PassengerServiceApplication.class
+})
 @CucumberContextConfiguration
 public class PassengerServiceStepDefinitions extends TestcontainersBase {
 
@@ -31,23 +36,45 @@ public class PassengerServiceStepDefinitions extends TestcontainersBase {
     private long passengerId;
     private PassengerResponse passengerResponse;
     private CreatePassengerRequest createRequest;
+    private PassengerNotFoundException passengerNotFoundException;
 
-    @Given("The id {long} of existing passenger")
-    public void existingPassengerIdGiven(long id) {
+    @Given("The passenger with id {long} exists")
+    public void passengerWithIdExists(long id) {
         passengerId = id;
+        var passenger = passengerRepository.findById(id);
+        assertThat(passenger.isPresent()).isEqualTo(true);
     }
 
-    @When("The getById method is called with this id")
-    public void getByIdMethodCalled() {
-        passengerResponse = passengerService.getById(passengerId);
+    @Given("The passenger with id {long} doesn't exist")
+    public void passengerWithIdNotExist(long id) {
+        passengerId = id;
+        var passenger = passengerRepository.findById(id);
+        assertThat(passenger.isPresent()).isEqualTo(true);
     }
 
-    @Then("The response should contain details of the passenger")
-    public void responseContainsPassengerDetails() {
-        var passenger = passengerRepository.findById(passengerId).get();
+    @When("The getById method is called with id {long}")
+    public void getByIdMethodCalled(long id) {
+        try {
+            passengerResponse = passengerService.getById(id);
+        } catch (PassengerNotFoundException e) {
+            passengerNotFoundException = e;
+        }
+    }
+
+    @Then("The response should contain details of the passenger with id {long}")
+    public void responseContainsPassengerDetails(long id) {
+        var passenger = passengerRepository.findById(id).get();
         var expected = passengerMapper.fromEntityToResponse(passenger);
 
         assertThat(passengerResponse).isEqualTo(expected);
+    }
+
+    @Then("The PassengerNotFoundException should be thrown")
+    public void passengerNotFoundExceptionThrown() {
+        var expected = String.format(NOT_FOUND_WITH_ID_MESSAGE, passengerId);
+        var actual = passengerNotFoundException.getMessage();
+
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Given("A new passenger request with first name {string}, last name {string}, email {string}, phone {string}")

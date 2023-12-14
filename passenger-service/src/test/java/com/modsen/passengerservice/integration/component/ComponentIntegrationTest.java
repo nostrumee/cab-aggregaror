@@ -10,5 +10,5 @@ import org.junit.runner.RunWith;
         plugin = {"pretty"},
         features = "classpath:features"
 )
-public class ComponentTest {
+public class ComponentIntegrationTest {
 }

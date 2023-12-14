@@ -1,8 +1,13 @@
 Feature: Passenger Service
   Scenario: Retrieving a passenger by id
-    Given The id 1 of existing passenger
-    When The getById method is called with this id
-    Then The response should contain details of the passenger
+    Given The passenger with id 1 exists
+    When The getById method is called with id 1
+    Then The response should contain details of the passenger with id 1
+
+  Scenario: Retrieving a passenger by id
+    Given The passenger with id 111 doesn't exist
+    When The getById method is called with id 111
+    Then The PassengerNotFoundException should be thrown
 
   Scenario: Creating a new passenger
     Given A new passenger request with first name "John", last name "Dorian", email "johndorian@example.com", phone "111-22-33"
