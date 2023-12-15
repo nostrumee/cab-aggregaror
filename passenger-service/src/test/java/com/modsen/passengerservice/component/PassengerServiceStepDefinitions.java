@@ -1,59 +1,60 @@
-package com.modsen.passengerservice.integration.component;
+package com.modsen.passengerservice.component;
 
-import com.modsen.passengerservice.PassengerServiceApplication;
 import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
 import com.modsen.passengerservice.exception.PassengerAlreadyExistsException;
 import com.modsen.passengerservice.exception.PassengerNotFoundException;
-import com.modsen.passengerservice.integration.TestcontainersBase;
 import com.modsen.passengerservice.mapper.PassengerMapper;
 import com.modsen.passengerservice.repository.PassengerRepository;
-import com.modsen.passengerservice.service.PassengerService;
-import io.cucumber.java.AfterAll;
-import io.cucumber.java.BeforeAll;
+import com.modsen.passengerservice.service.impl.PassengerServiceImpl;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.cucumber.spring.CucumberContextConfiguration;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+
+import java.util.Optional;
 
 import static com.modsen.passengerservice.util.ErrorMessages.NOT_FOUND_WITH_ID_MESSAGE;
 import static com.modsen.passengerservice.util.ErrorMessages.PASSENGER_ALREADY_EXISTS_MESSAGE;
 import static com.modsen.passengerservice.util.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 
 
 @RequiredArgsConstructor
-@SpringBootTest(classes = {
-        ComponentIntegrationTest.class,
-        PassengerServiceApplication.class
-})
 @CucumberContextConfiguration
-public class PassengerServiceStepDefinitions extends TestcontainersBase {
+public class PassengerServiceStepDefinitions {
 
-    private final PassengerService passengerService;
-    private final PassengerRepository passengerRepository;
-    private final PassengerMapper passengerMapper;
+    @Mock
+    private PassengerRepository passengerRepository;
+
+    @Mock
+    private PassengerMapper passengerMapper;
+
+    @InjectMocks
+    private PassengerServiceImpl passengerService;
 
     private PassengerResponse passengerResponse;
     private Exception exception;
 
-    @BeforeAll
-    public static void setUp() {
-        postgres.start();
-        kafka.start();
-    }
-
-    @AfterAll
-    public static void tearDown() {
-        postgres.stop();
-        kafka.stop();
-    }
 
     @Given("A passenger with id {long} exists")
     public void passengerWithIdExists(long id) {
+        var expected = getDefaultPassengerResponse();
+        var retrievedPassenger = getDefaultPassenger();
+
+        doReturn(Optional.of(retrievedPassenger))
+                .when(passengerRepository)
+                .findById(id);
+        doReturn(expected)
+                .when(passengerMapper)
+                .fromEntityToResponse(retrievedPassenger);
+
         var passenger = passengerRepository.findById(id);
         assertThat(passenger.isPresent()).isEqualTo(true);
     }
@@ -65,7 +66,7 @@ public class PassengerServiceStepDefinitions extends TestcontainersBase {
     }
 
     @When("The id {long} is passed to the getById method")
-    public void getByIdMethodCalled(long id) {
+    public void idPassedToGetByIdMethod(long id) {
         try {
             passengerResponse = passengerService.getById(id);
         } catch (PassengerNotFoundException e) {
@@ -91,17 +92,53 @@ public class PassengerServiceStepDefinitions extends TestcontainersBase {
 
     @Given("A passenger with email {string} and phone {string} doesn't exist")
     public void passengerWithEmailAndPhoneNotExist(String email, String phone) {
+        var expected = getDefaultPassengerResponse();
+
+        var passengerToSave = getNotSavedPassenger();
+        var savedPassenger = getDefaultPassenger();
+        var createRequest = getCreatePassengerRequest();
+
+        doReturn(false)
+                .when(passengerRepository)
+                .existsByEmail(email);
+        doReturn(false)
+                .when(passengerRepository)
+                .existsByPhone(phone);
+        doReturn(passengerToSave)
+                .when(passengerMapper)
+                .fromCreateRequestToEntity(createRequest);
+        doReturn(savedPassenger)
+                .when(passengerRepository)
+                .save(passengerToSave);
+        doReturn(expected)
+                .when(passengerMapper)
+                .fromEntityToResponse(savedPassenger);
+
         assertThat(passengerRepository.existsByEmail(email)).isEqualTo(false);
         assertThat(passengerRepository.existsByPhone(phone)).isEqualTo(false);
     }
 
     @Given("A passenger with email {string} exists")
     public void passengerWithEmailExists(String email) {
+        doReturn(true)
+                .when(passengerRepository)
+                .existsByEmail(email);
+        doReturn(false)
+                .when(passengerRepository)
+                .existsByPhone(DEFAULT_PHONE);
+
         assertThat(passengerRepository.existsByEmail(email)).isEqualTo(true);
     }
 
     @Given("A passenger with phone {string} exists")
     public void passengerWithPhoneExists(String phone) {
+        doReturn(false)
+                .when(passengerRepository)
+                .existsByEmail(DEFAULT_EMAIL);
+        doReturn(true)
+                .when(passengerRepository)
+                .existsByPhone(phone);
+
         assertThat(passengerRepository.existsByPhone(phone)).isEqualTo(true);
     }
 
@@ -124,11 +161,11 @@ public class PassengerServiceStepDefinitions extends TestcontainersBase {
     @Then("The response should contain details of the newly created passenger")
     public void responseContainsCreatedPassengerDetails() {
         var expected = PassengerResponse.builder()
-                .id(NEW_ID)
-                .firstName(NEW_FIRST_NAME)
-                .lastName(NEW_LAST_NAME)
-                .email(NEW_EMAIL)
-                .phone(NEW_PHONE)
+                .id(DEFAULT_ID)
+                .firstName(DEFAULT_FIRST_NAME)
+                .lastName(DEFAULT_LAST_NAME)
+                .email(DEFAULT_EMAIL)
+                .phone(DEFAULT_PHONE)
                 .rating(DEFAULT_RATING)
                 .build();
 
@@ -145,5 +182,20 @@ public class PassengerServiceStepDefinitions extends TestcontainersBase {
     @Then("The PassengerAlreadyExistsException should be thrown")
     public void exceptionWithEmailMessageThrown() {
         assertThat(exception.getMessage()).isEqualTo(PASSENGER_ALREADY_EXISTS_MESSAGE);
+    }
+
+    @When("The id {long} is passed to the deletePassenger method")
+    public void idPassedToDeletePassengerMethod(long id) {
+        try {
+             passengerService.deletePassenger(id);
+        } catch (PassengerNotFoundException e) {
+            exception = e;
+        }
+    }
+
+    @Then("The passenger with id {long} should be deleted from the database")
+    public void passengerDeletedFromDatabase(long id) {
+        var passenger = passengerRepository.findById(id);
+        verify(passengerRepository).delete(passenger.get());
     }
 }

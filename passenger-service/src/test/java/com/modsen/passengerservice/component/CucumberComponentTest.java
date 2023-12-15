@@ -1,4 +1,4 @@
-package com.modsen.passengerservice.integration.component;
+package com.modsen.passengerservice.component;
 
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
@@ -10,5 +10,5 @@ import org.junit.runner.RunWith;
         plugin = {"pretty"},
         features = "classpath:features"
 )
-public class ComponentIntegrationTest {
+public class CucumberComponentTest {
 }
