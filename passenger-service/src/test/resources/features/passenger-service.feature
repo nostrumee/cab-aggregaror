@@ -34,4 +34,14 @@ Feature: Passenger Service
     When The id 1 is passed to the deletePassenger method
     Then The PassengerNotFoundException with the message containing id 1 should be thrown
 
+  Scenario: Updating rating of existing passenger
+    Given A passenger with id 1 exists
+    When The rating message with id 1 and rating 4.65 passed to the updatePassengerRating method
+    Then Rating of the passenger with id 1 updated to 4.65
+
+  Scenario: Updating rating of non-existing passenger
+    Given A passenger with id 1 doesn't exist
+    When The rating message with id 1 and rating 4.65 passed to the updatePassengerRating method
+    Then The PassengerNotFoundException with the message containing id 1 should be thrown
+
 

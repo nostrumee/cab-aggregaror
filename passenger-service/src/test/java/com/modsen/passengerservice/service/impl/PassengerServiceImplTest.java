@@ -336,7 +336,7 @@ public class PassengerServiceImplTest {
         passengerService.updatePassengerRating(ratingMessage);
 
         verify(passengerRepository).findById(DEFAULT_ID);
-        assertEquals(OTHER_RATING, passenger.getRating());
+        assertEquals(NEW_RATING, passenger.getRating());
     }
 
     @Test

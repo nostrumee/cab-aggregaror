@@ -1,7 +1,9 @@
 package com.modsen.passengerservice.component;
 
+import com.modsen.passengerservice.dto.message.PassengerRatingMessage;
 import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
+import com.modsen.passengerservice.entity.Passenger;
 import com.modsen.passengerservice.exception.PassengerAlreadyExistsException;
 import com.modsen.passengerservice.exception.PassengerNotFoundException;
 import com.modsen.passengerservice.mapper.PassengerMapper;
@@ -160,15 +162,7 @@ public class PassengerServiceStepDefinitions {
 
     @Then("The response should contain details of the newly created passenger")
     public void responseContainsCreatedPassengerDetails() {
-        var expected = PassengerResponse.builder()
-                .id(DEFAULT_ID)
-                .firstName(DEFAULT_FIRST_NAME)
-                .lastName(DEFAULT_LAST_NAME)
-                .email(DEFAULT_EMAIL)
-                .phone(DEFAULT_PHONE)
-                .rating(DEFAULT_RATING)
-                .build();
-
+        var expected = getDefaultPassengerResponse();
         assertThat(passengerResponse).isEqualTo(expected);
     }
 
@@ -197,5 +191,38 @@ public class PassengerServiceStepDefinitions {
     public void passengerDeletedFromDatabase(long id) {
         var passenger = passengerRepository.findById(id);
         verify(passengerRepository).delete(passenger.get());
+    }
+
+    @When("The rating message with id {long} and rating {double} passed to the updatePassengerRating method")
+    public void ratingMessagePassedToUpdatePassengerRatingMethod(long id, double rating) {
+        var ratingMessage = PassengerRatingMessage.builder()
+                .passengerId(id)
+                .rating(rating)
+                .build();
+
+        try {
+            passengerService.updatePassengerRating(ratingMessage);
+        } catch (PassengerNotFoundException e) {
+            exception = e;
+        }
+    }
+
+    @Then("Rating of the passenger with id {long} updated to {double}")
+    public void ratingOfPassengerUpdated(long id, double rating) {
+        var passenger = Passenger.builder()
+                .id(id)
+                .firstName(DEFAULT_FIRST_NAME)
+                .lastName(DEFAULT_LAST_NAME)
+                .email(DEFAULT_EMAIL)
+                .phone(DEFAULT_PHONE)
+                .rating(rating)
+                .build();
+
+        doReturn(Optional.of(passenger))
+                .when(passengerRepository)
+                .findById(id);
+
+        var actual = passengerRepository.findById(id).get();
+        assertThat(actual.getRating()).isEqualTo(rating);
     }
 }
