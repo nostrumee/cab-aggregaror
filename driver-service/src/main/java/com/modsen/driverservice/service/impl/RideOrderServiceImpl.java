@@ -17,12 +17,12 @@ import java.util.Random;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 public class RideOrderServiceImpl implements RideOrderService {
 
     private final DriverService driverService;
 
     @Override
+    @Transactional
     public AcceptRideMessage acceptRideOrder(CreateRideMessage orderMessage) {
         log.info("Searching for a driver to accept a ride order");
 

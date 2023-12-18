@@ -33,12 +33,15 @@ spring:
           group: ${spring.application.name}
         acceptRideOrder-out-0:
           destination: ${kafka.accept-ride-topic-name}
+          producer:
+            use-native-encoding: true
         updateDriverRating-in-0:
           destination: ${kafka.driver-rating-topic-name}
           group: ${spring.application.name}
         updateDriverStatus-in-0:
           destination: ${kafka.driver-status-topic-name}
           group: ${spring.application.name}
+
 
       kafka:
         binder:
@@ -49,6 +52,8 @@ spring:
               serializer: org.springframework.kafka.support.serializer.JsonSerializer
             key:
               serializer: org.apache.kafka.common.serialization.StringSerializer
+
+
 
 springdoc:
   override-with-generic-response: false
