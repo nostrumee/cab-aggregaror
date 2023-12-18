@@ -175,7 +175,7 @@ public class TestUtils {
     public PassengerRatingMessage getPassengerRatingMessage() {
         return PassengerRatingMessage.builder()
                 .passengerId(DEFAULT_ID)
-                .rating(OTHER_RATING)
+                .rating(NEW_RATING)
                 .build();
     }
 }

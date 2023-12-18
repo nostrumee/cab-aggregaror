@@ -1,13 +1,14 @@
 package com.modsen.passengerservice.integration.kafka;
 
+import com.modsen.passengerservice.config.TestcontainersConfig;
 import com.modsen.passengerservice.dto.message.PassengerRatingMessage;
-import com.modsen.passengerservice.integration.TestcontainersBase;
 import com.modsen.passengerservice.repository.PassengerRepository;
 import com.modsen.passengerservice.service.TestSender;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestConstructor;
+import org.springframework.test.context.jdbc.Sql;
+import org.testcontainers.containers.KafkaContainer;
 
 import java.time.Duration;
 
@@ -16,13 +17,22 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+@SpringBootTest(
+        classes = TestcontainersConfig.class
+)
+@Sql(
+        scripts = {
+                "classpath:sql/delete-data.sql",
+                "classpath:sql/insert-data.sql"
+        },
+        executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
+)
 @RequiredArgsConstructor
-public class KafkaConsumerIntegrationTest extends TestcontainersBase {
+public class KafkaConsumerIntegrationTest {
 
     private final PassengerRepository passengerRepository;
     private final TestSender testSender;
+    private final KafkaContainer kafkaContainer;
 
     @Test
     void updatePassengerRating_shouldUpdatePassengerRating_whenMessageConsumed() {
@@ -32,7 +42,7 @@ public class KafkaConsumerIntegrationTest extends TestcontainersBase {
                 .build();
 
         testSender.sendMessage(
-                kafka.getBootstrapServers(),
+                kafkaContainer.getBootstrapServers(),
                 PASSENGER_RATING_TOPIC_NAME,
                 ratingMessage
         );
