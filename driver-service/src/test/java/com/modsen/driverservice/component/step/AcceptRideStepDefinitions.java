@@ -2,6 +2,7 @@ package com.modsen.driverservice.component.step;
 
 import com.modsen.driverservice.dto.message.AcceptRideMessage;
 import com.modsen.driverservice.dto.message.CreateRideMessage;
+import com.modsen.driverservice.dto.response.DriverResponse;
 import com.modsen.driverservice.entity.Driver;
 import com.modsen.driverservice.entity.DriverStatus;
 import com.modsen.driverservice.mapper.DriverMapper;
@@ -14,6 +15,8 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,10 +46,14 @@ public class AcceptRideStepDefinitions {
     @Given("There are available drivers")
     public void thereAreAvailableDrivers() {
         var retrievedDrivers = List.of(getDefaultDriver());
+        driver = getDefaultDriver();
 
         doReturn(retrievedDrivers)
                 .when(driverRepository)
                 .findAllByStatus(DriverStatus.AVAILABLE);
+        doReturn(Optional.of(driver))
+                .when(driverRepository)
+                .findById(DEFAULT_ID);
         doReturn(List.of(getDefaultDriverResponse()))
                 .when(driverMapper)
                 .fromEntityListToResponseList(retrievedDrivers);
@@ -56,13 +63,24 @@ public class AcceptRideStepDefinitions {
         assertThat(availableDrivers).isNotEmpty();
     }
 
+    @Given("There are no available drivers")
+    public void thereAreNoAvailableDrivers() {
+        List<Driver> retrievedDrivers = Collections.emptyList();
+
+        doReturn(retrievedDrivers)
+                .when(driverRepository)
+                .findAllByStatus(DriverStatus.AVAILABLE);
+        doReturn(new ArrayList<DriverResponse>())
+                .when(driverMapper)
+                .fromEntityListToResponseList(retrievedDrivers);
+
+        var availableDrivers = driverService.getAvailableDrivers();
+
+        assertThat(availableDrivers).isEmpty();
+    }
+
     @When("The create ride message with ride id {long} passed to acceptRideOrder method")
     public void createRideMessagePassedToAcceptRideOrderMethod(long id) {
-        driver = getDefaultDriver();
-
-        doReturn(Optional.of(driver))
-                .when(driverRepository)
-                .findById(DEFAULT_ID);
         acceptRideMessage = rideOrderService.acceptRideOrder(new CreateRideMessage(id));
     }
 
@@ -71,4 +89,11 @@ public class AcceptRideStepDefinitions {
         assertThat(acceptRideMessage.driverId()).isEqualTo(DEFAULT_ID);
         assertThat(driver.getStatus()).isEqualTo(DriverStatus.UNAVAILABLE);
     }
+
+    @Then("Accept ride message without assigned driver id should be returned")
+    public void acceptRideMessageWithoutDriverIdReturned() {
+        assertThat(acceptRideMessage.driverId()).isNull();
+    }
+
+
 }
