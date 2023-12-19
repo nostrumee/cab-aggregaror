@@ -152,7 +152,9 @@ public class DriverServiceStepDefinitions {
     }
 
     @When("A create request with first name {string}, last name {string}, licence number {string}, email {string}, phone {string} is passed to the addDriver method")
-    public void createRequestPassedToAddDriverMethod(String firstName, String lastName, String licenceNumber, String email, String phone) {
+    public void createRequestPassedToAddDriverMethod(
+            String firstName, String lastName, String licenceNumber, String email, String phone
+    ) {
         var createRequest = CreateDriverRequest.builder()
                 .firstName(firstName)
                 .lastName(lastName)
