@@ -43,5 +43,3 @@ Feature: Passenger Service
     Given A passenger with id 1 doesn't exist
     When The rating message with id 1 and rating 4.65 passed to the updatePassengerRating method
     Then The PassengerNotFoundException with the message containing id 1 should be thrown
-
-

@@ -90,7 +90,8 @@ public class DriverServiceImplTest {
                 .fromEntityListToResponseList(retrievedDrivers);
 
         var actual = driverService.getAvailableDrivers();
-        assertThat(actual.isEmpty()).isEqualTo(false);
+
+        assertThat(actual).isNotEmpty();
         verify(driverRepository).findAllByStatus(DriverStatus.AVAILABLE);
     }
 
@@ -107,7 +108,7 @@ public class DriverServiceImplTest {
 
         var actual = driverService.getAvailableDrivers();
 
-        assertThat(actual.isEmpty()).isEqualTo(true);
+        assertThat(actual).isEmpty();
         verify(driverRepository).findAllByStatus(DriverStatus.AVAILABLE);
     }
 

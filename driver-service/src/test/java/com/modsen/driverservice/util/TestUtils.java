@@ -213,7 +213,6 @@ public class TestUtils {
                 .build();
     }
 
-
     public List<Driver> getDriverList() {
         return Arrays.asList(
                 getOtherDriver(),

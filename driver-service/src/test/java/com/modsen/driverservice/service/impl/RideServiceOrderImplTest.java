@@ -1,6 +1,8 @@
 package com.modsen.driverservice.service.impl;
 
+import com.modsen.driverservice.dto.message.AcceptRideMessage;
 import com.modsen.driverservice.dto.message.CreateRideMessage;
+import com.modsen.driverservice.dto.response.DriverResponse;
 import com.modsen.driverservice.entity.DriverStatus;
 import com.modsen.driverservice.service.DriverService;
 import org.junit.jupiter.api.Test;
@@ -9,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.modsen.driverservice.util.TestUtils.*;
@@ -39,5 +42,22 @@ public class RideServiceOrderImplTest {
         assertThat(actual.rideId()).isEqualTo(expected.rideId());
         verify(driverService).getAvailableDrivers();
         verify(driverService).updateDriverStatus(DEFAULT_ID, DriverStatus.UNAVAILABLE);
+    }
+
+    @Test
+    void acceptRideOrder_shouldReturnAcceptRideMessageWithoutDriverId_whenThereAreNoAvailableDrivers() {
+        var expected = AcceptRideMessage.builder()
+                .rideId(DEFAULT_ID)
+                .build();
+        List<DriverResponse> availableDrivers = Collections.emptyList();
+
+        doReturn(availableDrivers)
+                .when(driverService)
+                .getAvailableDrivers();
+
+        var actual = rideOrderService.acceptRideOrder(new CreateRideMessage(DEFAULT_ID));
+
+        assertThat(actual).isEqualTo(expected);
+        verify(driverService).getAvailableDrivers();
     }
 }

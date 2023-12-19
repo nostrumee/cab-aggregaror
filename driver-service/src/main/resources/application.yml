@@ -41,8 +41,6 @@ spring:
         updateDriverStatus-in-0:
           destination: ${kafka.driver-status-topic-name}
           group: ${spring.application.name}
-
-
       kafka:
         binder:
           brokers:
@@ -52,8 +50,6 @@ spring:
               serializer: org.springframework.kafka.support.serializer.JsonSerializer
             key:
               serializer: org.apache.kafka.common.serialization.StringSerializer
-
-
 
 springdoc:
   override-with-generic-response: false
