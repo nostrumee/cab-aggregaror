@@ -35,7 +35,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.modsen.rideservice.util.ErrorMessages.*;
 
@@ -190,7 +192,11 @@ public class RideServiceImpl implements RideService {
 
         if (!rideToStart.getStatus().equals(RideStatus.ACCEPTED)) {
             log.error("Invalid ride status");
-            throw new InvalidRideStatusException(RideStatus.ACCEPTED.name());
+
+            List<RideStatus> validStatusList = Collections.singletonList(RideStatus.ACCEPTED);
+            String statusNames = convertRideStatusListToString(validStatusList);
+
+            throw new InvalidRideStatusException(statusNames);
         }
 
         PassengerResponse passenger = passengerService.getPassengerById(rideToStart.getPassengerId());
@@ -215,7 +221,11 @@ public class RideServiceImpl implements RideService {
 
         if (!rideToFinish.getStatus().equals(RideStatus.STARTED)) {
             log.error("Invalid ride status");
-            throw new InvalidRideStatusException(RideStatus.STARTED.name());
+
+            List<RideStatus> validStatusList = Collections.singletonList(RideStatus.STARTED);
+            String statusNames = convertRideStatusListToString(validStatusList);
+
+            throw new InvalidRideStatusException(statusNames);
         }
 
         PassengerResponse passenger = passengerService.getPassengerById(rideToFinish.getPassengerId());
@@ -243,8 +253,20 @@ public class RideServiceImpl implements RideService {
         log.info("Retrieving driver's profile from a ride with id {}", rideId);
 
         Ride ride = findRideById(rideId);
-        long driverId = ride.getDriverId();
+        if (ride.getDriverId() == null) {
+            log.error("Invalid ride status");
 
+            List<RideStatus> validStatusList = List.of(
+                    RideStatus.ACCEPTED,
+                    RideStatus.STARTED,
+                    RideStatus.FINISHED
+            );
+            String statusNames = convertRideStatusListToString(validStatusList);
+
+            throw new InvalidRideStatusException(statusNames);
+        }
+
+        long driverId = ride.getDriverId();
         return driverService.getDriverById(driverId);
     }
 
@@ -291,5 +313,11 @@ public class RideServiceImpl implements RideService {
 
         return min.add(BigDecimal.valueOf(Math.random()).multiply(max.subtract(min)))
                 .setScale(1, RoundingMode.HALF_UP);
+    }
+
+    private String convertRideStatusListToString(List<RideStatus> statuses) {
+        return statuses.stream()
+                .map(Enum::name)
+                .collect(Collectors.joining(", "));
     }
 }

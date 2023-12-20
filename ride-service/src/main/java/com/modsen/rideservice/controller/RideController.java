@@ -129,6 +129,10 @@ public class RideController {
             @ApiResponse(responseCode = "400", description = "Invalid data provided",
                     content = {
                             @Content(schema = @Schema(implementation = ValidationErrorResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Passenger not found",
+                    content = {
+                            @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })
     })
     public ResponseEntity<RideResponse> createRide(
@@ -212,6 +216,14 @@ public class RideController {
                             @Content(schema = @Schema(implementation = DriverResponse.class))
                     }),
             @ApiResponse(responseCode = "404", description = "Ride not found",
+                    content = {
+                            @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    }),
+            @ApiResponse(responseCode = "409", description = "Invalid ride status",
+                    content = {
+                            @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Driver not found",
                     content = {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })

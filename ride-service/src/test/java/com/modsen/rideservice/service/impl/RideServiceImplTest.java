@@ -2,8 +2,10 @@ package com.modsen.rideservice.service.impl;
 
 import com.modsen.rideservice.dto.message.CreateRideMessage;
 import com.modsen.rideservice.dto.response.RidePageResponse;
+import com.modsen.rideservice.entity.DriverStatus;
 import com.modsen.rideservice.entity.RideStatus;
 import com.modsen.rideservice.exception.InvalidRequestParamException;
+import com.modsen.rideservice.exception.InvalidRideStatusException;
 import com.modsen.rideservice.exception.PassengerNotFoundException;
 import com.modsen.rideservice.exception.RideNotFoundException;
 import com.modsen.rideservice.mapper.MessageMapper;
@@ -238,6 +240,288 @@ public class RideServiceImplTest {
                 PassengerNotFoundException.class,
                 () -> rideService.createRide(createRequest)
         );
+    }
+
+    @Test
+    void deleteRide_shouldDeleteRide_whenRideExists() {
+        var ride = getFinishedRide();
+
+        doReturn(Optional.of(ride))
+                .when(rideRepository)
+                .findById(FINISHED_RIDE_ID);
+
+        rideService.deleteRide(FINISHED_RIDE_ID);
+
+        verify(rideRepository).findById(FINISHED_RIDE_ID);
+        verify(rideRepository).delete(ride);
+    }
+
+    @Test
+    void deleteRide_shouldThrowRideNotFoundException_whenRideNotExist() {
+        doReturn(Optional.empty())
+                .when(rideRepository)
+                .findById(DEFAULT_ID);
+
+        assertThrows(
+                RideNotFoundException.class,
+                () -> rideService.deleteRide(DEFAULT_ID)
+        );
+        verify(rideRepository).findById(DEFAULT_ID);
+    }
+
+    @Test
+    void acceptRide_shouldMakeRideAccepted_whenDriverAssignedAndRideExists() {
+        var ride = getCreatedRide();
+        var passengerResponse = getPassengerResponse();
+        var acceptRideMessage = getAcceptRideMessage(DEFAULT_ID);
+        var rideStatusMessage = getRideStatusMessage(RideStatus.ACCEPTED);
+
+        doReturn(Optional.of(ride))
+                .when(rideRepository)
+                .findById(CREATED_RIDE_ID);
+        doReturn(passengerResponse)
+                .when(passengerService)
+                .getPassengerById(ride.getPassengerId());
+        doReturn(rideStatusMessage)
+                .when(messageMapper)
+                .fromRideAndPassengerResponse(ride, passengerResponse);
+
+        rideService.acceptRide(acceptRideMessage);
+
+        assertThat(ride.getDriverId()).isEqualTo(acceptRideMessage.driverId());
+        assertThat(ride.getStatus()).isEqualTo(RideStatus.ACCEPTED);
+        assertThat(ride.getAcceptedDate()).isNotNull();
+
+        verify(rideRepository).findById(acceptRideMessage.rideId());
+        verify(passengerService).getPassengerById(ride.getPassengerId());
+        verify(rideRepository).save(ride);
+        verify(messageMapper).fromRideAndPassengerResponse(ride, passengerResponse);
+        verify(sendMessageHandler).handleRideStatusMessage(rideStatusMessage);
+    }
+
+    @Test
+    void acceptRide_shouldMakeRideRejected_whenDriverNotAssignedAndRideExists() {
+        var ride = getCreatedRide();
+        var passengerResponse = getPassengerResponse();
+        var acceptRideMessage = getAcceptRideMessage(null);
+        var rideStatusMessage = getRideStatusMessage(RideStatus.REJECTED);
+
+        doReturn(Optional.of(ride))
+                .when(rideRepository)
+                .findById(CREATED_RIDE_ID);
+        doReturn(passengerResponse)
+                .when(passengerService)
+                .getPassengerById(ride.getPassengerId());
+        doReturn(rideStatusMessage)
+                .when(messageMapper)
+                .fromRideAndPassengerResponse(ride, passengerResponse);
+
+        rideService.acceptRide(acceptRideMessage);
+
+        assertThat(ride.getDriverId()).isNull();
+        assertThat(ride.getStatus()).isEqualTo(RideStatus.REJECTED);
+        assertThat(ride.getAcceptedDate()).isNull();
+
+        verify(rideRepository).findById(acceptRideMessage.rideId());
+        verify(passengerService).getPassengerById(ride.getPassengerId());
+        verify(rideRepository).save(ride);
+        verify(messageMapper).fromRideAndPassengerResponse(ride, passengerResponse);
+        verify(sendMessageHandler).handleRideStatusMessage(rideStatusMessage);
+    }
+
+    @Test
+    void acceptRide_shouldThrowRideNotFoundException_whenRideNotExist() {
+        var acceptRideMessage = getAcceptRideMessage(DEFAULT_ID);
+
+        doReturn(Optional.empty())
+                .when(rideRepository)
+                .findById(DEFAULT_ID);
+
+        assertThrows(
+                RideNotFoundException.class,
+                () -> rideService.acceptRide(acceptRideMessage)
+        );
+        verify(rideRepository).findById(DEFAULT_ID);
+    }
+
+    @Test
+    void startRide_shouldReturnStartedRideResponse_whenRideExistsAndHasAcceptedStatus() {
+        var expected = getStartedRideResponse();
+        var ride = getAcceptedRide();
+        var passengerResponse = getPassengerResponse();
+        var rideStatusMessage = getRideStatusMessage(RideStatus.STARTED);
+
+        doReturn(Optional.of(ride))
+                .when(rideRepository)
+                .findById(DEFAULT_ID);
+        doReturn(passengerResponse)
+                .when(passengerService)
+                .getPassengerById(ride.getPassengerId());
+        doReturn(ride)
+                .when(rideRepository)
+                .save(ride);
+        doReturn(rideStatusMessage)
+                .when(messageMapper)
+                .fromRideAndPassengerResponse(ride, passengerResponse);
+        doReturn(expected)
+                .when(rideMapper)
+                .fromEntityToResponse(ride);
+
+        var actual = rideService.startRide(DEFAULT_ID);
+
+        assertThat(actual).isEqualTo(expected);
+        assertThat(ride.getStatus()).isEqualTo(RideStatus.STARTED);
+        assertThat(ride.getStartDate()).isNotNull();
+
+        verify(rideRepository).findById(DEFAULT_ID);
+        verify(passengerService).getPassengerById(ride.getPassengerId());
+        verify(rideRepository).save(ride);
+        verify(messageMapper).fromRideAndPassengerResponse(ride, passengerResponse);
+        verify(sendMessageHandler).handleRideStatusMessage(rideStatusMessage);
+        verify(rideMapper).fromEntityToResponse(ride);
+    }
+
+    @Test
+    void startRide_shouldThrowInvalidRideStatusException_whenRideExistsAndHasInvalidStatus() {
+        var ride = getStartedRide();
+
+        doReturn(Optional.of(ride))
+                .when(rideRepository)
+                .findById(DEFAULT_ID);
+
+        assertThrows(
+                InvalidRideStatusException.class,
+                () -> rideService.startRide(DEFAULT_ID)
+        );
+        verify(rideRepository).findById(DEFAULT_ID);
+    }
+
+    @Test
+    void startRide_shouldThrowRideNotFoundException_whenRideNotExist() {
+        doReturn(Optional.empty())
+                .when(rideRepository)
+                .findById(DEFAULT_ID);
+
+        assertThrows(
+                RideNotFoundException.class,
+                () -> rideService.startRide(DEFAULT_ID)
+        );
+        verify(rideRepository).findById(DEFAULT_ID);
+    }
+
+    @Test
+    void finishRide_shouldReturnFinishedRideResponse_whenRideExistsAndHasAcceptedStatus() {
+        var expected = getFinishedRideResponse();
+        var ride = getStartedRide();
+        var passengerResponse = getPassengerResponse();
+        var rideStatusMessage = getRideStatusMessage(RideStatus.FINISHED);
+        var driverStatusMessage = getDriverStatusMessage(DriverStatus.AVAILABLE);
+
+        doReturn(Optional.of(ride))
+                .when(rideRepository)
+                .findById(DEFAULT_ID);
+        doReturn(passengerResponse)
+                .when(passengerService)
+                .getPassengerById(ride.getPassengerId());
+        doReturn(ride)
+                .when(rideRepository)
+                .save(ride);
+        doReturn(rideStatusMessage)
+                .when(messageMapper)
+                .fromRideAndPassengerResponse(ride, passengerResponse);
+        doReturn(expected)
+                .when(rideMapper)
+                .fromEntityToResponse(ride);
+
+        var actual = rideService.finishRide(DEFAULT_ID);
+
+        assertThat(actual).isEqualTo(expected);
+        assertThat(ride.getStatus()).isEqualTo(RideStatus.FINISHED);
+        assertThat(ride.getFinishDate()).isNotNull();
+
+        verify(rideRepository).findById(DEFAULT_ID);
+        verify(passengerService).getPassengerById(ride.getPassengerId());
+        verify(rideRepository).save(ride);
+        verify(messageMapper).fromRideAndPassengerResponse(ride, passengerResponse);
+        verify(sendMessageHandler).handleRideStatusMessage(rideStatusMessage);
+        verify(sendMessageHandler).handleDriverStatusMessage(driverStatusMessage);
+        verify(rideMapper).fromEntityToResponse(ride);
+    }
+
+    @Test
+    void finishRide_shouldThrowInvalidRideStatusException_whenRideExistsAndHasInvalidStatus() {
+        var ride = getFinishedRide();
+
+        doReturn(Optional.of(ride))
+                .when(rideRepository)
+                .findById(DEFAULT_ID);
+
+        assertThrows(
+                InvalidRideStatusException.class,
+                () -> rideService.finishRide(DEFAULT_ID)
+        );
+        verify(rideRepository).findById(DEFAULT_ID);
+    }
+
+    @Test
+    void finishRide_shouldThrowRideNotFoundException_whenRideNotExist() {
+        doReturn(Optional.empty())
+                .when(rideRepository)
+                .findById(DEFAULT_ID);
+
+        assertThrows(
+                RideNotFoundException.class,
+                () -> rideService.finishRide(DEFAULT_ID)
+        );
+        verify(rideRepository).findById(DEFAULT_ID);
+    }
+
+    @Test
+    void getDriverProfile_shouldReturnDriverResponse_whenRideExistsAndHasValidStatus() {
+        var ride = getFinishedRide();
+        var expected = getDriverResponse();
+
+        doReturn(Optional.of(ride))
+                .when(rideRepository)
+                .findById(DEFAULT_ID);
+        doReturn(expected)
+                .when(driverService)
+                .getDriverById(ride.getDriverId());
+
+        var actual = rideService.getDriverProfile(DEFAULT_ID);
+
+        assertThat(actual).isEqualTo(expected);
+
+        verify(rideRepository).findById(DEFAULT_ID);
+        verify(driverService).getDriverById(ride.getDriverId());
+    }
+
+    @Test
+    void getDriverProfile_shouldThrowInvalidRideStatusException_whenRideExistsAndHasInvalidStatus() {
+        var ride = getRejectedRide();
+
+        doReturn(Optional.of(ride))
+                .when(rideRepository)
+                .findById(DEFAULT_ID);
+
+        assertThrows(
+                InvalidRideStatusException.class,
+                () -> rideService.getDriverProfile(DEFAULT_ID)
+        );
+        verify(rideRepository).findById(DEFAULT_ID);
+    }
+
+    @Test
+    void getDriverProfile_shouldThrowRideNotFoundException_whenRideNotExist() {
+        doReturn(Optional.empty())
+                .when(rideRepository)
+                .findById(DEFAULT_ID);
+
+        assertThrows(
+                RideNotFoundException.class,
+                () -> rideService.getDriverProfile(DEFAULT_ID)
+        );
+        verify(rideRepository).findById(DEFAULT_ID);
     }
 
     private static Stream<Arguments> getInvalidParamsForGetRidesPageTest() {

@@ -1,5 +1,8 @@
 package com.modsen.rideservice.config;
 
+import com.modsen.rideservice.service.impl.DriverClientErrorDecoder;
+import com.modsen.rideservice.service.impl.PassengerClientErrorDecoder;
+import feign.codec.ErrorDecoder;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import org.springframework.context.MessageSource;

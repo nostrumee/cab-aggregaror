@@ -1,15 +1,22 @@
 package com.modsen.rideservice.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.modsen.rideservice.dto.message.AcceptRideMessage;
-import com.modsen.rideservice.dto.message.CreateRideMessage;
 import com.modsen.rideservice.dto.message.DriverStatusMessage;
 import com.modsen.rideservice.dto.message.RideStatusMessage;
 import com.modsen.rideservice.dto.request.CreateRideRequest;
 import com.modsen.rideservice.dto.response.DriverResponse;
+import com.modsen.rideservice.dto.response.ErrorResponse;
+import com.modsen.rideservice.dto.response.PassengerResponse;
 import com.modsen.rideservice.dto.response.RideResponse;
 import com.modsen.rideservice.entity.DriverStatus;
 import com.modsen.rideservice.entity.Ride;
 import com.modsen.rideservice.entity.RideStatus;
+import feign.Request;
+import feign.Request.Body;
+import feign.Request.HttpMethod;
+import feign.Response;
 import lombok.experimental.UtilityClass;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,6 +26,7 @@ import org.springframework.data.domain.Sort;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 @UtilityClass
@@ -55,6 +63,9 @@ public class TestUtils {
     public final int INVALID_PAGE = -1;
     public final int INVALID_SIZE = -1;
     public final String INVALID_ORDER_BY = "invalidOrderBy";
+
+    public final String PASSENGER_NOT_FOUND_MESSAGE = "Passenger with id 1 was not found";
+    public final String DRIVER_NOT_FOUND_MESSAGE = "Passenger with id 1 was not found";
 
     public Ride getCreatedRide() {
         return Ride.builder()
@@ -215,6 +226,14 @@ public class TestUtils {
                 .build();
     }
 
+    public PassengerResponse getPassengerResponse() {
+        return PassengerResponse.builder()
+                .id(DEFAULT_ID)
+                .firstName(FIRST_NAME)
+                .email(EMAIL)
+                .build();
+    }
+
     public CreateRideRequest getCreateRideRequest() {
         return CreateRideRequest.builder()
                 .passengerId(DEFAULT_ID)
@@ -230,10 +249,10 @@ public class TestUtils {
                 .build();
     }
 
-    public AcceptRideMessage getAcceptRideMessage() {
+    public AcceptRideMessage getAcceptRideMessage(Long driverId) {
         return AcceptRideMessage.builder()
                 .rideId(DEFAULT_ID)
-                .driverId(DEFAULT_ID)
+                .driverId(driverId)
                 .build();
     }
 
@@ -287,6 +306,22 @@ public class TestUtils {
 
     public PageRequest getPageRequest(int page, int size, String orderBy) {
         return PageRequest.of(page - 1, size, Sort.by(orderBy));
+    }
+
+    public Response getResponseWithErrorCode(int status, String message) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return Response.builder()
+                .status(status)
+                .reason("")
+                .headers(new HashMap<>())
+                .request(Request.create(HttpMethod.GET, "", new HashMap<>(), Body.empty(), null))
+                .body(objectMapper.writeValueAsBytes(
+                        ErrorResponse.builder()
+                                .status(status)
+                                .message(message)
+                                .build()
+                ))
+                .build();
     }
 
 }

@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
-        value = "passenger",
+        value = "passenger-service",
         configuration = PassengerClientConfig.class
 )
 public interface PassengerClient {
 
     @GetMapping("/{id}")
-    PassengerResponse getPassenger(@PathVariable("id") long id);
+    PassengerResponse getPassengerById(@PathVariable("id") long id);
 }

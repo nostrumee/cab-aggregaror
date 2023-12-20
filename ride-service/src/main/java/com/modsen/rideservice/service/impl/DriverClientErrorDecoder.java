@@ -3,7 +3,6 @@ package com.modsen.rideservice.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.modsen.rideservice.dto.response.ErrorResponse;
 import com.modsen.rideservice.exception.DriverNotFoundException;
-import com.modsen.rideservice.exception.PassengerNotFoundException;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import lombok.extern.slf4j.Slf4j;
@@ -15,12 +14,10 @@ import java.io.InputStream;
 import static com.modsen.rideservice.util.ErrorMessages.*;
 
 @Slf4j
-public class PassengerClientErrorDecoder implements ErrorDecoder {
+public class DriverClientErrorDecoder implements ErrorDecoder {
 
     @Override
     public Exception decode(String methodKey, Response response) {
-
-
         String requestUrl = response.request().url();
         Response.Body responseBody = response.body();
         int responseStatus = response.status();
@@ -31,8 +28,8 @@ public class PassengerClientErrorDecoder implements ErrorDecoder {
             if (responseStatus == HttpStatus.NOT_FOUND.value()) {
                 ErrorResponse errorResponse = mapper.readValue(error, ErrorResponse.class);
 
-                log.error("Error after passenger client request. Reason: {}", errorResponse.message());
-                return new PassengerNotFoundException(errorResponse.message());
+                log.error("Error after driver client request. Reason: {}", errorResponse.message());
+                return new DriverNotFoundException(errorResponse.message());
             }
 
             return new Exception(String.format(

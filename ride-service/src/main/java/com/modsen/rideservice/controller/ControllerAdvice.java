@@ -40,6 +40,15 @@ public class ControllerAdvice {
                 .build();
     }
 
+    @ExceptionHandler(DriverNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleDriverNotFound(DriverNotFoundException e) {
+        return ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message(e.getMessage())
+                .build();
+    }
+
     @ExceptionHandler(InvalidRideStatusException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleInvalidRideStatus(InvalidRideStatusException e) {
