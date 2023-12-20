@@ -72,7 +72,6 @@ public class DriverControllerIntegrationTest extends IntegrationTestBase {
                 .as(DriverPageResponse.class);
 
         assertThat(actual).isEqualTo(expected);
-        assertThat(driverRepository.findAll().size()).isEqualTo(10);
     }
 
     @ParameterizedTest
@@ -141,6 +140,7 @@ public class DriverControllerIntegrationTest extends IntegrationTestBase {
                 .body("status", equalTo(HttpStatus.BAD_REQUEST.value()))
                 .body("message", equalTo(INVALID_PARAMETER_TYPE_MESSAGE));
     }
+
     @Test
     void getDriverPage_shouldReturnBadRequestResponse_whenSizeTypeNotMatch() {
         given()

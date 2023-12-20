@@ -59,13 +59,31 @@ public class TestUtils {
     public final int VALID_PAGE = 1;
     public final int VALID_SIZE = 2;
     public final String VALID_ORDER_BY = "id";
+    public final long TOTAL = 5L;
 
     public final int INVALID_PAGE = -1;
     public final int INVALID_SIZE = -1;
     public final String INVALID_ORDER_BY = "invalidOrderBy";
+    public final String PAGE_PARAM_OF_INVALID_TYPE = "invalidType";
+
+    public final String PAGE_PARAM_NAME = "page";
+    public final String SIZE_PARAM_NAME = "size";
+    public final String ORDER_BY_PARAM_NAME = "order_by";
+    public final String ID_PARAM_NAME = "id";
+
+    public final String GET_RIDE_BY_ID_PATH = "/api/v1/rides/{id}";
+    public final String GET_RIDE_PAGE_PATH = "/api/v1/rides";
+    public final String CREATE_RIDE_PATH = "/api/v1/rides";
+    public final String DELETE_RIDE_PATH = "/api/v1/rides/{id}";
+    public final String START_RIDE_PATH = "/api/v1/rides/{id}/start";
+    public final String FINISH_RIDE_PATH = "/api/v1/rides/{id}/finish";
+    public final String GET_DRIVER_PROFILE_PATH = "/api/v1/rides/{id}/driver";
 
     public final String PASSENGER_NOT_FOUND_MESSAGE = "Passenger with id 1 was not found";
     public final String DRIVER_NOT_FOUND_MESSAGE = "Passenger with id 1 was not found";
+
+    public final String POSTGRES_IMAGE_NAME = "postgres:15-alpine";
+    public final String KAFKA_IMAGE_NAME = "confluentinc/cp-kafka:7.3.3";
 
     public Ride getCreatedRide() {
         return Ride.builder()
