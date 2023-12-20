@@ -289,7 +289,7 @@ public class DriverServiceImplTest {
     }
 
     @Test
-    void updatePassenger_shouldThrowPassengerNotFoundException_whenPassengerNotExist() {
+    void updateDriver_shouldThrowDriverNotFoundException_whenDriverNotExist() {
         var updateRequest = getUpdateDriverRequest();
 
         doReturn(Optional.empty())
