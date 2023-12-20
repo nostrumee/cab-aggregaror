@@ -177,8 +177,8 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
 
     @Test
     void getDriverById_shouldReturnDriverResponse_whenDriverExists() {
-        var passenger = driverRepository.findById(DEFAULT_ID);
-        var expected = driverMapper.fromEntityToResponse(passenger.get());
+        var driver = driverRepository.findById(DEFAULT_ID);
+        var expected = driverMapper.fromEntityToResponse(driver.get());
 
         var actual = given()
                 .port(port)
