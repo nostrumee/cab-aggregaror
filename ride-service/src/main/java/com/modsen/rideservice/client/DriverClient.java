@@ -12,6 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 )
 public interface DriverClient {
 
-    @GetMapping("/{id}")
+    @GetMapping("/api/v1/drivers/{id}")
     DriverResponse getDriverById(@PathVariable("id") long id);
 }

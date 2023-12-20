@@ -1,6 +1,5 @@
 package com.modsen.rideservice.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.modsen.rideservice.exception.PassengerNotFoundException;
 import feign.codec.ErrorDecoder;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +18,7 @@ public class PassengerClientErrorDecoderTest {
     }
 
     @Test
-    void decode_shouldReturnPassengerNotFoundException_whenPassengerNotExist() throws JsonProcessingException {
+    void decode_shouldReturnPassengerNotFoundException_whenPassengerNotExist() {
         var expected = new PassengerNotFoundException(PASSENGER_NOT_FOUND_MESSAGE);
 
         var response = getResponseWithErrorCode(404, PASSENGER_NOT_FOUND_MESSAGE);

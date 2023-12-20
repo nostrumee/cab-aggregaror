@@ -12,6 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 )
 public interface PassengerClient {
 
-    @GetMapping("/{id}")
+    @GetMapping("/api/v1/passengers/{id}")
     PassengerResponse getPassengerById(@PathVariable("id") long id);
 }

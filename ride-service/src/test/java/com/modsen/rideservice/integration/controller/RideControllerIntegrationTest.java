@@ -1,13 +1,16 @@
 package com.modsen.rideservice.integration.controller;
 
-import com.modsen.rideservice.dto.response.ErrorResponse;
-import com.modsen.rideservice.dto.response.RidePageResponse;
-import com.modsen.rideservice.dto.response.RideResponse;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.modsen.rideservice.dto.request.CreateRideRequest;
+import com.modsen.rideservice.dto.response.*;
+import com.modsen.rideservice.entity.RideStatus;
 import com.modsen.rideservice.integration.TestcontainersBase;
+import com.modsen.rideservice.integration.config.IntegrationTestConfig;
 import com.modsen.rideservice.mapper.RideMapper;
 import com.modsen.rideservice.repository.RideRepository;
 import com.modsen.rideservice.service.MessageService;
 import com.modsen.rideservice.service.SendMessageHandler;
+import io.restassured.http.ContentType;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -20,14 +23,19 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.modsen.rideservice.util.ErrorMessages.*;
 import static com.modsen.rideservice.util.TestUtils.*;
 import static io.restassured.RestAssured.given;
@@ -35,7 +43,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 @SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        classes = IntegrationTestConfig.class
 )
 @Sql(
         scripts = {
@@ -44,12 +53,14 @@ import static org.hamcrest.Matchers.equalTo;
         },
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
 )
+@ActiveProfiles("test")
 @RequiredArgsConstructor
 public class RideControllerIntegrationTest extends TestcontainersBase {
 
     private final RideRepository rideRepository;
     private final RideMapper rideMapper;
     private final MessageService messageService;
+    private final WireMockServer mockServer;
 
     @MockBean
     private SendMessageHandler sendMessageHandler;
@@ -119,7 +130,7 @@ public class RideControllerIntegrationTest extends TestcontainersBase {
     }
 
     @Test
-    void getDriverPage_shouldReturnBadRequestResponse_whenInvalidOrderByParamPassed() {
+    void getRidesPage_shouldReturnBadRequestResponse_whenInvalidOrderByParamPassed() {
         String errorMessage = getInvalidSortingParameterMessage();
         var expected = ErrorResponse.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
@@ -144,7 +155,7 @@ public class RideControllerIntegrationTest extends TestcontainersBase {
     }
 
     @Test
-    void getDriverPage_shouldReturnBadRequestResponse_whenPageTypeNotMatch() {
+    void getRidesPage_shouldReturnBadRequestResponse_whenPageTypeNotMatch() {
         given()
                 .port(port)
                 .params(Map.of(
@@ -161,7 +172,7 @@ public class RideControllerIntegrationTest extends TestcontainersBase {
     }
 
     @Test
-    void getDriverPage_shouldReturnBadRequestResponse_whenSizeTypeNotMatch() {
+    void getRidesPage_shouldReturnBadRequestResponse_whenSizeTypeNotMatch() {
         given()
                 .port(port)
                 .params(Map.of(
@@ -178,15 +189,333 @@ public class RideControllerIntegrationTest extends TestcontainersBase {
     }
 
     @Test
-    void getRideById_shouldReturnDriverResponse_whenRideExists() {
-        var passenger = rideRepository.findById(DEFAULT_ID);
-        var expected = rideMapper.fromEntityToResponse(passenger.get());
+    void getRideById_shouldReturnRideResponse_whenRideExists() {
+        var ride = rideRepository.findById(FINISHED_RIDE_ID);
+        var expected = rideMapper.fromEntityToResponse(ride.get());
+
+        var actual = given()
+                .port(port)
+                .pathParam(ID_PARAM_NAME, FINISHED_RIDE_ID)
+                .when()
+                .get(GET_RIDE_BY_ID_PATH)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(RideResponse.class);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void getRideById_shouldReturnNotFoundResponse_whenRideNotExist() {
+        var expected = ErrorResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message(String.format(RIDE_NOT_FOUND_WITH_ID_MESSAGE, NON_EXISTING_ID))
+                .build();
+
+        var actual = given()
+                .port(port)
+                .pathParam(ID_PARAM_NAME, NON_EXISTING_ID)
+                .when()
+                .get(GET_RIDE_BY_ID_PATH)
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract()
+                .as(ErrorResponse.class);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void createRide_shouldReturnCreatedRideResponse_whenPassengerExists() {
+        var createRequest = getCreateRideRequest();
+        var passenger = getPassengerResponse();
+
+        mockServer.stubFor(get(GET_PASSENGER_BY_ID_PATH).willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(fromObjectToString(passenger)))
+        );
+
+        var actual = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .body(createRequest)
+                .when()
+                .post(CREATE_RIDE_PATH)
+                .then()
+                .statusCode(HttpStatus.CREATED.value())
+                .extract()
+                .as(RideResponse.class);
+
+
+        assertThat(actual.status()).isEqualTo(RideStatus.CREATED);
+        assertThat(actual.createdDate()).isNotNull();
+        assertThat(actual.estimatedCost()).isNotNull();
+    }
+
+    @Test
+    void createRide_shouldReturnBadRequestResponse_whenPassengerNotExist() {
+        var createRequest = getCreateRideRequest();
+        var errorResponse = ErrorResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message(PASSENGER_NOT_FOUND_MESSAGE)
+                .build();
+
+        mockServer.stubFor(get(GET_PASSENGER_BY_ID_PATH).willReturn(aResponse()
+                .withStatus(HttpStatus.NOT_FOUND.value())
+                .withHeader("Content-Type", "application/json")
+                .withBody(fromObjectToString(errorResponse)))
+        );
+
+        var actual = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .body(createRequest)
+                .when()
+                .post(CREATE_RIDE_PATH)
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract()
+                .as(ErrorResponse.class);
+
+        assertThat(actual.message()).isEqualTo(PASSENGER_NOT_FOUND_MESSAGE);
+        assertThat(actual.status()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    void createRide_shouldReturnBadRequestResponse_whenDataNotValid() {
+        String passengerIdValidationMessage = messageService.getMessage(PASSENGER_ID_VALIDATION_MESSAGE_KEY);
+        String startPointValidationMessage = messageService.getMessage(START_POINT_VALIDATION_MESSAGE_KEY);
+        String destinationPointValidationMessage = messageService.getMessage(DESTINATION_POINT_VALIDATION_MESSAGE_KEY);
+
+        var createRequest = CreateRideRequest.builder()
+                .passengerId(INVALID_PASSENGER_ID)
+                .startPoint(null)
+                .destinationPoint(null)
+                .build();
+
+        var expected = ValidationErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message(VALIDATION_FAILED_MESSAGE)
+                .errors(Map.of(
+                        PASSENGER_ID_FIELD_NAME, passengerIdValidationMessage,
+                        START_POINT_FIELD_NAME, startPointValidationMessage,
+                        DESTINATION_POINT_FIELD_NAME, destinationPointValidationMessage
+                ))
+                .build();
+
+        var actual = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .body(createRequest)
+                .when()
+                .post(CREATE_RIDE_PATH)
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract()
+                .as(ValidationErrorResponse.class);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void deleteRide_shouldDeleteRide_whenRideExists() {
+        var expected = ErrorResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message(String.format(RIDE_NOT_FOUND_WITH_ID_MESSAGE, DEFAULT_ID))
+                .build();
+
+        given()
+                .port(port)
+                .pathParam(ID_PARAM_NAME, DEFAULT_ID)
+                .when()
+                .delete(DELETE_RIDE_PATH)
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
 
         var actual = given()
                 .port(port)
                 .pathParam(ID_PARAM_NAME, DEFAULT_ID)
                 .when()
-                .get(GET_DRIVER_BY_ID_PATH)
+                .get(GET_RIDE_BY_ID_PATH)
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract()
+                .as(ErrorResponse.class);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void deleteRide_shouldReturnNotFoundResponse_whenRideNotExist() {
+        var expected = ErrorResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message(String.format(RIDE_NOT_FOUND_WITH_ID_MESSAGE, NON_EXISTING_ID))
+                .build();
+
+        var actual = given()
+                .port(port)
+                .pathParam(ID_PARAM_NAME, NON_EXISTING_ID)
+                .when()
+                .delete(DELETE_RIDE_PATH)
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract()
+                .as(ErrorResponse.class);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void startRide_shouldReturnStartedRideResponse_whenRideExistsAndHasValidStatus() {
+        var passenger = getPassengerResponse();
+
+        mockServer.stubFor(get(GET_PASSENGER_BY_ID_PATH).willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(fromObjectToString(passenger)))
+        );
+
+        var actual = given()
+                .port(port)
+                .pathParam(ID_PARAM_NAME, ACCEPTED_RIDE_ID)
+                .when()
+                .get(START_RIDE_PATH)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(RideResponse.class);
+
+        assertThat(actual.status()).isEqualTo(RideStatus.STARTED);
+        assertThat(actual.startDate()).isNotNull();
+    }
+
+    @Test
+    void startRide_shouldReturnBadRequestResponse_whenRideExistsAndHasInvalidStatus() {
+        var validStatusList = Collections.singletonList(RideStatus.ACCEPTED);
+        String statusNames = convertRideStatusListToString(validStatusList);
+
+        var expected = ErrorResponse.builder()
+                .message(String.format(INVALID_RIDE_STATUS_MESSAGE, statusNames))
+                .status(HttpStatus.CONFLICT.value())
+                .build();
+
+        var actual = given()
+                .port(port)
+                .pathParam(ID_PARAM_NAME, STARTED_RIDE_ID)
+                .when()
+                .get(START_RIDE_PATH)
+                .then()
+                .statusCode(HttpStatus.CONFLICT.value())
+                .extract()
+                .as(ErrorResponse.class);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void startRide_shouldReturnNotFoundResponse_whenRideNotExist() {
+        var expected = ErrorResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message(String.format(RIDE_NOT_FOUND_WITH_ID_MESSAGE, NON_EXISTING_ID))
+                .build();
+
+        var actual = given()
+                .port(port)
+                .pathParam(ID_PARAM_NAME, NON_EXISTING_ID)
+                .when()
+                .get(START_RIDE_PATH)
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract()
+                .as(ErrorResponse.class);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void finishRide_shouldReturnFinishedRideResponse_whenRideExistsAndHasValidStatus() {
+        var passenger = getPassengerResponse();
+
+        mockServer.stubFor(get(GET_PASSENGER_BY_ID_PATH).willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(fromObjectToString(passenger)))
+        );
+
+        var actual = given()
+                .port(port)
+                .pathParam(ID_PARAM_NAME, STARTED_RIDE_ID)
+                .when()
+                .get(FINISH_RIDE_PATH)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(RideResponse.class);
+
+        assertThat(actual.status()).isEqualTo(RideStatus.FINISHED);
+        assertThat(actual.finishDate()).isNotNull();
+    }
+
+    @Test
+    void finishRide_shouldReturnConflictResponse_whenRideExistsAndHasInvalidStatus() {
+        var validStatusList = Collections.singletonList(RideStatus.STARTED);
+        String statusNames = convertRideStatusListToString(validStatusList);
+
+        var expected = ErrorResponse.builder()
+                .message(String.format(INVALID_RIDE_STATUS_MESSAGE, statusNames))
+                .status(HttpStatus.CONFLICT.value())
+                .build();
+
+        var actual = given()
+                .port(port)
+                .pathParam(ID_PARAM_NAME, FINISHED_RIDE_ID)
+                .when()
+                .get(FINISH_RIDE_PATH)
+                .then()
+                .statusCode(HttpStatus.CONFLICT.value())
+                .extract()
+                .as(ErrorResponse.class);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void finishRide_shouldReturnNotFoundResponse_whenRideNotExist() {
+        var expected = ErrorResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message(String.format(RIDE_NOT_FOUND_WITH_ID_MESSAGE, NON_EXISTING_ID))
+                .build();
+
+        var actual = given()
+                .port(port)
+                .pathParam(ID_PARAM_NAME, NON_EXISTING_ID)
+                .when()
+                .get(FINISH_RIDE_PATH)
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract()
+                .as(ErrorResponse.class);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void getDriverProfile_shouldReturnDriverResponse_whenRideExistsAndHasValidStatus() {
+        var expected = getDriverResponse();
+
+        mockServer.stubFor(get(GET_DRIVER_BY_ID_PATH).willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(fromObjectToString(expected)))
+        );
+
+        var actual = given()
+                .port(port)
+                .pathParam(ID_PARAM_NAME, FINISHED_RIDE_ID)
+                .when()
+                .get(GET_DRIVER_PROFILE_PATH)
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .extract()
@@ -196,17 +525,44 @@ public class RideControllerIntegrationTest extends TestcontainersBase {
     }
 
     @Test
-    void getDriverById_shouldReturnNotFoundResponse_whenDriverNotExist() {
+    void getDriverProfile_shouldReturnConflictResponse_whenRideExistsAndHasInvalidStatus() {
+        var validStatusList = List.of(
+                RideStatus.ACCEPTED,
+                RideStatus.STARTED,
+                RideStatus.FINISHED
+        );
+        String statusNames = convertRideStatusListToString(validStatusList);
+
+        var expected = ErrorResponse.builder()
+                .message(String.format(INVALID_RIDE_STATUS_MESSAGE, statusNames))
+                .status(HttpStatus.CONFLICT.value())
+                .build();
+
+        var actual = given()
+                .port(port)
+                .pathParam(ID_PARAM_NAME, CREATED_RIDE_ID)
+                .when()
+                .get(GET_DRIVER_PROFILE_PATH)
+                .then()
+                .statusCode(HttpStatus.CONFLICT.value())
+                .extract()
+                .as(ErrorResponse.class);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void getDriverProfile_shouldReturnNotFoundResponse_whenRideNotExist() {
         var expected = ErrorResponse.builder()
                 .status(HttpStatus.NOT_FOUND.value())
-                .message(String.format(NOT_FOUND_WITH_ID_MESSAGE, NON_EXISTING_ID))
+                .message(String.format(RIDE_NOT_FOUND_WITH_ID_MESSAGE, NON_EXISTING_ID))
                 .build();
 
         var actual = given()
                 .port(port)
                 .pathParam(ID_PARAM_NAME, NON_EXISTING_ID)
                 .when()
-                .get(GET_DRIVER_BY_ID_PATH)
+                .get(GET_DRIVER_PROFILE_PATH)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract()
@@ -229,5 +585,11 @@ public class RideControllerIntegrationTest extends TestcontainersBase {
 
         String acceptableParams = String.join(", ", fieldNames);
         return String.format(INVALID_SORTING_PARAMETER_MESSAGE, INVALID_ORDER_BY, acceptableParams);
+    }
+
+    private String convertRideStatusListToString(List<RideStatus> statuses) {
+        return statuses.stream()
+                .map(Enum::name)
+                .collect(Collectors.joining(", "));
     }
 }

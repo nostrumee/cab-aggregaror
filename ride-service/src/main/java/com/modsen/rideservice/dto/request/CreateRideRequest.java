@@ -17,8 +17,8 @@ public record CreateRideRequest(
         @Length(max = 255, message = "{start-point.length}")
         String startPoint,
 
-        @NotBlank(message = "{finish-point.not.blank}")
-        @Length(max = 255, message = "{finish-point.length}")
+        @NotBlank(message = "{destination-point.not.blank}")
+        @Length(max = 255, message = "{destination-point.length}")
         String destinationPoint
 ) {
 }
