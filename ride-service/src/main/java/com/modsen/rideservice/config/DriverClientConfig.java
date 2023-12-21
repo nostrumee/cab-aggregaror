@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 public class DriverClientConfig {
 
     @Bean
-    public ErrorDecoder driverClientErrorDecoder() {
+    public ErrorDecoder errorDecoder() {
         return new DriverClientErrorDecoder();
     }
 }

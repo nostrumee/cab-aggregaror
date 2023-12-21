@@ -16,6 +16,7 @@ public class ReceiveMessageHandlerImpl implements ReceiveMessageHandler {
 
     @Override
     public void handleAcceptRideMessage(AcceptRideMessage acceptRideMessage) {
+        log.info("Accept ride message received --- {}", acceptRideMessage);
         rideService.acceptRide(acceptRideMessage);
     }
 }

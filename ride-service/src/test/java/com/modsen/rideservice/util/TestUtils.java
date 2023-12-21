@@ -18,16 +18,25 @@ import feign.Request.Body;
 import feign.Request.HttpMethod;
 import feign.Response;
 import lombok.experimental.UtilityClass;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 
 @UtilityClass
 public class TestUtils {
@@ -99,6 +108,11 @@ public class TestUtils {
     public final String POSTGRES_IMAGE_NAME = "postgres:15-alpine";
     public final String KAFKA_IMAGE_NAME = "confluentinc/cp-kafka:7.3.3";
     public final int WIREMOCK_PORT = 8088;
+
+    public final String ACCEPT_RIDE_TOPIC_NAME = "accept-ride-topic";
+    public final String CREATE_RIDE_TOPIC_NAME = "create-ride-topic";
+    public final String RIDE_STATUS_TOPIC_NAME = "ride-status-topic";
+    public final String DRIVER_STATUS_TOPIC_NAME = "driver-status-topic";
 
     public Ride getCreatedRide() {
         return Ride.builder()
@@ -339,6 +353,28 @@ public class TestUtils {
 
     public PageRequest getPageRequest(int page, int size, String orderBy) {
         return PageRequest.of(page - 1, size, Sort.by(orderBy));
+    }
+
+    public KafkaProducer<String, Object> getKafkaProducer(String bootstrapServers) {
+        Properties properties = new Properties();
+        properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+
+        return new KafkaProducer<>(properties);
+    }
+
+    public KafkaConsumer<String, Object> getKafkaConsumer(String bootstrapServers) {
+        Properties properties = new Properties();
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group");
+        properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        properties.put(JsonDeserializer.TYPE_MAPPINGS, "rideStatusMessage:" + RideStatusMessage.class.getName());
+        properties.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+
+        return new KafkaConsumer<>(properties);
     }
 
     public Response getResponseWithErrorCode(int status, String message) {

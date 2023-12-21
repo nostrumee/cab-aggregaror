@@ -1,30 +1,25 @@
 package com.modsen.rideservice.integration.controller;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
 import com.modsen.rideservice.dto.request.CreateRideRequest;
 import com.modsen.rideservice.dto.response.*;
 import com.modsen.rideservice.entity.RideStatus;
-import com.modsen.rideservice.integration.TestcontainersBase;
-import com.modsen.rideservice.integration.config.IntegrationTestConfig;
+import com.modsen.rideservice.integration.IntegrationTestBase;
 import com.modsen.rideservice.mapper.RideMapper;
 import com.modsen.rideservice.repository.RideRepository;
 import com.modsen.rideservice.service.MessageService;
 import com.modsen.rideservice.service.SendMessageHandler;
 import io.restassured.http.ContentType;
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -42,25 +37,13 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = IntegrationTestConfig.class
-)
-@Sql(
-        scripts = {
-                "classpath:sql/delete-data.sql",
-                "classpath:sql/insert-data.sql"
-        },
-        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
-)
-@ActiveProfiles("test")
+
 @RequiredArgsConstructor
-public class RideControllerIntegrationTest extends TestcontainersBase {
+public class RideControllerIntegrationTest extends IntegrationTestBase {
 
     private final RideRepository rideRepository;
     private final RideMapper rideMapper;
     private final MessageService messageService;
-    private final WireMockServer mockServer;
 
     @MockBean
     private SendMessageHandler sendMessageHandler;
@@ -68,10 +51,10 @@ public class RideControllerIntegrationTest extends TestcontainersBase {
     @LocalServerPort
     private int port;
 
-    @BeforeAll
-    static void beforeAll() {
-        postgres.start();
-        kafka.start();
+
+    @AfterEach
+    void tearDown() {
+        mockServer.resetAll();
     }
 
     @Test
@@ -80,7 +63,6 @@ public class RideControllerIntegrationTest extends TestcontainersBase {
                 PageRequest.of(VALID_PAGE - 1, VALID_SIZE, Sort.by(VALID_ORDER_BY))
         );
         var rides = rideMapper.fromEntityListToResponseList(ridesPage.getContent());
-
         var expected = RidePageResponse.builder()
                 .rides(rides)
                 .pageNumber(VALID_PAGE)
@@ -232,7 +214,7 @@ public class RideControllerIntegrationTest extends TestcontainersBase {
         var passenger = getPassengerResponse();
 
         mockServer.stubFor(get(GET_PASSENGER_BY_ID_PATH).willReturn(aResponse()
-                .withStatus(200)
+                .withStatus(HttpStatus.OK.value())
                 .withHeader("Content-Type", "application/json")
                 .withBody(fromObjectToString(passenger)))
         );
@@ -247,7 +229,6 @@ public class RideControllerIntegrationTest extends TestcontainersBase {
                 .statusCode(HttpStatus.CREATED.value())
                 .extract()
                 .as(RideResponse.class);
-
 
         assertThat(actual.status()).isEqualTo(RideStatus.CREATED);
         assertThat(actual.createdDate()).isNotNull();
@@ -372,7 +353,7 @@ public class RideControllerIntegrationTest extends TestcontainersBase {
         var passenger = getPassengerResponse();
 
         mockServer.stubFor(get(GET_PASSENGER_BY_ID_PATH).willReturn(aResponse()
-                .withStatus(200)
+                .withStatus(HttpStatus.OK.value())
                 .withHeader("Content-Type", "application/json")
                 .withBody(fromObjectToString(passenger)))
         );
@@ -439,7 +420,7 @@ public class RideControllerIntegrationTest extends TestcontainersBase {
         var passenger = getPassengerResponse();
 
         mockServer.stubFor(get(GET_PASSENGER_BY_ID_PATH).willReturn(aResponse()
-                .withStatus(200)
+                .withStatus(HttpStatus.OK.value())
                 .withHeader("Content-Type", "application/json")
                 .withBody(fromObjectToString(passenger)))
         );
@@ -506,7 +487,7 @@ public class RideControllerIntegrationTest extends TestcontainersBase {
         var expected = getDriverResponse();
 
         mockServer.stubFor(get(GET_DRIVER_BY_ID_PATH).willReturn(aResponse()
-                .withStatus(200)
+                .withStatus(HttpStatus.OK.value())
                 .withHeader("Content-Type", "application/json")
                 .withBody(fromObjectToString(expected)))
         );

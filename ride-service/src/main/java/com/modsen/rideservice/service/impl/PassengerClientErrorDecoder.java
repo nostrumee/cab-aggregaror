@@ -19,8 +19,6 @@ public class PassengerClientErrorDecoder implements ErrorDecoder {
 
     @Override
     public Exception decode(String methodKey, Response response) {
-
-
         String requestUrl = response.request().url();
         Response.Body responseBody = response.body();
         int responseStatus = response.status();
