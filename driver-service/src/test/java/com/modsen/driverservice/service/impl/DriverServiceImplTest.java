@@ -44,11 +44,11 @@ public class DriverServiceImplTest {
 
     @Test
     void getDriverPage_shouldReturnPassengerPage_whenValidParamsPassed() {
+        // arrange
         var driverResponseList = getDriverResponseList();
         var driversPage = getDriverPage();
         var retrievedDrivers = getDriverList();
         var pageRequest = getPageRequest(VALID_PAGE, VALID_SIZE, VALID_ORDER_BY);
-
         var expected = DriverPageResponse.builder()
                 .drivers(driverResponseList)
                 .pageNumber(VALID_PAGE)
@@ -62,8 +62,10 @@ public class DriverServiceImplTest {
                 .when(driverMapper)
                 .fromEntityListToResponseList(retrievedDrivers);
 
+        // act
         var actual = driverService.getDriverPage(VALID_PAGE, VALID_SIZE, VALID_ORDER_BY);
 
+        // assert
         assertThat(actual).isEqualTo(expected);
         verify(driverRepository).findAll(pageRequest);
         verify(driverMapper).fromEntityListToResponseList(retrievedDrivers);
@@ -72,6 +74,7 @@ public class DriverServiceImplTest {
     @ParameterizedTest
     @MethodSource("getInvalidParamsForGetDriverPageTest")
     void getDriverPage_shouldThrowInvalidRequestParamException_whenInvalidParamsPassed(int page, int size, String orderBy) {
+        // act and assert
         assertThrows(
                 InvalidRequestParamException.class,
                 () -> driverService.getDriverPage(page, size, orderBy)
@@ -80,6 +83,7 @@ public class DriverServiceImplTest {
 
     @Test
     void getAvailableDrivers_shouldReturnNotEmptyList_whenThereAreAvailableDrivers() {
+        // arrange
         var retrievedDrivers = List.of(getDefaultDriver());
 
         doReturn(retrievedDrivers)
@@ -89,14 +93,17 @@ public class DriverServiceImplTest {
                 .when(driverMapper)
                 .fromEntityListToResponseList(retrievedDrivers);
 
+        // act
         var actual = driverService.getAvailableDrivers();
 
+        // assert
         assertThat(actual).isNotEmpty();
         verify(driverRepository).findAllByStatus(DriverStatus.AVAILABLE);
     }
 
     @Test
     void getAvailableDrivers_shouldReturnEmptyList_whenThereAreNoAvailableDrivers() {
+        // arrange
         List<Driver> retrievedDrivers = Collections.emptyList();
 
         doReturn(retrievedDrivers)
@@ -106,14 +113,17 @@ public class DriverServiceImplTest {
                 .when(driverMapper)
                 .fromEntityListToResponseList(retrievedDrivers);
 
+        // act
         var actual = driverService.getAvailableDrivers();
 
+        // assert
         assertThat(actual).isEmpty();
         verify(driverRepository).findAllByStatus(DriverStatus.AVAILABLE);
     }
 
     @Test
     void getById_shouldReturnDriverResponse_whenDriverExists() {
+        // arrange
         var expected = getDefaultDriverResponse();
         var retrievedDriver = getDefaultDriver();
 
@@ -124,8 +134,10 @@ public class DriverServiceImplTest {
                 .when(driverMapper)
                 .fromEntityToResponse(retrievedDriver);
 
+        // act
         var actual = driverService.getById(DEFAULT_ID);
 
+        // assert
         assertThat(actual).isEqualTo(expected);
         verify(driverRepository).findById(DEFAULT_ID);
         verify(driverMapper).fromEntityToResponse(retrievedDriver);
@@ -133,10 +145,12 @@ public class DriverServiceImplTest {
 
     @Test
     void getById_shouldThrowDriverNotFoundException_whenDriverNotExist() {
+        // arrange
         doReturn(Optional.empty())
                 .when(driverRepository)
                 .findById(DEFAULT_ID);
 
+        // act and assert
         assertThrows(
                 DriverNotFoundException.class,
                 () -> driverService.getById(DEFAULT_ID)
@@ -146,8 +160,8 @@ public class DriverServiceImplTest {
 
     @Test
     void addDriver_shouldReturnDriverResponse_whenDataUnique() {
+        // arrange
         var expected = getDefaultDriverResponse();
-
         var driverToSave = getNotSavedDriver();
         var savedDriver = getDefaultDriver();
         var createRequest = getCreateDriverRequest();
@@ -171,8 +185,10 @@ public class DriverServiceImplTest {
                 .when(driverMapper)
                 .fromEntityToResponse(savedDriver);
 
+        // act
         var actual = driverService.addDriver(createRequest);
 
+        // assert
         assertThat(actual).isEqualTo(expected);
 
         verify(driverRepository).existsByEmail(createRequest.email());
@@ -186,6 +202,7 @@ public class DriverServiceImplTest {
 
     @Test
     void addDriver_shouldThrowDriverAlreadyExistsException_whenEmailNotUnique() {
+        // arrange
         var createRequest = getCreateDriverRequest();
 
         doReturn(true)
@@ -198,6 +215,7 @@ public class DriverServiceImplTest {
                 .when(driverRepository)
                 .existsByLicenceNumber(createRequest.licenceNumber());
 
+        // act and assert
         assertThrows(
                 DriverAlreadyExistsException.class,
                 () -> driverService.addDriver(createRequest)
@@ -209,6 +227,7 @@ public class DriverServiceImplTest {
 
     @Test
     void addDriver_shouldThrowDriverAlreadyExistsException_whenPhoneNotUnique() {
+        // arrange
         var createRequest = getCreateDriverRequest();
 
         doReturn(false)
@@ -221,6 +240,7 @@ public class DriverServiceImplTest {
                 .when(driverRepository)
                 .existsByLicenceNumber(createRequest.licenceNumber());
 
+        // act and assert
         assertThrows(
                 DriverAlreadyExistsException.class,
                 () -> driverService.addDriver(createRequest)
@@ -232,6 +252,7 @@ public class DriverServiceImplTest {
 
     @Test
     void addDriver_shouldThrowDriverAlreadyExistsException_whenLicenceNumberNotUnique() {
+        // arrange
         var createRequest = getCreateDriverRequest();
 
         doReturn(false)
@@ -244,6 +265,7 @@ public class DriverServiceImplTest {
                 .when(driverRepository)
                 .existsByLicenceNumber(createRequest.licenceNumber());
 
+        // act and assert
         assertThrows(
                 DriverAlreadyExistsException.class,
                 () -> driverService.addDriver(createRequest)
@@ -255,6 +277,7 @@ public class DriverServiceImplTest {
 
     @Test
     void updateDriver_shouldReturnDriverResponse_whenDriverExistsAndDataUnique() {
+        // arrange
         var expected = getUpdatedDriverResponse();
         var driver = getDefaultDriver();
         var updateRequest = getUpdateDriverRequest();
@@ -275,8 +298,10 @@ public class DriverServiceImplTest {
                 .when(driverMapper)
                 .fromEntityToResponse(driver);
 
+        // act
         var actual = driverService.updateDriver(updateRequest, DEFAULT_ID);
 
+        // assert
         assertThat(actual).isEqualTo(expected);
 
         verify(driverRepository).findById(DEFAULT_ID);
@@ -290,12 +315,13 @@ public class DriverServiceImplTest {
 
     @Test
     void updateDriver_shouldThrowDriverNotFoundException_whenDriverNotExist() {
+        // arrange
         var updateRequest = getUpdateDriverRequest();
-
         doReturn(Optional.empty())
                 .when(driverRepository)
                 .findById(DEFAULT_ID);
 
+        // act and assert
         assertThrows(
                 DriverNotFoundException.class,
                 () -> driverService.updateDriver(updateRequest, DEFAULT_ID)
@@ -305,6 +331,7 @@ public class DriverServiceImplTest {
 
     @Test
     void updateDriver_shouldThrowDriverAlreadyExistsException_whenEmailNotUnique() {
+        // arrange
         var driver = getDefaultDriver();
         var updateRequest = getUpdateDriverRequest();
 
@@ -321,6 +348,7 @@ public class DriverServiceImplTest {
                 .when(driverRepository)
                 .existsByLicenceNumber(updateRequest.licenceNumber());
 
+        // act and assert
         assertThrows(
                 DriverAlreadyExistsException.class,
                 () -> driverService.updateDriver(updateRequest, DEFAULT_ID)
@@ -332,6 +360,7 @@ public class DriverServiceImplTest {
 
     @Test
     void updateDriver_shouldThrowDriverAlreadyExistsException_whenPhoneNotUnique() {
+        // arrange
         var driver = getDefaultDriver();
         var updateRequest = getUpdateDriverRequest();
 
@@ -348,6 +377,7 @@ public class DriverServiceImplTest {
                 .when(driverRepository)
                 .existsByLicenceNumber(updateRequest.licenceNumber());
 
+        // act and assert
         assertThrows(
                 DriverAlreadyExistsException.class,
                 () -> driverService.updateDriver(updateRequest, DEFAULT_ID)
@@ -359,6 +389,7 @@ public class DriverServiceImplTest {
 
     @Test
     void updateDriver_shouldThrowDriverAlreadyExistsException_whenLicenceNumberNotUnique() {
+        // arrange
         var driver = getDefaultDriver();
         var updateRequest = getUpdateDriverRequest();
 
@@ -375,6 +406,7 @@ public class DriverServiceImplTest {
                 .when(driverRepository)
                 .existsByLicenceNumber(updateRequest.licenceNumber());
 
+        // act and assert
         assertThrows(
                 DriverAlreadyExistsException.class,
                 () -> driverService.updateDriver(updateRequest, DEFAULT_ID)
@@ -386,24 +418,29 @@ public class DriverServiceImplTest {
 
     @Test
     void deleteDriver_shouldDeleteDriver_whenDriverExists() {
+        // arrange
         var driver = getDefaultDriver();
 
         doReturn(Optional.of(driver))
                 .when(driverRepository)
                 .findById(DEFAULT_ID);
 
+        // act
         driverService.deleteDriver(DEFAULT_ID);
 
+        // assert
         verify(driverRepository).findById(DEFAULT_ID);
         verify(driverRepository).delete(driver);
     }
 
     @Test
     void deleteDriver_shouldThrowDriverNotFoundException_whenDriverNotExist() {
+        // arrange
         doReturn(Optional.empty())
                 .when(driverRepository)
                 .findById(DEFAULT_ID);
 
+        // act and assert
         assertThrows(
                 DriverNotFoundException.class,
                 () -> driverService.deleteDriver(DEFAULT_ID)
@@ -413,6 +450,7 @@ public class DriverServiceImplTest {
 
     @Test
     void updateDriverRating_shouldUpdateRating_whenDriverExists() {
+        // arrange
         var ratingMessage = getDriverRatingMessage();
         var driver = getDefaultDriver();
         var expected = ratingMessage.rating();
@@ -421,9 +459,11 @@ public class DriverServiceImplTest {
                 .when(driverRepository)
                 .findById(ratingMessage.driverId());
 
+        // act
         driverService.updateDriverRating(ratingMessage);
-        var actual = driver.getRating();
 
+        // assert
+        var actual = driver.getRating();
         assertThat(actual).isEqualTo(expected);
         verify(driverRepository).findById(ratingMessage.driverId());
         verify(driverRepository).save(driver);
@@ -431,12 +471,14 @@ public class DriverServiceImplTest {
 
     @Test
     void updateDriverRating_shouldThrowDriverNotFoundException_whenDriverNotExist() {
+        // arrange
         var ratingMessage = getDriverRatingMessage();
 
         doReturn(Optional.empty())
                 .when(driverRepository)
                 .findById(ratingMessage.driverId());
 
+        // act and assert
         assertThrows(
                 DriverNotFoundException.class,
                 () -> driverService.updateDriverRating(ratingMessage)
@@ -446,6 +488,7 @@ public class DriverServiceImplTest {
 
     @Test
     void updateDriverStatus_shouldUpdateStatus_whenDriverExists() {
+        // arrange
         var statusMessage = getDriverStatusMessage();
         var driver = getDefaultDriver();
         var expected = statusMessage.status();
@@ -454,9 +497,11 @@ public class DriverServiceImplTest {
                 .when(driverRepository)
                 .findById(statusMessage.driverId());
 
+        // act
         driverService.updateDriverStatus(statusMessage.driverId(), statusMessage.status());
-        var actual = driver.getStatus();
 
+        // assert
+        var actual = driver.getStatus();
         assertThat(actual).isEqualTo(expected);
         verify(driverRepository).findById(statusMessage.driverId());
         verify(driverRepository).save(driver);
@@ -464,12 +509,14 @@ public class DriverServiceImplTest {
 
     @Test
     void updateDriverStatus_shouldThrowDriverNotFoundException_whenDriverNotExist() {
+        // arrange
         var statusMessage = getDriverStatusMessage();
 
         doReturn(Optional.empty())
                 .when(driverRepository)
                 .findById(statusMessage.driverId());
 
+        // act and assert
         assertThrows(
                 DriverNotFoundException.class,
                 () -> driverService.updateDriverStatus(statusMessage.driverId(), statusMessage.status())
