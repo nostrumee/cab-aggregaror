@@ -98,6 +98,8 @@ public class TestUtils {
     public final String START_RIDE_PATH = "/api/v1/rides/{id}/start";
     public final String FINISH_RIDE_PATH = "/api/v1/rides/{id}/finish";
     public final String GET_DRIVER_PROFILE_PATH = "/api/v1/rides/{id}/driver";
+    public final String GET_DRIVER_RIDE_HISTORY_PATH = "/api/v1/rides/driver/{id}";
+    public final String GET_PASSENGER_RIDE_HISTORY_PATH = "/api/v1/rides/passenger/{id}";
 
     public final String GET_PASSENGER_BY_ID_PATH = "/api/v1/passengers/1";
     public final String GET_DRIVER_BY_ID_PATH = "/api/v1/drivers/1";

@@ -126,7 +126,6 @@ public class RideServiceImpl implements RideService {
         return rideMapper.fromEntityToResponse(ride);
     }
 
-
     @Override
     @Transactional
     public RideResponse createRide(CreateRideRequest createRequest) {

@@ -51,7 +51,6 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
     @LocalServerPort
     private int port;
 
-
     @AfterEach
     void tearDown() {
         mockServer.resetAll();
@@ -168,6 +167,68 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .body("status", equalTo(HttpStatus.BAD_REQUEST.value()))
                 .body("message", equalTo(INVALID_PARAMETER_TYPE_MESSAGE));
+    }
+
+    @Test
+    void getDriverRideHistory_shouldReturnRidePageResponseWithDriverFinishedRides() {
+        var ridesPage = rideRepository.findAllByDriverIdAndStatus(
+                DEFAULT_ID, RideStatus.FINISHED,
+                PageRequest.of(VALID_PAGE - 1, VALID_SIZE, Sort.by(VALID_ORDER_BY))
+        );
+        var rides = rideMapper.fromEntityListToResponseList(ridesPage.getContent());
+        var expected = RidePageResponse.builder()
+                .rides(rides)
+                .pageNumber(VALID_PAGE)
+                .total(1L)
+                .build();
+
+        var actual = given()
+                .port(port)
+                .pathParam(ID_PARAM_NAME, DEFAULT_ID)
+                .params(Map.of(
+                        PAGE_PARAM_NAME, VALID_PAGE,
+                        SIZE_PARAM_NAME, VALID_SIZE,
+                        ORDER_BY_PARAM_NAME, VALID_ORDER_BY
+                ))
+                .when()
+                .get(GET_DRIVER_RIDE_HISTORY_PATH)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(RidePageResponse.class);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void getPassengerRideHistory_shouldReturnRidePageResponseWithPassengerFinishedRides() {
+        var ridesPage = rideRepository.findAllByPassengerIdAndStatus(
+                DEFAULT_ID, RideStatus.FINISHED,
+                PageRequest.of(VALID_PAGE - 1, VALID_SIZE, Sort.by(VALID_ORDER_BY))
+        );
+        var rides = rideMapper.fromEntityListToResponseList(ridesPage.getContent());
+        var expected = RidePageResponse.builder()
+                .rides(rides)
+                .pageNumber(VALID_PAGE)
+                .total(1L)
+                .build();
+
+        var actual = given()
+                .port(port)
+                .pathParam(ID_PARAM_NAME, DEFAULT_ID)
+                .params(Map.of(
+                        PAGE_PARAM_NAME, VALID_PAGE,
+                        SIZE_PARAM_NAME, VALID_SIZE,
+                        ORDER_BY_PARAM_NAME, VALID_ORDER_BY
+                ))
+                .when()
+                .get(GET_PASSENGER_RIDE_HISTORY_PATH)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(RidePageResponse.class);
+
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
