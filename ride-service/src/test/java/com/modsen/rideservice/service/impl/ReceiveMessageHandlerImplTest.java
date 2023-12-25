@@ -22,10 +22,13 @@ public class ReceiveMessageHandlerImplTest {
 
     @Test
     void handleAcceptRideMessage_shouldCallAcceptRideMethod() {
+        // arrange
         var acceptRideMessage = getAcceptRideMessage(DEFAULT_ID);
 
+        // act
         receiveMessageHandler.handleAcceptRideMessage(acceptRideMessage);
 
+        // assert
         verify(rideService).acceptRide(acceptRideMessage);
     }
 }

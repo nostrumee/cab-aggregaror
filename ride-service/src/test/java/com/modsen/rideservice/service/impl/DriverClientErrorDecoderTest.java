@@ -20,11 +20,14 @@ public class DriverClientErrorDecoderTest {
 
     @Test
     void decode_shouldReturnPassengerNotFoundException_whenPassengerNotExist() {
+        // arrange
         var expected = new DriverNotFoundException(DRIVER_NOT_FOUND_MESSAGE);
-
         var response = getResponseWithErrorCode(HttpStatus.NOT_FOUND.value(), DRIVER_NOT_FOUND_MESSAGE);
+
+        // act
         var actual = errorDecoder.decode("", response);
 
+        // assert
         assertThat(actual.getMessage()).isEqualTo(expected.getMessage());
     }
 }

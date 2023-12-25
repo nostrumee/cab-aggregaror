@@ -25,24 +25,28 @@ public class DriverServiceImplTest {
 
     @Test
     void getDriverById_shouldReturnPassengerResponse_whenPassengerExists() {
+        // arrange
         var expected = getDriverResponse();
-
         doReturn(expected)
                 .when(driverClient)
                 .getDriverById(DEFAULT_ID);
 
+        // act
         var actual = driverService.getDriverById(DEFAULT_ID);
 
+        // assert
         assertThat(actual).isEqualTo(expected);
         verify(driverClient).getDriverById(DEFAULT_ID);
     }
 
     @Test
     void getDriverById_shouldThrowDriverNotFoundException_whenDriverNotExist() {
+        // arrange
         doThrow(DriverNotFoundException.class)
                 .when(driverClient)
                 .getDriverById(DEFAULT_ID);
 
+        // act and assert
         assertThrows(
                 DriverNotFoundException.class,
                 () -> driverService.getDriverById(DEFAULT_ID)

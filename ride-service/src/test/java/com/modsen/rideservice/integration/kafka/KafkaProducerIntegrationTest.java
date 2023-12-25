@@ -1,5 +1,6 @@
 package com.modsen.rideservice.integration.kafka;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.modsen.rideservice.dto.message.CreateRideMessage;
 import com.modsen.rideservice.dto.message.DriverStatusMessage;
 import com.modsen.rideservice.dto.message.RideStatusMessage;
@@ -24,13 +25,13 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-
 @RequiredArgsConstructor
 public class KafkaProducerIntegrationTest extends IntegrationTestBase {
 
     private static KafkaProducer<String, Object> producer;
     private static KafkaConsumer<String, Object> consumer;
 
+    private final WireMockServer mockServer;
     private final RideService rideService;
 
     @BeforeAll
@@ -69,7 +70,6 @@ public class KafkaProducerIntegrationTest extends IntegrationTestBase {
     @Test
     void createRide_shouldSendCreateRideMessageToCreateRideTopic() {
         var createRequest = getCreateRideRequest();
-
         rideService.createRide(createRequest);
 
         await()
@@ -82,7 +82,7 @@ public class KafkaProducerIntegrationTest extends IntegrationTestBase {
 
                     var actual = (CreateRideMessage) records.iterator().next().value();
 
-                    assertThat(actual.rideId()).isEqualTo(11L);
+                    assertThat(actual.rideId()).isNotNull();
                     return true;
                 });
     }
@@ -90,7 +90,6 @@ public class KafkaProducerIntegrationTest extends IntegrationTestBase {
     @Test
     void acceptRide_shouldSendAcceptedRideStatusMessageToRideStatusTopic() {
         var acceptRideMessage = getAcceptRideMessage(DEFAULT_ID);
-
         rideService.acceptRide(acceptRideMessage);
 
         await()

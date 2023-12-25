@@ -1,5 +1,6 @@
 package com.modsen.rideservice.integration.controller;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.modsen.rideservice.dto.request.CreateRideRequest;
 import com.modsen.rideservice.dto.response.*;
 import com.modsen.rideservice.entity.RideStatus;
@@ -44,6 +45,8 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
     private final RideRepository rideRepository;
     private final RideMapper rideMapper;
     private final MessageService messageService;
+
+    private final WireMockServer mockServer;
 
     @MockBean
     private SendMessageHandler sendMessageHandler;

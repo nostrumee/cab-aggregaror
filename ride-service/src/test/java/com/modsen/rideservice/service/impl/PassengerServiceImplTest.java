@@ -24,24 +24,28 @@ public class PassengerServiceImplTest {
 
     @Test
     void getPassengerById_shouldReturnPassengerResponse_whenPassengerExists() {
+        // arrange
         var expected = getPassengerResponse();
-
         doReturn(expected)
                 .when(passengerClient)
                 .getPassengerById(DEFAULT_ID);
 
+        // act
         var actual = passengerService.getPassengerById(DEFAULT_ID);
 
+        // assert
         assertThat(actual).isEqualTo(expected);
         verify(passengerClient).getPassengerById(DEFAULT_ID);
     }
 
     @Test
     void getPassengerById_shouldThrowPassengerNotFoundException_whenPassengerNotExist() {
+        // arrange
         doThrow(PassengerNotFoundException.class)
                 .when(passengerClient)
                 .getPassengerById(DEFAULT_ID);
 
+        // act and assert
         assertThrows(
                 PassengerNotFoundException.class,
                 () -> passengerService.getPassengerById(DEFAULT_ID)
