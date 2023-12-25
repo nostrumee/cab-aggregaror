@@ -34,6 +34,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.modsen.rideservice.util.ErrorMessages.*;
 import static com.modsen.rideservice.util.TestUtils.*;
+import static com.modsen.rideservice.util.UriPaths.*;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -79,7 +80,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                         ORDER_BY_PARAM_NAME, VALID_ORDER_BY
                 ))
                 .when()
-                .get(GET_RIDE_PAGE_PATH)
+                .get(RIDE_SERVICE_BASE_PATH)
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .extract()
@@ -104,7 +105,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                         ORDER_BY_PARAM_NAME, VALID_ORDER_BY
                 ))
                 .when()
-                .get(GET_RIDE_PAGE_PATH)
+                .get(RIDE_SERVICE_BASE_PATH)
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract()
@@ -129,7 +130,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                         ORDER_BY_PARAM_NAME, INVALID_ORDER_BY
                 ))
                 .when()
-                .get(GET_RIDE_PAGE_PATH)
+                .get(RIDE_SERVICE_BASE_PATH)
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract()
@@ -148,7 +149,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                         ORDER_BY_PARAM_NAME, VALID_ORDER_BY
                 ))
                 .when()
-                .get(GET_RIDE_PAGE_PATH)
+                .get(RIDE_SERVICE_BASE_PATH)
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .body("status", equalTo(HttpStatus.BAD_REQUEST.value()))
@@ -165,7 +166,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                         ORDER_BY_PARAM_NAME, VALID_ORDER_BY
                 ))
                 .when()
-                .get(GET_RIDE_PAGE_PATH)
+                .get(RIDE_SERVICE_BASE_PATH)
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .body("status", equalTo(HttpStatus.BAD_REQUEST.value()))
@@ -187,14 +188,14 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
 
         var actual = given()
                 .port(port)
-                .pathParam(ID_PARAM_NAME, DEFAULT_ID)
+                .pathParam(DRIVER_ID_PARAM_NAME, DEFAULT_ID)
                 .params(Map.of(
                         PAGE_PARAM_NAME, VALID_PAGE,
                         SIZE_PARAM_NAME, VALID_SIZE,
                         ORDER_BY_PARAM_NAME, VALID_ORDER_BY
                 ))
                 .when()
-                .get(GET_DRIVER_RIDE_HISTORY_PATH)
+                .get(RIDE_SERVICE_BASE_PATH + GET_DRIVER_RIDE_HISTORY_PATH)
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .extract()
@@ -218,14 +219,14 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
 
         var actual = given()
                 .port(port)
-                .pathParam(ID_PARAM_NAME, DEFAULT_ID)
+                .pathParam(PASSENGER_ID_PARAM_NAME, DEFAULT_ID)
                 .params(Map.of(
                         PAGE_PARAM_NAME, VALID_PAGE,
                         SIZE_PARAM_NAME, VALID_SIZE,
                         ORDER_BY_PARAM_NAME, VALID_ORDER_BY
                 ))
                 .when()
-                .get(GET_PASSENGER_RIDE_HISTORY_PATH)
+                .get(RIDE_SERVICE_BASE_PATH + GET_PASSENGER_RIDE_HISTORY_PATH)
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .extract()
@@ -243,7 +244,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                 .port(port)
                 .pathParam(ID_PARAM_NAME, FINISHED_RIDE_ID)
                 .when()
-                .get(GET_RIDE_BY_ID_PATH)
+                .get(RIDE_SERVICE_BASE_PATH + GET_BY_ID_PATH)
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .extract()
@@ -263,7 +264,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                 .port(port)
                 .pathParam(ID_PARAM_NAME, NON_EXISTING_ID)
                 .when()
-                .get(GET_RIDE_BY_ID_PATH)
+                .get(RIDE_SERVICE_BASE_PATH + GET_BY_ID_PATH)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract()
@@ -288,7 +289,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                 .contentType(ContentType.JSON)
                 .body(createRequest)
                 .when()
-                .post(CREATE_RIDE_PATH)
+                .post(RIDE_SERVICE_BASE_PATH)
                 .then()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract()
@@ -318,7 +319,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                 .contentType(ContentType.JSON)
                 .body(createRequest)
                 .when()
-                .post(CREATE_RIDE_PATH)
+                .post(RIDE_SERVICE_BASE_PATH)
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract()
@@ -355,7 +356,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                 .contentType(ContentType.JSON)
                 .body(createRequest)
                 .when()
-                .post(CREATE_RIDE_PATH)
+                .post(RIDE_SERVICE_BASE_PATH)
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract()
@@ -375,7 +376,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                 .port(port)
                 .pathParam(ID_PARAM_NAME, DEFAULT_ID)
                 .when()
-                .delete(DELETE_RIDE_PATH)
+                .delete(RIDE_SERVICE_BASE_PATH + DELETE_BY_ID_PATH)
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
@@ -383,7 +384,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                 .port(port)
                 .pathParam(ID_PARAM_NAME, DEFAULT_ID)
                 .when()
-                .get(GET_RIDE_BY_ID_PATH)
+                .get(RIDE_SERVICE_BASE_PATH + DELETE_BY_ID_PATH)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract()
@@ -403,7 +404,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                 .port(port)
                 .pathParam(ID_PARAM_NAME, NON_EXISTING_ID)
                 .when()
-                .delete(DELETE_RIDE_PATH)
+                .delete(RIDE_SERVICE_BASE_PATH + DELETE_BY_ID_PATH)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract()
@@ -426,7 +427,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                 .port(port)
                 .pathParam(ID_PARAM_NAME, ACCEPTED_RIDE_ID)
                 .when()
-                .get(START_RIDE_PATH)
+                .get(RIDE_SERVICE_BASE_PATH + START_RIDE_PATH)
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .extract()
@@ -450,7 +451,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                 .port(port)
                 .pathParam(ID_PARAM_NAME, STARTED_RIDE_ID)
                 .when()
-                .get(START_RIDE_PATH)
+                .get(RIDE_SERVICE_BASE_PATH + START_RIDE_PATH)
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
                 .extract()
@@ -470,7 +471,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                 .port(port)
                 .pathParam(ID_PARAM_NAME, NON_EXISTING_ID)
                 .when()
-                .get(START_RIDE_PATH)
+                .get(RIDE_SERVICE_BASE_PATH + START_RIDE_PATH)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract()
@@ -493,7 +494,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                 .port(port)
                 .pathParam(ID_PARAM_NAME, STARTED_RIDE_ID)
                 .when()
-                .get(FINISH_RIDE_PATH)
+                .get(RIDE_SERVICE_BASE_PATH + FINISH_RIDE_PATH)
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .extract()
@@ -517,7 +518,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                 .port(port)
                 .pathParam(ID_PARAM_NAME, FINISHED_RIDE_ID)
                 .when()
-                .get(FINISH_RIDE_PATH)
+                .get(RIDE_SERVICE_BASE_PATH + FINISH_RIDE_PATH)
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
                 .extract()
@@ -537,7 +538,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                 .port(port)
                 .pathParam(ID_PARAM_NAME, NON_EXISTING_ID)
                 .when()
-                .get(FINISH_RIDE_PATH)
+                .get(RIDE_SERVICE_BASE_PATH + FINISH_RIDE_PATH)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract()
@@ -558,9 +559,9 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
 
         var actual = given()
                 .port(port)
-                .pathParam(ID_PARAM_NAME, FINISHED_RIDE_ID)
+                .pathParam(RIDE_ID_PARAM_NAME, FINISHED_RIDE_ID)
                 .when()
-                .get(GET_DRIVER_PROFILE_PATH)
+                .get(RIDE_SERVICE_BASE_PATH + GET_DRIVER_PROFILE_PATH)
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .extract()
@@ -585,9 +586,9 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
 
         var actual = given()
                 .port(port)
-                .pathParam(ID_PARAM_NAME, CREATED_RIDE_ID)
+                .pathParam(RIDE_ID_PARAM_NAME, CREATED_RIDE_ID)
                 .when()
-                .get(GET_DRIVER_PROFILE_PATH)
+                .get(RIDE_SERVICE_BASE_PATH + GET_DRIVER_PROFILE_PATH)
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
                 .extract()
@@ -605,9 +606,9 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
 
         var actual = given()
                 .port(port)
-                .pathParam(ID_PARAM_NAME, NON_EXISTING_ID)
+                .pathParam(RIDE_ID_PARAM_NAME, NON_EXISTING_ID)
                 .when()
-                .get(GET_DRIVER_PROFILE_PATH)
+                .get(RIDE_SERVICE_BASE_PATH + GET_DRIVER_PROFILE_PATH)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract()

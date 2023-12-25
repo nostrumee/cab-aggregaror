@@ -38,14 +38,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
+import static com.modsen.rideservice.util.UriPaths.*;
+
 @UtilityClass
 public class TestUtils {
 
     public final LocalDateTime NOW = LocalDateTime.now();
 
     public final long DEFAULT_ID = 1L;
-    public final long NEW_ID = 11L;
-
     public final long CREATED_RIDE_ID = 1L;
     public final long REJECTED_RIDE_ID = 2L;
     public final long ACCEPTED_RIDE_ID = 3L;
@@ -82,6 +82,9 @@ public class TestUtils {
     public final String SIZE_PARAM_NAME = "size";
     public final String ORDER_BY_PARAM_NAME = "order_by";
     public final String ID_PARAM_NAME = "id";
+    public final String PASSENGER_ID_PARAM_NAME = "passengerId";
+    public final String DRIVER_ID_PARAM_NAME = "driverId";
+    public final String RIDE_ID_PARAM_NAME = "rideId";
 
     public final String PASSENGER_ID_VALIDATION_MESSAGE_KEY = "passenger-id.positive";
     public final String START_POINT_VALIDATION_MESSAGE_KEY = "start-point.not.blank";
@@ -91,25 +94,14 @@ public class TestUtils {
     public final String START_POINT_FIELD_NAME = "startPoint";
     public final String DESTINATION_POINT_FIELD_NAME = "destinationPoint";
 
-    public final String GET_RIDE_BY_ID_PATH = "/api/v1/rides/{id}";
-    public final String GET_RIDE_PAGE_PATH = "/api/v1/rides";
-    public final String CREATE_RIDE_PATH = "/api/v1/rides";
-    public final String DELETE_RIDE_PATH = "/api/v1/rides/{id}";
-    public final String START_RIDE_PATH = "/api/v1/rides/{id}/start";
-    public final String FINISH_RIDE_PATH = "/api/v1/rides/{id}/finish";
-    public final String GET_DRIVER_PROFILE_PATH = "/api/v1/rides/{id}/driver";
-    public final String GET_DRIVER_RIDE_HISTORY_PATH = "/api/v1/rides/driver/{id}";
-    public final String GET_PASSENGER_RIDE_HISTORY_PATH = "/api/v1/rides/passenger/{id}";
-
-    public final String GET_PASSENGER_BY_ID_PATH = "/api/v1/passengers/1";
-    public final String GET_DRIVER_BY_ID_PATH = "/api/v1/drivers/1";
+    public final String GET_PASSENGER_BY_ID_PATH = String.format("%s/%s", PASSENGER_SERVICE_BASE_PATH, DEFAULT_ID);
+    public final String GET_DRIVER_BY_ID_PATH = String.format("%s/%s", DRIVER_SERVICE_BASE_PATH, DEFAULT_ID);
 
     public final String PASSENGER_NOT_FOUND_MESSAGE = "Passenger with id 1 was not found";
     public final String DRIVER_NOT_FOUND_MESSAGE = "Passenger with id 1 was not found";
 
     public final String POSTGRES_IMAGE_NAME = "postgres:15-alpine";
     public final String KAFKA_IMAGE_NAME = "confluentinc/cp-kafka:7.3.3";
-    public final int WIREMOCK_PORT = 8088;
 
     public final String ACCEPT_RIDE_TOPIC_NAME = "accept-ride-topic";
     public final String CREATE_RIDE_TOPIC_NAME = "create-ride-topic";
