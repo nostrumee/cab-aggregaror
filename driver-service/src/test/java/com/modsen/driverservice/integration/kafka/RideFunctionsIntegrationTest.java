@@ -3,8 +3,9 @@ package com.modsen.driverservice.integration.kafka;
 import com.modsen.driverservice.dto.message.AcceptRideMessage;
 import com.modsen.driverservice.dto.message.CreateRideMessage;
 import com.modsen.driverservice.entity.DriverStatus;
-import com.modsen.driverservice.integration.TestcontainersBase;
+import com.modsen.driverservice.integration.IntegrationTestBase;
 import com.modsen.driverservice.repository.DriverRepository;
+import com.modsen.driverservice.util.PropertiesUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -13,8 +14,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -24,16 +23,9 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-@SpringBootTest
-@Sql(
-        scripts = {
-                "classpath:sql/delete-data.sql",
-                "classpath:sql/insert-data.sql"
-        },
-        executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
-)
+
 @RequiredArgsConstructor
-public class RideFunctionsIntegrationTest extends TestcontainersBase {
+public class RideFunctionsIntegrationTest extends IntegrationTestBase {
 
     private static KafkaProducer<String, Object> producer;
     private static KafkaConsumer<String, Object> consumer;
@@ -42,12 +34,11 @@ public class RideFunctionsIntegrationTest extends TestcontainersBase {
 
     @BeforeAll
     static void beforeAll() {
-        postgres.start();
-        kafka.start();
-
         producer = getKafkaProducer(kafka.getBootstrapServers());
         consumer = getKafkaConsumer(kafka.getBootstrapServers());
-        consumer.subscribe(Collections.singletonList(ACCEPT_RIDE_TOPIC_NAME));
+        consumer.subscribe(Collections.singletonList(
+                PropertiesUtil.get(ACCEPT_RIDE_TOPIC_NAME_KEY)
+        ));
     }
 
     @AfterAll
@@ -59,9 +50,11 @@ public class RideFunctionsIntegrationTest extends TestcontainersBase {
 
     @Test
     void acceptRideOrder_shouldAssignDriverToRide_whenMessageConsumed() {
+        String createRideTopicName = PropertiesUtil.get(CREATE_RIDE_TOPIC_NAME_KEY);
+
         var createRideMessage = new CreateRideMessage(DEFAULT_ID);
         ProducerRecord<String, Object> record = new ProducerRecord<>(
-                CREATE_RIDE_TOPIC_NAME,
+                createRideTopicName,
                 createRideMessage
         );
         producer.send(record);

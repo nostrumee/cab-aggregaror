@@ -3,16 +3,15 @@ package com.modsen.driverservice.integration.kafka;
 import com.modsen.driverservice.dto.message.DriverRatingMessage;
 import com.modsen.driverservice.dto.message.DriverStatusMessage;
 import com.modsen.driverservice.entity.DriverStatus;
-import com.modsen.driverservice.integration.TestcontainersBase;
+import com.modsen.driverservice.integration.IntegrationTestBase;
 import com.modsen.driverservice.repository.DriverRepository;
+import com.modsen.driverservice.util.PropertiesUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.time.Duration;
 
@@ -21,24 +20,15 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-@SpringBootTest
-@Sql(
-        scripts = {
-                "classpath:sql/delete-data.sql",
-                "classpath:sql/insert-data.sql"
-        },
-        executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
-)
+
 @RequiredArgsConstructor
-public class DriverFunctionsIntegrationTest extends TestcontainersBase {
+public class DriverFunctionsIntegrationTest extends IntegrationTestBase {
 
     private static KafkaProducer<String, Object> producer;
     private final DriverRepository driverRepository;
 
     @BeforeAll
     static void beforeAll() {
-        postgres.start();
-        kafka.start();
         producer = getKafkaProducer(kafka.getBootstrapServers());
     }
 
@@ -50,12 +40,14 @@ public class DriverFunctionsIntegrationTest extends TestcontainersBase {
 
     @Test
     void updateDriverRating_shouldUpdateDriverRating_whenMessageConsumed() {
+        String driverRatingTopicName = PropertiesUtil.get(DRIVER_RATING_TOPIC_NAME_KEY);
+
         var ratingMessage = DriverRatingMessage.builder()
                 .driverId(DEFAULT_ID)
                 .rating(OTHER_RATING)
                 .build();
         ProducerRecord<String, Object> record = new ProducerRecord<>(
-                DRIVER_RATING_TOPIC_NAME,
+                driverRatingTopicName,
                 ratingMessage
         );
         producer.send(record);
@@ -72,17 +64,17 @@ public class DriverFunctionsIntegrationTest extends TestcontainersBase {
 
     @Test
     void updateDriverStatus_shouldUpdateDriverStatus_whenMessageConsumed() {
+        String driverStatusTopicName = PropertiesUtil.get(DRIVER_STATUS_TOPIC_NAME_KEY);
+
         var statusMessage = DriverStatusMessage.builder()
                 .driverId(DEFAULT_ID)
                 .status(DriverStatus.UNAVAILABLE)
                 .build();
         ProducerRecord<String, Object> record = new ProducerRecord<>(
-                DRIVER_STATUS_TOPIC_NAME,
+                driverStatusTopicName,
                 statusMessage
         );
         producer.send(record);
-
-
 
         await()
                 .pollInterval(Duration.ofSeconds(3))

@@ -71,12 +71,6 @@ public class TestUtils {
     public final String EMAIL_VALIDATION_MESSAGE_KEY = "email.valid";
     public final String PHONE_VALIDATION_MESSAGE_KEY = "phone.valid";
 
-    public final String GET_DRIVER_BY_ID_PATH = "/api/v1/drivers/{id}";
-    public final String GET_DRIVER_PAGE_PATH = "/api/v1/drivers";
-    public final String ADD_DRIVER_PATH = "/api/v1/drivers";
-    public final String UPDATE_DRIVER_PATH = "/api/v1/drivers/{id}";
-    public final String DELETE_DRIVER_PATH = "/api/v1/drivers/{id}";
-
     public final String FIRST_NAME_FIELD_NAME = "firstName";
     public final String LAST_NAME_FIELD_NAME = "lastName";
     public final String LICENCE_NUMBER_FIELD_NAME = "licenceNumber";
@@ -88,14 +82,13 @@ public class TestUtils {
     public final String ORDER_BY_PARAM_NAME = "order_by";
     public final String ID_PARAM_NAME = "id";
 
-    public final String DRIVER_RATING_TOPIC_NAME = "driver-rating-topic";
-    public final String DRIVER_STATUS_TOPIC_NAME = "driver-status-topic";
-    public final String CREATE_RIDE_TOPIC_NAME = "create-ride-topic";
-    public final String ACCEPT_RIDE_TOPIC_NAME = "accept-ride-topic";
+    public final String DRIVER_RATING_TOPIC_NAME_KEY = "driver-rating-topic-name";
+    public final String DRIVER_STATUS_TOPIC_NAME_KEY = "driver-status-topic-name";
+    public final String CREATE_RIDE_TOPIC_NAME_KEY = "create-ride-topic-name";
+    public final String ACCEPT_RIDE_TOPIC_NAME_KEY = "accept-ride-topic-name";
 
-    public final String POSTGRES_IMAGE_NAME = "postgres:15-alpine";
-    public final String KAFKA_IMAGE_NAME = "confluentinc/cp-kafka:7.3.3";
-
+    public final String POSTGRES_IMAGE_NAME_KEY = "postgres-image-name";
+    public final String KAFKA_IMAGE_NAME_KEY = "kafka-image-name";
 
     public Driver getDefaultDriver() {
         return Driver.builder()

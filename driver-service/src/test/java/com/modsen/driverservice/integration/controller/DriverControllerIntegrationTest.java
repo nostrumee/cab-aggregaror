@@ -5,23 +5,20 @@ import com.modsen.driverservice.dto.request.CreateDriverRequest;
 import com.modsen.driverservice.dto.request.UpdateDriverRequest;
 import com.modsen.driverservice.dto.response.*;
 import com.modsen.driverservice.entity.DriverStatus;
-import com.modsen.driverservice.integration.TestcontainersBase;
+import com.modsen.driverservice.integration.IntegrationTestBase;
 import com.modsen.driverservice.mapper.DriverMapper;
 import com.modsen.driverservice.repository.DriverRepository;
 import com.modsen.driverservice.service.MessageService;
 import io.restassured.http.ContentType;
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -31,22 +28,14 @@ import java.util.stream.Stream;
 
 import static com.modsen.driverservice.util.ErrorMessages.*;
 import static com.modsen.driverservice.util.TestUtils.*;
+import static com.modsen.driverservice.util.UriPaths.*;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
-)
-@Sql(
-        scripts = {
-                "classpath:sql/delete-data.sql",
-                "classpath:sql/insert-data.sql"
-        },
-        executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
-)
+
 @RequiredArgsConstructor
-public class DriverControllerIntegrationTest extends TestcontainersBase {
+public class DriverControllerIntegrationTest extends IntegrationTestBase {
 
     private final DriverRepository driverRepository;
     private final DriverMapper driverMapper;
@@ -54,12 +43,6 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
 
     @LocalServerPort
     private int port;
-
-    @BeforeAll
-    static void beforeAll() {
-        postgres.start();
-        kafka.start();
-    }
 
     @Test
     void getDriverPage_shouldReturnDriverPageResponse_whenValidParamsPassed() {
@@ -82,7 +65,7 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
                         ORDER_BY_PARAM_NAME, VALID_ORDER_BY
                 ))
                 .when()
-                .get(GET_DRIVER_PAGE_PATH)
+                .get(DRIVER_SERVICE_V1_BASE_PATH)
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .extract()
@@ -108,7 +91,7 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
                         ORDER_BY_PARAM_NAME, VALID_ORDER_BY
                 ))
                 .when()
-                .get(GET_DRIVER_PAGE_PATH)
+                .get(DRIVER_SERVICE_V1_BASE_PATH)
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract()
@@ -133,7 +116,7 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
                         ORDER_BY_PARAM_NAME, INVALID_ORDER_BY
                 ))
                 .when()
-                .get(GET_DRIVER_PAGE_PATH)
+                .get(DRIVER_SERVICE_V1_BASE_PATH)
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract()
@@ -152,7 +135,7 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
                         ORDER_BY_PARAM_NAME, VALID_ORDER_BY
                 ))
                 .when()
-                .get(GET_DRIVER_PAGE_PATH)
+                .get(DRIVER_SERVICE_V1_BASE_PATH)
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .body("status", equalTo(HttpStatus.BAD_REQUEST.value()))
@@ -168,7 +151,7 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
                         ORDER_BY_PARAM_NAME, VALID_ORDER_BY
                 ))
                 .when()
-                .get(GET_DRIVER_PAGE_PATH)
+                .get(DRIVER_SERVICE_V1_BASE_PATH)
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .body("status", equalTo(HttpStatus.BAD_REQUEST.value()))
@@ -184,7 +167,7 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
                 .port(port)
                 .pathParam(ID_PARAM_NAME, DEFAULT_ID)
                 .when()
-                .get(GET_DRIVER_BY_ID_PATH)
+                .get(DRIVER_SERVICE_V1_BASE_PATH + GET_DRIVER_BY_ID_PATH)
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .extract()
@@ -204,7 +187,7 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
                 .port(port)
                 .pathParam(ID_PARAM_NAME, NON_EXISTING_ID)
                 .when()
-                .get(GET_DRIVER_BY_ID_PATH)
+                .get(DRIVER_SERVICE_V1_BASE_PATH + GET_DRIVER_BY_ID_PATH)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract()
@@ -239,7 +222,7 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
                 .contentType(ContentType.JSON)
                 .body(createRequest)
                 .when()
-                .post(ADD_DRIVER_PATH)
+                .post(DRIVER_SERVICE_V1_BASE_PATH)
                 .then()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract()
@@ -273,7 +256,7 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
                 .contentType(ContentType.JSON)
                 .body(createRequest)
                 .when()
-                .post(ADD_DRIVER_PATH)
+                .post(DRIVER_SERVICE_V1_BASE_PATH)
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
                 .extract()
@@ -315,7 +298,7 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
                 .contentType(ContentType.JSON)
                 .body(createRequest)
                 .when()
-                .post(ADD_DRIVER_PATH)
+                .post(DRIVER_SERVICE_V1_BASE_PATH)
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract()
@@ -351,7 +334,7 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
                 .contentType(ContentType.JSON)
                 .body(updateRequest)
                 .when()
-                .put(UPDATE_DRIVER_PATH)
+                .put(DRIVER_SERVICE_V1_BASE_PATH + UPDATE_DRIVER_BY_ID_PATH)
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .extract()
@@ -381,7 +364,7 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
                 .contentType(ContentType.JSON)
                 .body(updateRequest)
                 .when()
-                .put(UPDATE_DRIVER_PATH)
+                .put(DRIVER_SERVICE_V1_BASE_PATH + UPDATE_DRIVER_BY_ID_PATH)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract()
@@ -416,7 +399,7 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
                 .contentType(ContentType.JSON)
                 .body(updateRequest)
                 .when()
-                .put(UPDATE_DRIVER_PATH)
+                .put(DRIVER_SERVICE_V1_BASE_PATH + UPDATE_DRIVER_BY_ID_PATH)
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
                 .extract()
@@ -459,7 +442,7 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
                 .contentType(ContentType.JSON)
                 .body(updateRequest)
                 .when()
-                .put(UPDATE_DRIVER_PATH)
+                .put(DRIVER_SERVICE_V1_BASE_PATH + UPDATE_DRIVER_BY_ID_PATH)
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract()
@@ -479,7 +462,7 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
                 .port(port)
                 .pathParam(ID_PARAM_NAME, DEFAULT_ID)
                 .when()
-                .delete(DELETE_DRIVER_PATH)
+                .delete(DRIVER_SERVICE_V1_BASE_PATH + DELETE_DRIVER_BY_ID_PATH)
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
@@ -487,7 +470,7 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
                 .port(port)
                 .pathParam(ID_PARAM_NAME, DEFAULT_ID)
                 .when()
-                .get(GET_DRIVER_BY_ID_PATH)
+                .get(DRIVER_SERVICE_V1_BASE_PATH + GET_DRIVER_BY_ID_PATH)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract()
@@ -507,7 +490,7 @@ public class DriverControllerIntegrationTest extends TestcontainersBase {
                 .port(port)
                 .pathParam(ID_PARAM_NAME, NON_EXISTING_ID)
                 .when()
-                .delete(DELETE_DRIVER_PATH)
+                .delete(DRIVER_SERVICE_V1_BASE_PATH + DELETE_DRIVER_BY_ID_PATH)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract()
