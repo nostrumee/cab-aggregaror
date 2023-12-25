@@ -23,7 +23,7 @@ import java.util.Map;
 import static com.modsen.driverservice.util.UriPaths.*;
 
 @RestController
-@RequestMapping(DRIVER_SERVICE_V1_BASE_PATH)
+@RequestMapping(DRIVER_SERVICE_BASE_PATH)
 @RequiredArgsConstructor
 @Tag(name = "Driver Controller", description = "Driver API")
 public class DriverController {
