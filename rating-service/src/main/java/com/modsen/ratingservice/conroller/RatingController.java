@@ -14,19 +14,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
+import static com.modsen.ratingservice.util.UriPaths.*;
+
 @RestController
-@RequestMapping("/rating")
+@RequestMapping(RATING_SERVICE_BASE_PATH)
 @RequiredArgsConstructor
 public class RatingController {
 
     private final RatingService ratingService;
 
-    @PostMapping("/driver")
+    @PostMapping(RATE_DRIVER_PATH)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Rate a driver")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Driver rated"),
-            @ApiResponse(responseCode = "404", description = "Ride not found",
+            @ApiResponse(responseCode = "400", description = "Ride not found",
                     content = {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     }),
@@ -41,12 +43,12 @@ public class RatingController {
         ratingService.rateDriver(ratingRequest);
     }
 
-    @PostMapping("/passenger")
+    @PostMapping(RATE_PASSENGER_PATH)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Rate a passenger")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Passenger rated"),
-            @ApiResponse(responseCode = "404", description = "Ride not found",
+            @ApiResponse(responseCode = "400", description = "Ride not found",
                     content = {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     }),

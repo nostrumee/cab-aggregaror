@@ -20,19 +20,19 @@ import static com.modsen.ratingservice.util.ErrorMessages.*;
 public class ControllerAdvice {
 
     @ExceptionHandler(RideNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleRideNotFound(RideNotFoundException e) {
         return ErrorResponse.builder()
-                .status(HttpStatus.NOT_FOUND.value())
+                .status(HttpStatus.BAD_REQUEST.value())
                 .message(e.getMessage())
                 .build();
     }
 
     @ExceptionHandler(InvalidRideStatusException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleInvalidRideStatus(InvalidRideStatusException e) {
         return ErrorResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
+                .status(HttpStatus.CONFLICT.value())
                 .message(e.getMessage())
                 .build();
     }

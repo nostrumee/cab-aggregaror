@@ -18,6 +18,6 @@ public class RideServiceImpl implements RideService {
     public RideResponse getRideById(long id) {
         log.info("Retrieving a ride by id {}", id);
 
-        return rideClient.getRide(id);
+        return rideClient.getRideById(id);
     }
 }

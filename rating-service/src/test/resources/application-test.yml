@@ -11,6 +11,12 @@ spring:
     password: password
     driver-class-name: org.postgresql.Driver
 
+  sql:
+    init:
+      mode: always
+      continue-on-error: false
+      data-locations: classpath:sql/init-data.sql
+
   jpa:
     properties:
       hibernate:
