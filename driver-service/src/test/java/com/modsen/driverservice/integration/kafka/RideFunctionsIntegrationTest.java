@@ -5,7 +5,6 @@ import com.modsen.driverservice.dto.message.CreateRideMessage;
 import com.modsen.driverservice.entity.DriverStatus;
 import com.modsen.driverservice.integration.IntegrationTestBase;
 import com.modsen.driverservice.repository.DriverRepository;
-import com.modsen.driverservice.util.PropertiesUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -37,7 +36,7 @@ public class RideFunctionsIntegrationTest extends IntegrationTestBase {
         producer = getKafkaProducer(kafka.getBootstrapServers());
         consumer = getKafkaConsumer(kafka.getBootstrapServers());
         consumer.subscribe(Collections.singletonList(
-                PropertiesUtil.get(ACCEPT_RIDE_TOPIC_NAME_KEY)
+                ACCEPT_RIDE_TOPIC_NAME
         ));
     }
 
@@ -50,11 +49,9 @@ public class RideFunctionsIntegrationTest extends IntegrationTestBase {
 
     @Test
     void acceptRideOrder_shouldAssignDriverToRide_whenMessageConsumed() {
-        String createRideTopicName = PropertiesUtil.get(CREATE_RIDE_TOPIC_NAME_KEY);
-
         var createRideMessage = new CreateRideMessage(DEFAULT_ID);
         ProducerRecord<String, Object> record = new ProducerRecord<>(
-                createRideTopicName,
+                CREATE_RIDE_TOPIC_NAME,
                 createRideMessage
         );
         producer.send(record);

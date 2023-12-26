@@ -5,7 +5,6 @@ import com.modsen.driverservice.dto.message.DriverStatusMessage;
 import com.modsen.driverservice.entity.DriverStatus;
 import com.modsen.driverservice.integration.IntegrationTestBase;
 import com.modsen.driverservice.repository.DriverRepository;
-import com.modsen.driverservice.util.PropertiesUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -40,14 +39,12 @@ public class DriverFunctionsIntegrationTest extends IntegrationTestBase {
 
     @Test
     void updateDriverRating_shouldUpdateDriverRating_whenMessageConsumed() {
-        String driverRatingTopicName = PropertiesUtil.get(DRIVER_RATING_TOPIC_NAME_KEY);
-
         var ratingMessage = DriverRatingMessage.builder()
                 .driverId(DEFAULT_ID)
                 .rating(OTHER_RATING)
                 .build();
         ProducerRecord<String, Object> record = new ProducerRecord<>(
-                driverRatingTopicName,
+                DRIVER_RATING_TOPIC_NAME,
                 ratingMessage
         );
         producer.send(record);
@@ -64,14 +61,12 @@ public class DriverFunctionsIntegrationTest extends IntegrationTestBase {
 
     @Test
     void updateDriverStatus_shouldUpdateDriverStatus_whenMessageConsumed() {
-        String driverStatusTopicName = PropertiesUtil.get(DRIVER_STATUS_TOPIC_NAME_KEY);
-
         var statusMessage = DriverStatusMessage.builder()
                 .driverId(DEFAULT_ID)
                 .status(DriverStatus.UNAVAILABLE)
                 .build();
         ProducerRecord<String, Object> record = new ProducerRecord<>(
-                driverStatusTopicName,
+                DRIVER_STATUS_TOPIC_NAME,
                 statusMessage
         );
         producer.send(record);
