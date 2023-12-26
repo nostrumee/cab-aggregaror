@@ -28,7 +28,7 @@ spring:
       client:
         config:
           ride-service:
-            url: http://localhost:${wiremock.server.port}
+            url: http://localhost:8083
 
 springdoc:
   override-with-generic-response: false
