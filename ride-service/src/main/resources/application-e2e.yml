@@ -28,10 +28,10 @@ spring:
       client:
         config:
           passenger-service:
-            url: http://localhost:${wiremock.server.port}
+            url: http://localhost:8081
             logger-level: FULL
           driver-service:
-            url: http://localhost:${wiremock.server.port}
+            url: http://localhost:8082
             logger-level: FULL
 
 springdoc:
@@ -49,3 +49,4 @@ logging:
   level:
     org.springframework.transaction.interceptor: TRACE
     com.zaxxer.hikari.pool.HikariPool: DEBUG
+    com.modsen.rideservice.client: DEBUG

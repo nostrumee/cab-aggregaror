@@ -1,0 +1,67 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: driver-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/driver_db
+    username: admin
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+  liquibase:
+    change-log: db/changelog/changelog-master.xml
+
+  cloud:
+    function:
+      definition: acceptRideOrder;updateDriverRating;updateDriverStatus
+    stream:
+      bindings:
+        acceptRideOrder-in-0:
+          destination: ${kafka.create-ride-topic-name}
+          group: ${spring.application.name}
+        acceptRideOrder-out-0:
+          destination: ${kafka.accept-ride-topic-name}
+          producer:
+            use-native-encoding: true
+        updateDriverRating-in-0:
+          destination: ${kafka.driver-rating-topic-name}
+          group: ${spring.application.name}
+        updateDriverStatus-in-0:
+          destination: ${kafka.driver-status-topic-name}
+          group: ${spring.application.name}
+      kafka:
+        binder:
+          brokers:
+            - ${kafka.bootstrap-servers}
+          configuration:
+            value:
+              serializer: org.springframework.kafka.support.serializer.JsonSerializer
+            key:
+              serializer: org.apache.kafka.common.serialization.StringSerializer
+          producer-properties:
+            spring:
+              json:
+                type:
+                  mapping: acceptRideMessage:com.modsen.driverservice.dto.message.AcceptRideMessage
+
+springdoc:
+  override-with-generic-response: false
+
+kafka:
+  create-ride-topic-name: create-ride-topic
+  accept-ride-topic-name: accept-ride-topic
+  driver-rating-topic-name: driver-rating-topic
+  driver-status-topic-name: driver-status-topic
+  bootstrap-servers: localhost:9092
