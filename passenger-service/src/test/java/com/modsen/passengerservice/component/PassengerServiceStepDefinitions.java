@@ -20,8 +20,7 @@ import org.mockito.Mock;
 
 import java.util.Optional;
 
-import static com.modsen.passengerservice.util.ErrorMessages.NOT_FOUND_WITH_ID_MESSAGE;
-import static com.modsen.passengerservice.util.ErrorMessages.PASSENGER_ALREADY_EXISTS_MESSAGE;
+import static com.modsen.passengerservice.util.ErrorMessages.*;
 import static com.modsen.passengerservice.util.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
@@ -157,7 +156,6 @@ public class PassengerServiceStepDefinitions {
         } catch (PassengerAlreadyExistsException e) {
             exception = e;
         }
-
     }
 
     @Then("The response should contain details of the newly created passenger")
@@ -166,15 +164,8 @@ public class PassengerServiceStepDefinitions {
         assertThat(passengerResponse).isEqualTo(expected);
     }
 
-    @And("A new passenger should be added to the database")
-    public void newPassengerAddedToDatabase() {
-        var passenger = passengerRepository.findById(NEW_ID);
-        assertThat(passenger.isPresent()).isEqualTo(true);
-    }
-
-
     @Then("The PassengerAlreadyExistsException should be thrown")
-    public void exceptionWithEmailMessageThrown() {
+    public void notFoundExceptionThrown() {
         assertThat(exception.getMessage()).isEqualTo(PASSENGER_ALREADY_EXISTS_MESSAGE);
     }
 

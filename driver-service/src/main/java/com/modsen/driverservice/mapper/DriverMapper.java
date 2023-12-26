@@ -4,9 +4,7 @@ import com.modsen.driverservice.dto.request.CreateDriverRequest;
 import com.modsen.driverservice.dto.request.UpdateDriverRequest;
 import com.modsen.driverservice.dto.response.DriverResponse;
 import com.modsen.driverservice.entity.Driver;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -18,6 +16,10 @@ public interface DriverMapper {
 
     DriverResponse fromEntityToResponse(Driver entity);
 
+    @Mappings(value = {
+            @Mapping(target = "rating", constant = "5.0"),
+            @Mapping(target = "status", constant = "AVAILABLE")
+    })
     Driver fromCreateRequestToEntity(CreateDriverRequest createRequest);
 
     void updateEntityFromUpdateRequest(UpdateDriverRequest updateRequest, @MappingTarget Driver entity);

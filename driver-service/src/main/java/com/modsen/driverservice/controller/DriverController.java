@@ -20,8 +20,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.Map;
 
+import static com.modsen.driverservice.util.UriPaths.*;
+
 @RestController
-@RequestMapping("api/v1/drivers")
+@RequestMapping(DRIVER_SERVICE_BASE_PATH)
 @RequiredArgsConstructor
 @Tag(name = "Driver Controller", description = "Driver API")
 public class DriverController {
@@ -54,7 +56,7 @@ public class DriverController {
         return driverService.getDriverPage(page, size, orderBy);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(GET_DRIVER_BY_ID_PATH)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a driver by id")
     @ApiResponses(value = {
@@ -103,7 +105,7 @@ public class DriverController {
                 .body(response);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(UPDATE_DRIVER_BY_ID_PATH)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Update an existing driver")
     @ApiResponses(value = {
@@ -131,7 +133,7 @@ public class DriverController {
         return driverService.updateDriver(updateRequest, id);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(DELETE_DRIVER_BY_ID_PATH)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a driver")
     @ApiResponses(value = {
