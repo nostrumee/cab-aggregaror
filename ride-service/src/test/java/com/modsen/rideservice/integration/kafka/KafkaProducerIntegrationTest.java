@@ -28,7 +28,6 @@ import static org.awaitility.Awaitility.await;
 @RequiredArgsConstructor
 public class KafkaProducerIntegrationTest extends IntegrationTestBase {
 
-    private static KafkaProducer<String, Object> producer;
     private static KafkaConsumer<String, Object> consumer;
 
     private final WireMockServer mockServer;
@@ -36,7 +35,6 @@ public class KafkaProducerIntegrationTest extends IntegrationTestBase {
 
     @BeforeAll
     static void beforeAll() {
-        producer = getKafkaProducer(kafka.getBootstrapServers());
         consumer = getKafkaConsumer(kafka.getBootstrapServers());
         consumer.subscribe(List.of(
                 RIDE_STATUS_TOPIC_NAME,
@@ -62,8 +60,6 @@ public class KafkaProducerIntegrationTest extends IntegrationTestBase {
 
     @AfterAll
     static void afterAll() {
-        producer.flush();
-        producer.close();
         consumer.close();
     }
 
