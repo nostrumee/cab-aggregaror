@@ -24,7 +24,7 @@ public class DriverServiceImplTest {
     private DriverServiceImpl driverService;
 
     @Test
-    void getDriverById_shouldReturnPassengerResponse_whenPassengerExists() {
+    void getDriverById_shouldReturnDriverResponse_whenDriverExists() {
         // arrange
         var expected = getDriverResponse();
         doReturn(expected)
