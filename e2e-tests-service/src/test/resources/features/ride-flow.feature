@@ -22,12 +22,12 @@ Feature: Ride Flow
 
   Scenario: A driver rates passenger
     Given The ride has status "FINISHED"
-    When A driver rates a passenger with rating 1
+    When A driver rates a passenger with rating 4
     Then After a few sec passenger's rating should be changed
 
   Scenario: A passenger rates driver
     Given The ride has status "FINISHED"
-    When A passenger rates a driver with rating 1
+    When A passenger rates a driver with rating 4
     Then After a few sec driver's rating should be changed
 
   Scenario: A passenger views his rides history

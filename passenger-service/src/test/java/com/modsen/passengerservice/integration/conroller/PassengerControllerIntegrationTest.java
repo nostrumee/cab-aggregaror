@@ -1,21 +1,19 @@
 package com.modsen.passengerservice.integration.conroller;
 
-import com.modsen.passengerservice.config.TestcontainersConfig;
 import com.modsen.passengerservice.dto.request.CreatePassengerRequest;
 import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
 import com.modsen.passengerservice.dto.response.*;
+import com.modsen.passengerservice.integration.IntegrationTestBase;
 import com.modsen.passengerservice.mapper.PassengerMapper;
 import com.modsen.passengerservice.repository.PassengerRepository;
 import com.modsen.passengerservice.service.MessageService;
 import io.restassured.http.ContentType;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -28,20 +26,8 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = TestcontainersConfig.class
-)
-@Sql(
-        scripts = {
-                "classpath:sql/delete-data.sql",
-                "classpath:sql/insert-data.sql"
-        },
-        executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
-)
 @RequiredArgsConstructor
-public class PassengerControllerIntegrationTest {
+public class PassengerControllerIntegrationTest extends IntegrationTestBase {
 
     private final PassengerRepository passengerRepository;
     private final PassengerMapper passengerMapper;

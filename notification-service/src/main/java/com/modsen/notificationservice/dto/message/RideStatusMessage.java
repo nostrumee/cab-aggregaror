@@ -1,9 +1,11 @@
 package com.modsen.notificationservice.dto.message;
 
 import com.modsen.notificationservice.dto.RideStatus;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 
+@Builder
 public record RideStatusMessage(
         Long rideId,
         RideStatus status,

@@ -1,0 +1,18 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: notification-service
+
+  mail:
+    username: user
+    password: admin
+    host: localhost
+    port: 3025
+    protocol: smtp
+
+kafka:
+  bootstrap-servers: localhost:9092
+  ride-status-topic-name: ride-status-topic
+  group-id: ${spring.application.name}

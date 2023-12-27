@@ -1,13 +1,11 @@
 package com.modsen.passengerservice.integration.kafka;
 
-import com.modsen.passengerservice.config.TestcontainersConfig;
 import com.modsen.passengerservice.dto.message.PassengerRatingMessage;
+import com.modsen.passengerservice.integration.IntegrationTestBase;
 import com.modsen.passengerservice.repository.PassengerRepository;
 import com.modsen.passengerservice.service.TestSender;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.KafkaContainer;
 
 import java.time.Duration;
@@ -17,22 +15,11 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-@SpringBootTest(
-        classes = TestcontainersConfig.class
-)
-@Sql(
-        scripts = {
-                "classpath:sql/delete-data.sql",
-                "classpath:sql/insert-data.sql"
-        },
-        executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
-)
 @RequiredArgsConstructor
-public class KafkaConsumerIntegrationTest {
+public class KafkaConsumerIntegrationTest extends IntegrationTestBase {
 
     private final PassengerRepository passengerRepository;
     private final TestSender testSender;
-    private final KafkaContainer kafkaContainer;
 
     @Test
     void updatePassengerRating_shouldUpdatePassengerRating_whenMessageConsumed() {
@@ -42,7 +29,7 @@ public class KafkaConsumerIntegrationTest {
                 .build();
 
         testSender.sendMessage(
-                kafkaContainer.getBootstrapServers(),
+                kafka.getBootstrapServers(),
                 PASSENGER_RATING_TOPIC_NAME,
                 ratingMessage
         );

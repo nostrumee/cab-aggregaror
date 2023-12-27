@@ -245,6 +245,7 @@ public class TestUtils {
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group");
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         properties.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        properties.put(JsonDeserializer.TYPE_MAPPINGS, "acceptRideMessage:" + AcceptRideMessage.class.getName());
 
         return new KafkaConsumer<>(properties);
     }

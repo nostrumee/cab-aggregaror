@@ -75,6 +75,9 @@ public class TestUtils {
     public final String ORDER_BY_PARAM_NAME = "order_by";
     public final String ID_PARAM_NAME = "id";
 
+    public final String POSTGRES_IMAGE_NAME = "postgres:15-alpine";
+    public final String KAFKA_IMAGE_NAME = "confluentinc/cp-kafka:7.3.3";
+
     public final String PASSENGER_RATING_TOPIC_NAME = "passenger-rating-topic";
 
     public Passenger getDefaultPassenger() {
