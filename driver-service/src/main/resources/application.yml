@@ -50,6 +50,11 @@ spring:
               serializer: org.springframework.kafka.support.serializer.JsonSerializer
             key:
               serializer: org.apache.kafka.common.serialization.StringSerializer
+            properties:
+              spring:
+                json:
+                  type:
+                    mapping: acceptRideMessage:com.modsen.driverservice.dto.message.AcceptRideMessage
 
 springdoc:
   override-with-generic-response: false
@@ -60,7 +65,3 @@ kafka:
   driver-rating-topic-name: driver-rating-topic
   driver-status-topic-name: driver-status-topic
   bootstrap-servers: localhost:9092
-
-images:
-  postgres-image-name: postgres:15-alpine
-  kafka-image-name: confluentinc/cp-kafka:7.3.3

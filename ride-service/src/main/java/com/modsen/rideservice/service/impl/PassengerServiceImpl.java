@@ -18,6 +18,6 @@ public class PassengerServiceImpl implements PassengerService {
     public PassengerResponse getPassengerById(long id) {
         log.info("Retrieving passenger by id {}", id);
 
-        return passengerClient.getPassenger(id);
+        return passengerClient.getPassengerById(id);
     }
 }

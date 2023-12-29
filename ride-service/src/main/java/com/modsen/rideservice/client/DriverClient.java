@@ -1,24 +1,19 @@
 package com.modsen.rideservice.client;
 
+import com.modsen.rideservice.config.DriverClientConfig;
 import com.modsen.rideservice.dto.response.DriverResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import static com.modsen.rideservice.util.UriPaths.*;
 
-@Component
-@RequiredArgsConstructor
-public class DriverClient {
+@FeignClient(
+        value = "driver-service",
+        configuration = DriverClientConfig.class
+)
+public interface DriverClient {
 
-    private final WebClient webClient;
-
-    public DriverResponse getDriverById(Long id) {
-        return webClient
-                .get()
-                .uri(DRIVERS_ROOT_URI + id)
-                .retrieve()
-                .bodyToMono(DriverResponse.class)
-                .block();
-    }
+    @GetMapping(DRIVER_SERVICE_BASE_PATH + GET_BY_ID_PATH)
+    DriverResponse getDriverById(@PathVariable("id") long id);
 }

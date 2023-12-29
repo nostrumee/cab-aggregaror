@@ -18,8 +18,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.Map;
 
+import static com.modsen.rideservice.util.UriPaths.*;
+
 @RestController
-@RequestMapping("/api/v1/rides")
+@RequestMapping(RIDE_SERVICE_BASE_PATH)
 @RequiredArgsConstructor
 public class RideController {
 
@@ -50,7 +52,7 @@ public class RideController {
         return rideService.getRidesPage(page, size, orderBy);
     }
 
-    @GetMapping("/driver/{driverId}")
+    @GetMapping(GET_DRIVER_RIDE_HISTORY_PATH)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get driver's rides history")
     @ApiResponses(value = {
@@ -76,7 +78,7 @@ public class RideController {
         return rideService.getRidesByDriverId(driverId, page, size, orderBy);
     }
 
-    @GetMapping("/passenger/{passengerId}")
+    @GetMapping(GET_PASSENGER_RIDE_HISTORY_PATH)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get passenger's rides history")
     @ApiResponses(value = {
@@ -102,7 +104,7 @@ public class RideController {
         return rideService.getRidesByPassengerId(passengerId, page, size, orderBy);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(GET_BY_ID_PATH)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a ride by id")
     @ApiResponses(value = {
@@ -129,6 +131,10 @@ public class RideController {
             @ApiResponse(responseCode = "400", description = "Invalid data provided",
                     content = {
                             @Content(schema = @Schema(implementation = ValidationErrorResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Passenger not found",
+                    content = {
+                            @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })
     })
     public ResponseEntity<RideResponse> createRide(
@@ -147,7 +153,7 @@ public class RideController {
                 .body(response);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(DELETE_BY_ID_PATH)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a ride")
     @ApiResponses(value = {
@@ -161,7 +167,7 @@ public class RideController {
         rideService.deleteRide(id);
     }
 
-    @GetMapping("/{id}/start")
+    @GetMapping(START_RIDE_PATH)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Start a ride")
     @ApiResponses(value = {
@@ -182,7 +188,7 @@ public class RideController {
         return rideService.startRide(id);
     }
 
-    @GetMapping("/{id}/finish")
+    @GetMapping(FINISH_RIDE_PATH)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Finish a ride")
     @ApiResponses(value = {
@@ -203,7 +209,7 @@ public class RideController {
         return rideService.finishRide(id);
     }
 
-    @GetMapping("/{rideId}/driver")
+    @GetMapping(GET_DRIVER_PROFILE_PATH)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "View driver's profile from a ride by ride id")
     @ApiResponses(value = {
@@ -212,6 +218,14 @@ public class RideController {
                             @Content(schema = @Schema(implementation = DriverResponse.class))
                     }),
             @ApiResponse(responseCode = "404", description = "Ride not found",
+                    content = {
+                            @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    }),
+            @ApiResponse(responseCode = "409", description = "Invalid ride status",
+                    content = {
+                            @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Driver not found",
                     content = {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })

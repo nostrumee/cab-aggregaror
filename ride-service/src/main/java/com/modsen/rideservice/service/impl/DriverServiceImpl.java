@@ -16,6 +16,8 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public DriverResponse getDriverById(long driverId) {
+        log.info("Retrieving driver by id {}", driverId);
+
         return driverClient.getDriverById(driverId);
     }
 }

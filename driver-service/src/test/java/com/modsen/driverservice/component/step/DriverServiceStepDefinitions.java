@@ -15,16 +15,10 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.cucumber.spring.CucumberContextConfiguration;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
 
-import static com.modsen.driverservice.util.ErrorMessages.DRIVER_ALREADY_EXISTS_MESSAGE;
-import static com.modsen.driverservice.util.ErrorMessages.NOT_FOUND_WITH_ID_MESSAGE;
+import static com.modsen.driverservice.util.ErrorMessages.*;
 import static com.modsen.driverservice.util.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -53,7 +47,7 @@ public class DriverServiceStepDefinitions {
 
         doReturn(Optional.of(retrievedDriver))
                 .when(driverRepository)
-                .findById(DEFAULT_ID);
+                .findById(id);
         doReturn(expected)
                 .when(driverMapper)
                 .fromEntityToResponse(retrievedDriver);

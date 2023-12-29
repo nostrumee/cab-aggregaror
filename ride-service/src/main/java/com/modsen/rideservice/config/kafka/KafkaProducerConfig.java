@@ -80,7 +80,7 @@ public class KafkaProducerConfig {
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.bootstrapServers(),
                 ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
                 ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class,
-                JsonSerializer.TYPE_MAPPINGS, JSON_SERIALIZER_TYPE_MAPPING
+                JsonSerializer.TYPE_MAPPINGS, JSON_SERIALIZER_TYPE_MAPPINGS
         );
     }
 }
