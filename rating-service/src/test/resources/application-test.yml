@@ -11,6 +11,12 @@ spring:
     password: password
     driver-class-name: org.postgresql.Driver
 
+  sql:
+    init:
+      mode: always
+      continue-on-error: false
+      data-locations: classpath:sql/init-data.sql
+
   jpa:
     properties:
       hibernate:
@@ -28,7 +34,7 @@ spring:
       client:
         config:
           ride-service:
-            url: http://localhost:8083
+            url: http://localhost:${wiremock.server.port}
 
 springdoc:
   override-with-generic-response: false

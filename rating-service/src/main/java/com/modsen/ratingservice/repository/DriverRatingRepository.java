@@ -9,5 +9,5 @@ import java.math.BigDecimal;
 @Repository
 public interface DriverRatingRepository extends JpaRepository<DriverRating, Long> {
 
-    BigDecimal findDriverRating(long passengerId);
+    BigDecimal findDriverRating(long driverId);
 }

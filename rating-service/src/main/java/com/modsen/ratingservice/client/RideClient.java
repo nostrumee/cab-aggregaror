@@ -6,12 +6,15 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import static com.modsen.ratingservice.util.UriPaths.GET_BY_ID_PATH;
+import static com.modsen.ratingservice.util.UriPaths.RIDE_SERVICE_BASE_PATH;
+
 @FeignClient(
-        value = "ride",
+        value = "ride-service",
         configuration = RideClientConfig.class
 )
 public interface RideClient {
 
-    @GetMapping("/{id}")
-    RideResponse getRide(@PathVariable("id") long id);
+    @GetMapping(RIDE_SERVICE_BASE_PATH + GET_BY_ID_PATH)
+    RideResponse getRideById(@PathVariable("id") long id);
 }
