@@ -1,6 +1,5 @@
 package com.modsen.notificationservice.integration;
 
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.AfterAll;
@@ -45,7 +44,8 @@ public class NotificationServiceIntegrationTest extends IntegrationTestBase {
                 .untilAsserted(() -> {
                     assertThat(greenMail.getReceivedMessages().length).isEqualTo(1);
                     var receivedMessage = greenMail.getReceivedMessages()[0];
-                    assertThat(receivedMessage.getSubject()).isEqualTo(String.format(SUBJECT, rideStatusMessage.rideId()));
+                    assertThat(receivedMessage.getSubject())
+                            .isEqualTo(String.format(SUBJECT, rideStatusMessage.rideId()));
 
                     assertThat(receivedMessage.getAllRecipients().length).isEqualTo(1);
                     assertThat(receivedMessage.getAllRecipients()[0].toString()).isEqualTo(EMAIL);

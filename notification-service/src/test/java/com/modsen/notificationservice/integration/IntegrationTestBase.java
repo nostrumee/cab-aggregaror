@@ -38,7 +38,5 @@ public abstract class IntegrationTestBase {
         registry.add("kafka.bootstrap-servers", kafka::getBootstrapServers);
         registry.add("spring.mail.", kafka::getBootstrapServers);
         registry.add("kafka.bootstrap-servers", kafka::getBootstrapServers);
-        registry.add("kafka.bootstrap-servers", kafka::getBootstrapServers);
-        registry.add("kafka.bootstrap-servers", kafka::getBootstrapServers);
     }
 }
