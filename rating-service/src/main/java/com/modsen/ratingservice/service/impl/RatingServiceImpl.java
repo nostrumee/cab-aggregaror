@@ -7,6 +7,7 @@ import com.modsen.ratingservice.entity.DriverRating;
 import com.modsen.ratingservice.entity.PassengerRating;
 import com.modsen.ratingservice.entity.RideStatus;
 import com.modsen.ratingservice.exception.InvalidRideStatusException;
+import com.modsen.ratingservice.exception.ServiceUnavailableException;
 import com.modsen.ratingservice.mapper.RatingMapper;
 import com.modsen.ratingservice.dto.message.DriverRatingMessage;
 import com.modsen.ratingservice.dto.message.PassengerRatingMessage;
@@ -15,6 +16,7 @@ import com.modsen.ratingservice.repository.PassengerRatingRepository;
 import com.modsen.ratingservice.service.RatingService;
 import com.modsen.ratingservice.service.RideService;
 import com.modsen.ratingservice.service.SendMessageHandler;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+
+import static com.modsen.ratingservice.util.ErrorMessages.*;
 
 @Service
 @Slf4j
@@ -39,7 +43,18 @@ public class RatingServiceImpl implements RatingService {
     public void ratePassenger(PassengerRatingRequest ratingRequest) {
         log.info("Rating a passenger of a ride with id {}", ratingRequest.rideId());
 
-        RideResponse rideResponse = rideService.getRideById(ratingRequest.rideId());
+        RideResponse rideResponse;
+        try {
+            rideResponse = rideService.getRideById(ratingRequest.rideId());
+
+            if (rideResponse.passengerId().equals(0L)) {
+                log.error("Passenger service currently unavailable");
+                throw new ServiceUnavailableException(PASSENGER_SERVICE_UNAVAILABLE);
+            }
+        } catch (CallNotPermittedException e) {
+            log.error("Passenger service unavailable. Reason: {}", e.getMessage());
+            throw new ServiceUnavailableException(PASSENGER_SERVICE_UNAVAILABLE);
+        }
 
         if (!rideResponse.status().equals(RideStatus.FINISHED)) {
             log.error("Ride order with id {} is not finished yet", ratingRequest.rideId());
@@ -63,7 +78,19 @@ public class RatingServiceImpl implements RatingService {
     public void rateDriver(DriverRatingRequest ratingRequest) {
         log.info("Rating a driver of a ride with id {}", ratingRequest.rideId());
 
-        RideResponse rideResponse = rideService.getRideById(ratingRequest.rideId());
+        RideResponse rideResponse;
+        try {
+            rideResponse = rideService.getRideById(ratingRequest.rideId());
+
+            if (rideResponse.driverId().equals(0L)) {
+                log.error("Driver service currently unavailable");
+                throw new ServiceUnavailableException(DRIVER_SERVICE_UNAVAILABLE);
+            }
+        } catch (CallNotPermittedException e) {
+            log.error("Driver service unavailable. Reason: {}", e.getMessage());
+            throw new ServiceUnavailableException(DRIVER_SERVICE_UNAVAILABLE);
+        }
+
 
         if (!rideResponse.status().equals(RideStatus.FINISHED)) {
             log.error("Ride order with id {} is not finished yet", ratingRequest.rideId());

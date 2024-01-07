@@ -4,6 +4,7 @@ import com.modsen.ratingservice.dto.response.ErrorResponse;
 import com.modsen.ratingservice.dto.response.ValidationErrorResponse;
 import com.modsen.ratingservice.exception.InvalidRideStatusException;
 import com.modsen.ratingservice.exception.RideNotFoundException;
+import com.modsen.ratingservice.exception.ServiceUnavailableException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -68,6 +69,15 @@ public class ControllerAdvice {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(VALIDATION_FAILED_MESSAGE)
                 .errors(errors)
+                .build();
+    }
+
+    @ExceptionHandler(ServiceUnavailableException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ErrorResponse handleServiceUnavailable(ServiceUnavailableException e) {
+        return ErrorResponse.builder()
+                .status(HttpStatus.SERVICE_UNAVAILABLE.value())
+                .message(e.getMessage())
                 .build();
     }
 }

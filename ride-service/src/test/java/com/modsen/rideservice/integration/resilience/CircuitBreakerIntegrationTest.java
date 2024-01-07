@@ -1,4 +1,4 @@
-package com.modsen.rideservice.integration.controller;
+package com.modsen.rideservice.integration.resilience;
 
 import com.modsen.rideservice.client.DriverClient;
 import com.modsen.rideservice.client.PassengerClient;
