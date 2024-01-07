@@ -125,6 +125,15 @@ public class ControllerAdvice {
                 .build();
     }
 
+    @ExceptionHandler(ServiceUnavailableException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ErrorResponse handleServiceUnavailable(ServiceUnavailableException e) {
+        return ErrorResponse.builder()
+                .status(HttpStatus.SERVICE_UNAVAILABLE.value())
+                .message(e.getMessage())
+                .build();
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(Exception e) {

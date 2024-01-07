@@ -39,6 +39,23 @@ spring:
 springdoc:
   override-with-generic-response: false
 
+resilience4j:
+  circuitbreaker:
+    instances:
+      ride-service:
+        register-health-indicator: true
+        sliding-window-size: 10
+        permitted-number-of-calls-in-half-open-state: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 5s
+        failure-rate-threshold: 50
+        record-exceptions:
+          - feign.RetryableException
+          - org.springframework.web.client.HttpServerErrorException
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+          - org.springframework.web.client.ResourceAccessException
+
 kafka:
   passenger-rating-topic-name: passenger-rating-topic
   driver-rating-topic-name: driver-rating-topic
