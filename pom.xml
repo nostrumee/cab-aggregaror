@@ -17,6 +17,7 @@
         <module>rating-service</module>
         <module>end-to-end-tests</module>
         <module>edge-service</module>
+        <module>eureka-server</module>
     </modules>
 
     <properties>
