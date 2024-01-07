@@ -15,9 +15,6 @@
     <artifactId>notification-service</artifactId>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.integration.version>6.2.0</spring.integration.version>
         <jackson.version>2.16.0</jackson.version>
         <awaitility.version>4.2.0</awaitility.version>

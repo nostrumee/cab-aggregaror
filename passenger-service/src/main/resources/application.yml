@@ -43,6 +43,8 @@ spring:
 
 springdoc:
   override-with-generic-response: false
+  api-docs:
+    path: /passenger-service/v3/api-docs
 
 kafka:
   bootstrap-servers: localhost:9092

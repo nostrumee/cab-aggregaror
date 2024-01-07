@@ -39,6 +39,8 @@ spring:
 
 springdoc:
   override-with-generic-response: false
+  api-docs:
+    path: /ride-service/v3/api-docs
 
 kafka:
   create-ride-topic-name: create-ride-topic

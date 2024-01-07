@@ -1,0 +1,75 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: edge-service
+
+  cloud:
+    gateway:
+      default-filters:
+        - SaveSession
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: passenger-service
+          uri: lb://PASSENGER-SERVICE
+          predicates:
+            - Path=/api/v1/passengers/**, /passenger-service/**
+
+        - id: driver-service
+          uri: lb://DRIVER-SERVICE
+          predicates:
+            - Path=/api/v1/drivers/**, /driver-service/**
+
+        - id: ride-service
+          uri: lb://RIDE-SERVICE
+          predicates:
+            - Path=/api/v1/rides/**, /ride-service/**
+
+        - id: rating-service
+          uri: lb://RATING-SERVICE
+          predicates:
+            - Path=/api/v1/rating/**, /rating-service/**
+
+  data:
+    redis:
+      connect-timeout: 2s
+      host: localhost
+      port: 6379
+      timeout: 1s
+
+  session:
+    timeout: 10m
+    redis:
+      namespace: cab-aggregator:edge
+      repository-type: indexed
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui/index.html
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - url: /v3/api-docs
+        name: Edge Service
+      - url: /passenger-service/v3/api-docs
+        name: Passenger Service
+      - url: /driver-service/v3/api-docs
+        name: Driver Service
+      - url: /ride-service/v3/api-docs
+        name: Ride Service
+      - url: /rating-service/v3/api-docs
+        name: Rating Service
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
