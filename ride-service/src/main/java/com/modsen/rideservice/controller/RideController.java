@@ -228,7 +228,11 @@ public class RideController {
             @ApiResponse(responseCode = "400", description = "Driver not found",
                     content = {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
-                    })
+                    }),
+            @ApiResponse(responseCode = "503", description = "Driver service unavailable",
+                    content = {
+                            @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    }),
     })
     public DriverResponse getDriverProfile(@PathVariable long rideId) {
         return rideService.getDriverProfile(rideId);

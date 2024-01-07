@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import static com.modsen.rideservice.util.UriPaths.*;
 
 @FeignClient(
-        value = "driver-service",
+        value = "${driver-service.name}",
         configuration = DriverClientConfig.class
 )
 public interface DriverClient {

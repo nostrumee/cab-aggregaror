@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import static com.modsen.rideservice.util.UriPaths.*;
 
 @FeignClient(
-        value = "passenger-service",
+        value = "${passenger-service.name}",
         configuration = PassengerClientConfig.class
 )
 public interface PassengerClient {

@@ -108,6 +108,9 @@ public class TestUtils {
     public final String RIDE_STATUS_TOPIC_NAME = "ride-status-topic";
     public final String DRIVER_STATUS_TOPIC_NAME = "driver-status-topic";
 
+    public final String DRIVER_SERVICE_NAME = "driver-service";
+    public final String PASSENGER_SERVICE_NAME = "passenger-service";
+
     public Ride getCreatedRide() {
         return Ride.builder()
                 .id(CREATED_RIDE_ID)

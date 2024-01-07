@@ -15,6 +15,7 @@ import com.modsen.rideservice.entity.RideStatus;
 import com.modsen.rideservice.exception.InvalidRequestParamException;
 import com.modsen.rideservice.exception.InvalidRideStatusException;
 import com.modsen.rideservice.exception.RideNotFoundException;
+import com.modsen.rideservice.exception.ServiceUnavailableException;
 import com.modsen.rideservice.mapper.MessageMapper;
 import com.modsen.rideservice.mapper.RideMapper;
 import com.modsen.rideservice.repository.RideRepository;
@@ -22,6 +23,7 @@ import com.modsen.rideservice.service.DriverService;
 import com.modsen.rideservice.service.PassengerService;
 import com.modsen.rideservice.service.RideService;
 import com.modsen.rideservice.service.SendMessageHandler;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -100,6 +102,7 @@ public class RideServiceImpl implements RideService {
     public RidePageResponse getRidesByPassengerId(long passengerId, int page, int size, String orderBy) {
         log.info("Retrieving rides for passenger with id {}", passengerId);
 
+
         PageRequest pageRequest = getPageRequest(page, size, orderBy);
         Page<Ride> ridesPage = rideRepository.findAllByPassengerIdAndStatus(passengerId, RideStatus.FINISHED, pageRequest);
 
@@ -159,9 +162,7 @@ public class RideServiceImpl implements RideService {
     @Transactional
     public void acceptRide(AcceptRideMessage acceptRideMessage) {
         long rideId = acceptRideMessage.rideId();
-
         Ride ride = findRideById(rideId);
-        PassengerResponse passenger = passengerService.getPassengerById(ride.getPassengerId());
 
         if (acceptRideMessage.driverId() == null) {
             log.info("Rejecting a ride with id {} as there no available drivers", rideId);
@@ -177,9 +178,7 @@ public class RideServiceImpl implements RideService {
             rideRepository.save(ride);
         }
 
-        RideStatusMessage rideStatusMessage =
-                messageMapper.fromRideAndPassengerResponse(ride, passenger);
-        sendMessageHandler.handleRideStatusMessage(rideStatusMessage);
+        composeAndSendRideStatusMessage(ride);
     }
 
     @Override
@@ -198,18 +197,16 @@ public class RideServiceImpl implements RideService {
             throw new InvalidRideStatusException(statusNames);
         }
 
-        PassengerResponse passenger = passengerService.getPassengerById(rideToStart.getPassengerId());
-
         rideToStart.setStatus(RideStatus.STARTED);
         rideToStart.setStartDate(LocalDateTime.now());
         Ride startedRide = rideRepository.save(rideToStart);
 
-        RideStatusMessage rideStatusMessage =
-                messageMapper.fromRideAndPassengerResponse(rideToStart, passenger);
-        sendMessageHandler.handleRideStatusMessage(rideStatusMessage);
+        composeAndSendRideStatusMessage(rideToStart);
 
         return rideMapper.fromEntityToResponse(startedRide);
     }
+
+
 
     @Override
     @Transactional
@@ -227,8 +224,6 @@ public class RideServiceImpl implements RideService {
             throw new InvalidRideStatusException(statusNames);
         }
 
-        PassengerResponse passenger = passengerService.getPassengerById(rideToFinish.getPassengerId());
-
         rideToFinish.setStatus(RideStatus.FINISHED);
         rideToFinish.setFinishDate(LocalDateTime.now());
         Ride finishedRide = rideRepository.save(rideToFinish);
@@ -239,9 +234,7 @@ public class RideServiceImpl implements RideService {
                 .build();
         sendMessageHandler.handleDriverStatusMessage(driverStatusMessage);
 
-        RideStatusMessage rideStatusMessage =
-                messageMapper.fromRideAndPassengerResponse(rideToFinish, passenger);
-        sendMessageHandler.handleRideStatusMessage(rideStatusMessage);
+        composeAndSendRideStatusMessage(rideToFinish);
 
         return rideMapper.fromEntityToResponse(finishedRide);
     }
@@ -265,8 +258,13 @@ public class RideServiceImpl implements RideService {
             throw new InvalidRideStatusException(statusNames);
         }
 
-        long driverId = ride.getDriverId();
-        return driverService.getDriverById(driverId);
+        try {
+            long driverId = ride.getDriverId();
+            return driverService.getDriverById(driverId);
+        } catch (CallNotPermittedException e) {
+            log.error("Driver service unavailable. Reason: {}", e.getMessage());
+            throw new ServiceUnavailableException(DRIVER_SERVICE_UNAVAILABLE);
+        }
     }
 
     private Ride findRideById(long id) {
@@ -318,5 +316,21 @@ public class RideServiceImpl implements RideService {
         return statuses.stream()
                 .map(Enum::name)
                 .collect(Collectors.joining(", "));
+    }
+
+    private void composeAndSendRideStatusMessage(Ride ride) {
+        try {
+            PassengerResponse passenger = passengerService.getPassengerById(ride.getPassengerId());
+
+            if (!"fallback".equals(passenger.firstName())) {
+                RideStatusMessage rideStatusMessage =
+                        messageMapper.fromRideAndPassengerResponse(ride, passenger);
+                sendMessageHandler.handleRideStatusMessage(rideStatusMessage);
+            } else {
+                log.info("Passenger service currently unavailable");
+            }
+        } catch (CallNotPermittedException e) {
+            log.error("Passenger service currently unavailable. Reason: {}", e.getMessage());
+        }
     }
 }
