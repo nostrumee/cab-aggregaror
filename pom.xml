@@ -15,7 +15,7 @@
         <module>ride-service</module>
         <module>notification-service</module>
         <module>rating-service</module>
-        <module>e2e-tests-service</module>
+        <module>end-to-end-tests</module>
     </modules>
 
     <properties>
@@ -106,6 +106,22 @@
     </profiles>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring.boot.maven.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

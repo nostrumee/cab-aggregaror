@@ -4,5 +4,5 @@ import com.modsen.rideservice.dto.response.DriverResponse;
 
 public interface DriverService {
 
-    DriverResponse getDriverById(long driverId);
+    DriverResponse getDriverById(long id);
 }
