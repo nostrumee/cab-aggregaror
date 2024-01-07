@@ -2,6 +2,7 @@ package com.modsen.ratingservice.conroller;
 
 import com.modsen.ratingservice.dto.request.DriverRatingRequest;
 import com.modsen.ratingservice.dto.request.PassengerRatingRequest;
+import com.modsen.ratingservice.dto.response.ErrorResponse;
 import com.modsen.ratingservice.service.RatingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,7 +12,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import static com.modsen.ratingservice.util.UriPaths.*;
@@ -62,5 +62,4 @@ public class RatingController {
     ) {
         ratingService.ratePassenger(ratingRequest);
     }
-
 }

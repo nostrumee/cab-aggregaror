@@ -16,22 +16,22 @@ spring:
         - id: passenger-service
           uri: lb://PASSENGER-SERVICE
           predicates:
-            - Path=/api/v1/passengers/**, /passenger-service/**
+            - Path=/api/v1/passengers/**, /passenger-service/v3/api-docs
 
         - id: driver-service
           uri: lb://DRIVER-SERVICE
           predicates:
-            - Path=/api/v1/drivers/**, /driver-service/**
+            - Path=/api/v1/drivers/**, /driver-service/v3/api-docs
 
         - id: ride-service
           uri: lb://RIDE-SERVICE
           predicates:
-            - Path=/api/v1/rides/**, /ride-service/**
+            - Path=/api/v1/rides/**, /ride-service/v3/api-docs
 
         - id: rating-service
           uri: lb://RATING-SERVICE
           predicates:
-            - Path=/api/v1/rating/**, /rating-service/**
+            - Path=/api/v1/rating/**, /rating-service/v3/api-docs
 
   data:
     redis:
