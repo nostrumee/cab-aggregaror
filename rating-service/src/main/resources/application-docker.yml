@@ -36,6 +36,8 @@ spring:
 
 springdoc:
   override-with-generic-response: false
+  api-docs:
+    path: /rating-service/v3/api-docs
 
 kafka:
   passenger-rating-topic-name: passenger-rating-topic
