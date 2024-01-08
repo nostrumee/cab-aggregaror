@@ -13,20 +13,20 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.kafka.support.converter.StringJsonMessageConverter;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+
+import static com.modsen.driverservice.util.KafkaTypeMappings.JSON_DESERIALIZER_TYPE_MAPPINGS;
 
 @UtilityClass
 public class TestUtils {
@@ -245,7 +245,7 @@ public class TestUtils {
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group");
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         properties.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-        properties.put(JsonDeserializer.TYPE_MAPPINGS, "acceptRideMessage:" + AcceptRideMessage.class.getName());
+        properties.put(JsonDeserializer.TYPE_MAPPINGS, JSON_DESERIALIZER_TYPE_MAPPINGS);
 
         return new KafkaConsumer<>(properties);
     }

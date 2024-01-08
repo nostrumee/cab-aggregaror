@@ -19,3 +19,15 @@ spring:
 logging:
   level:
     com.modsen.endtoendtests.client: DEGUG
+
+driver-service:
+  name: driver-service
+
+passenger-service:
+  name: passenger-service
+
+rating-service:
+  name: rating-service
+
+ride-service:
+  name: ride-service

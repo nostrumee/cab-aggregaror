@@ -11,24 +11,27 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import static com.modsen.endtoendtests.util.UriPaths.*;
 
-@FeignClient("ride-service")
+@FeignClient(
+        value = "${ride-service.name}",
+        path = RIDE_SERVICE_BASE_PATH
+)
 public interface RideClient {
 
-    @GetMapping(RIDE_SERVICE_BASE_PATH + GET_BY_ID_PATH)
+    @GetMapping(GET_BY_ID_PATH)
     RideResponse getRideById(@PathVariable("id") long id);
 
-    @PostMapping(RIDE_SERVICE_BASE_PATH)
+    @PostMapping
     RideResponse createRide(@RequestBody CreateRideRequest createRideRequest);
 
-    @GetMapping(RIDE_SERVICE_BASE_PATH + START_RIDE_PATH)
+    @GetMapping(START_RIDE_PATH)
     RideResponse startRide(@PathVariable("id") long id);
 
-    @GetMapping(RIDE_SERVICE_BASE_PATH + FINISH_RIDE_PATH)
+    @GetMapping(FINISH_RIDE_PATH)
     RideResponse finishRide(@PathVariable("id") long id);
 
-    @GetMapping(RIDE_SERVICE_BASE_PATH + GET_PASSENGER_RIDE_HISTORY_PATH)
+    @GetMapping(GET_PASSENGER_RIDE_HISTORY_PATH)
     RidePageResponse getPassengerRideHistory(@PathVariable("passengerId") long passengerId);
 
-    @GetMapping(RIDE_SERVICE_BASE_PATH + GET_DRIVER_RIDE_HISTORY_PATH)
+    @GetMapping(GET_DRIVER_RIDE_HISTORY_PATH)
     RidePageResponse getDriverRideHistory(@PathVariable("driverId") long driverId);
 }

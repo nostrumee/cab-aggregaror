@@ -18,6 +18,7 @@
         <spring.integration.version>6.2.0</spring.integration.version>
         <jackson.version>2.16.0</jackson.version>
         <awaitility.version>4.2.0</awaitility.version>
+        <greenmail.version>2.0.0</greenmail.version>
     </properties>
 
     <dependencies>
@@ -75,7 +76,7 @@
         <dependency>
             <groupId>com.icegreen</groupId>
             <artifactId>greenmail-junit5</artifactId>
-            <version>2.0.0</version>
+            <version>${greenmail.version}</version>
             <scope>test</scope>
         </dependency>
 
