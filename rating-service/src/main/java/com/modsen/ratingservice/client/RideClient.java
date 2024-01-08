@@ -10,11 +10,12 @@ import static com.modsen.ratingservice.util.UriPaths.GET_BY_ID_PATH;
 import static com.modsen.ratingservice.util.UriPaths.RIDE_SERVICE_BASE_PATH;
 
 @FeignClient(
-        value = "ride-service",
+        value = "${ride-service.name}",
+        path = RIDE_SERVICE_BASE_PATH,
         configuration = RideClientConfig.class
 )
 public interface RideClient {
 
-    @GetMapping(RIDE_SERVICE_BASE_PATH + GET_BY_ID_PATH)
+    @GetMapping(GET_BY_ID_PATH)
     RideResponse getRideById(@PathVariable("id") long id);
 }

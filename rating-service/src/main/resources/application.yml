@@ -33,7 +33,7 @@ spring:
 springdoc:
   override-with-generic-response: false
   api-docs:
-    path: /rating-service/v3/api-docs
+    path: /${spring.application.name}/v3/api-docs
 
 eureka:
   instance:
@@ -54,3 +54,6 @@ logging:
     org.springframework.transaction.interceptor: TRACE
     com.zaxxer.hikari.pool.HikariPool: DEBUG
     com.modsen.ratingservice.client: DEBUG
+
+ride-service:
+  name: ride-service
