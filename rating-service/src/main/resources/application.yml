@@ -37,3 +37,9 @@ kafka:
   passenger-rating-topic-name: passenger-rating-topic
   driver-rating-topic-name: driver-rating-topic
   bootstrap-servers: localhost:9092
+
+logging:
+  level:
+    org.springframework.transaction.interceptor: TRACE
+    com.zaxxer.hikari.pool.HikariPool: DEBUG
+    com.modsen.ratingservice.client: DEBUG

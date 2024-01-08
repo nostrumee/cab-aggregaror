@@ -1,0 +1,33 @@
+spring:
+  cloud:
+    openfeign:
+      client:
+        config:
+          passenger-service:
+            url: http://localhost:8081
+            logger-level: FULL
+          driver-service:
+            url: http://localhost:8082
+            logger-level: FULL
+          ride-service:
+            url: http://localhost:8083
+            logger-level: FULL
+          rating-service:
+            url: http://localhost:8084
+            logger-level: FULL
+
+logging:
+  level:
+    com.modsen.endtoendtests.client: DEGUG
+
+driver-service:
+  name: driver-service
+
+passenger-service:
+  name: passenger-service
+
+rating-service:
+  name: rating-service
+
+ride-service:
+  name: ride-service
