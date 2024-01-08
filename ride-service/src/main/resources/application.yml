@@ -59,3 +59,9 @@ logging:
     org.springframework.transaction.interceptor: TRACE
     com.zaxxer.hikari.pool.HikariPool: DEBUG
     com.modsen.rideservice.client: DEBUG
+
+driver-service:
+  name: driver-service
+
+passenger-service:
+  name: passenger-service
