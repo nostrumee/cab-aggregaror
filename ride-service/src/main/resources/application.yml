@@ -28,14 +28,23 @@ spring:
       client:
         config:
           passenger-service:
-            url: http://localhost:8081
             logger-level: FULL
           driver-service:
-            url: http://localhost:8082
             logger-level: FULL
 
 springdoc:
   override-with-generic-response: false
+  api-docs:
+    path: /${spring.application.name}/v3/api-docs
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
 
 kafka:
   create-ride-topic-name: create-ride-topic
@@ -50,3 +59,9 @@ logging:
     org.springframework.transaction.interceptor: TRACE
     com.zaxxer.hikari.pool.HikariPool: DEBUG
     com.modsen.rideservice.client: DEBUG
+
+driver-service:
+  name: driver-service
+
+passenger-service:
+  name: passenger-service

@@ -16,13 +16,15 @@
         <module>notification-service</module>
         <module>rating-service</module>
         <module>end-to-end-tests</module>
+        <module>edge-service</module>
+        <module>eureka-server</module>
     </modules>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.boot.maven.plugin.version>3.1.2</spring.boot.maven.plugin.version>
+        <spring-boot-maven-plugin.version>3.1.2</spring-boot-maven-plugin.version>
         <spring.boot.depencencies.version>3.1.2</spring.boot.depencencies.version>
         <spring.cloud.version>2022.0.3</spring.cloud.version>
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
@@ -111,7 +113,7 @@
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>${spring.boot.maven.plugin.version}</version>
+                    <version>${spring-boot-maven-plugin.version}</version>
                     <executions>
                         <execution>
                             <goals>

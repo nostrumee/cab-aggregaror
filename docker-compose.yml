@@ -3,7 +3,7 @@ services:
     container_name: postgres
     image: postgres:15-alpine
     ports:
-      - 5432:5432
+      - '5432:5432'
     volumes:
       - ./initdb:/docker-entrypoint-initdb.d
       - postgres:/var/lib/postgresql/data
@@ -22,17 +22,114 @@ services:
     image: confluentinc/cp-kafka:7.3.3
     container_name: kafka
     ports:
-      - 9092:9092
+      - '9092:9092'
     depends_on:
       - zookeeper
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_INTERNAL://localhost:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+  redis:
+    image: redis:7.2-rc-alpine
+    container_name: redis
+    ports:
+      - '6379:6379'
+
+  eureka-server:
+    image: eureka-server
+    container_name: eureka-server
+    ports:
+      - '8761:8761'
+
+  edge-service:
+    image: edge-service
+    container_name: edge-service
+    ports:
+      - "8080:8080"
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=${EUREKA_DEFAULTZONE_URL}
+      - SPRING_DATA_REDIS_HOST=${REDIS_HOST}
+    depends_on:
+      - eureka-server
+      - redis
+
+  passenger-service:
+    image: passenger-service
+    container_name: passenger-service
+    ports:
+      - '8081:8081'
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - SPRING_DATASOURCE_URL=${PASSENGER_DB_URL}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=${EUREKA_DEFAULTZONE_URL}
+    depends_on:
+      - kafka
+      - db
+      - edge-service
+
+  driver-service:
+    image: driver-service
+    container_name: driver-service
+    ports:
+      - '8082:8082'
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - SPRING_DATASOURCE_URL=${DRIVER_DB_URL}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=${EUREKA_DEFAULTZONE_URL}
+    depends_on:
+      - kafka
+      - db
+      - edge-service
+
+  ride-service:
+    image: ride-service
+    container_name: ride-service
+    ports:
+      - '8083:8083'
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - SPRING_DATASOURCE_URL=${RIDE_DB_URL}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=${EUREKA_DEFAULTZONE_URL}
+    depends_on:
+      - kafka
+      - db
+      - edge-service
+
+  rating-service:
+    image: rating-service
+    container_name: rating-service
+    ports:
+      - '8084:8084'
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - SPRING_DATASOURCE_URL=${RATING_DB_URL}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=${EUREKA_DEFAULTZONE_URL}
+    depends_on:
+      - kafka
+      - db
+      - edge-service
+
+  notification-service:
+    image: notification-service
+    container_name: notification-service
+    ports:
+      - '8085:8085'
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=${EUREKA_DEFAULTZONE_URL}
+    depends_on:
+      - kafka
+      - eureka-server
 
 volumes:
   postgres:
