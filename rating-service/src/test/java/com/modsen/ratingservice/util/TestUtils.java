@@ -59,6 +59,8 @@ public final class TestUtils {
     public static final String DRIVER_RATING_TOPIC_NAME = "driver-rating-topic";
     public static final String PASSENGER_RATING_TOPIC_NAME = "passenger-rating-topic";
 
+    public static final String RIDE_SERVICE_NAME = "ride-service";
+
     public static PassengerRatingRequest getPassengerRatingRequest() {
         return PassengerRatingRequest.builder()
                 .rideId(DEFAULT_ID)

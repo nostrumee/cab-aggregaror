@@ -35,6 +35,10 @@ public class RatingController {
             @ApiResponse(responseCode = "409", description = "Invalid ride status",
                     content = {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    }),
+            @ApiResponse(responseCode = "503", description = "Ride service unavailable",
+                    content = {
+                            @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })
     })
     public void rateDriver(
@@ -53,6 +57,10 @@ public class RatingController {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     }),
             @ApiResponse(responseCode = "409", description = "Invalid ride status",
+                    content = {
+                            @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    }),
+            @ApiResponse(responseCode = "503", description = "Ride service unavailable",
                     content = {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })

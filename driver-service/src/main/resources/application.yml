@@ -76,3 +76,8 @@ kafka:
   driver-rating-topic-name: driver-rating-topic
   driver-status-topic-name: driver-status-topic
   bootstrap-servers: localhost:9092
+
+logging:
+  level:
+    org.springframework.transaction.interceptor: TRACE
+    com.zaxxer.hikari.pool.HikariPool: DEBUG

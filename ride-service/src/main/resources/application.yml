@@ -46,6 +46,37 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka/
 
+resilience4j:
+  circuitbreaker:
+    instances:
+      driver-service:
+        register-health-indicator: true
+        sliding-window-size: 10
+        permitted-number-of-calls-in-half-open-state: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 5s
+        failure-rate-threshold: 50
+        record-exceptions:
+          - feign.RetryableException
+          - org.springframework.web.client.HttpServerErrorException
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+          - org.springframework.web.client.ResourceAccessException
+
+      passenger-service:
+        register-health-indicator: true
+        sliding-window-size: 10
+        permitted-number-of-calls-in-half-open-state: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 5s
+        failure-rate-threshold: 50
+        record-exceptions:
+          - feign.RetryableException
+          - org.springframework.web.client.HttpServerErrorException
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+          - org.springframework.web.client.ResourceAccessException
+
 kafka:
   create-ride-topic-name: create-ride-topic
   accept-ride-topic-name: accept-ride-topic
