@@ -13,12 +13,9 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.Duration;
-import java.util.stream.IntStream;
 
 import static com.modsen.rideservice.util.TestUtils.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -28,7 +25,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
 @RequiredArgsConstructor
-@ExtendWith(MockitoExtension.class)
 public class CircuitBreakerIntegrationTest extends IntegrationTestBase {
 
     @MockBean
@@ -56,32 +52,32 @@ public class CircuitBreakerIntegrationTest extends IntegrationTestBase {
                 .when(driverClient)
                 .getDriverById(DEFAULT_ID);
 
-        assertThat(CircuitBreaker.State.CLOSED).isEqualTo(driverServiceCircuitBreaker.getState());
+        assertThat(driverServiceCircuitBreaker.getState()).isEqualTo(CircuitBreaker.State.CLOSED);
 
-        IntStream.range(0, 10).forEach((i) -> {
+        for (int i = 0; i < 10; i++) {
             DriverResponse driver = driverService.getDriverById(DEFAULT_ID);
             assertThat(driver.firstName()).isEqualTo("fallback");
-        });
+        }
 
-        assertThat(CircuitBreaker.State.OPEN).isEqualTo(driverServiceCircuitBreaker.getState());
+        assertThat(driverServiceCircuitBreaker.getState()).isEqualTo(CircuitBreaker.State.OPEN);
 
         await()
                 .pollInterval(Duration.ofSeconds(5))
                 .atMost(20, SECONDS)
                 .untilAsserted(() -> {
-                    assertThat(CircuitBreaker.State.HALF_OPEN).isEqualTo(driverServiceCircuitBreaker.getState());
+                    assertThat(driverServiceCircuitBreaker.getState()).isEqualTo(CircuitBreaker.State.HALF_OPEN);
                 });
 
         doReturn(getDriverResponse())
                 .when(driverClient)
                 .getDriverById(DEFAULT_ID);
 
-        IntStream.range(0, 5).forEach((i) -> {
+        for (int i = 0; i < 5; i++) {
             DriverResponse driver = driverService.getDriverById(DEFAULT_ID);
             assertThat(driver.firstName()).isNotEqualTo("fallback");
-        });
+        }
 
-        assertThat(CircuitBreaker.State.CLOSED).isEqualTo(driverServiceCircuitBreaker.getState());
+        assertThat(driverServiceCircuitBreaker.getState()).isEqualTo(CircuitBreaker.State.CLOSED);
     }
 
     @Test
@@ -90,31 +86,31 @@ public class CircuitBreakerIntegrationTest extends IntegrationTestBase {
                 .when(passengerClient)
                 .getPassengerById(DEFAULT_ID);
 
-        assertThat(CircuitBreaker.State.CLOSED).isEqualTo(passengerServiceCircuitBreaker.getState());
+        assertThat(passengerServiceCircuitBreaker.getState()).isEqualTo(CircuitBreaker.State.CLOSED);
 
-        IntStream.range(0, 10).forEach((i) -> {
+        for (int i = 0; i < 10; i++) {
             PassengerResponse passenger = passengerService.getPassengerById(DEFAULT_ID);
             assertThat(passenger.firstName()).isEqualTo("fallback");
-        });
+        }
 
-        assertThat(CircuitBreaker.State.OPEN).isEqualTo(passengerServiceCircuitBreaker.getState());
+        assertThat(passengerServiceCircuitBreaker.getState()).isEqualTo(CircuitBreaker.State.OPEN);
 
         await()
                 .pollInterval(Duration.ofSeconds(5))
                 .atMost(20, SECONDS)
                 .untilAsserted(() -> {
-                    assertThat(CircuitBreaker.State.HALF_OPEN).isEqualTo(passengerServiceCircuitBreaker.getState());
+                    assertThat(passengerServiceCircuitBreaker.getState()).isEqualTo(CircuitBreaker.State.HALF_OPEN);
                 });
 
         doReturn(getPassengerResponse())
                 .when(passengerClient)
                 .getPassengerById(DEFAULT_ID);
 
-        IntStream.range(0, 5).forEach((i) -> {
+        for (int i = 0; i < 5; i++) {
             PassengerResponse passenger = passengerService.getPassengerById(DEFAULT_ID);
             assertThat(passenger.firstName()).isNotEqualTo("fallback");
-        });
+        }
 
-        assertThat(CircuitBreaker.State.CLOSED).isEqualTo(passengerServiceCircuitBreaker.getState());
+        assertThat(passengerServiceCircuitBreaker.getState()).isEqualTo(CircuitBreaker.State.CLOSED);
     }
 }

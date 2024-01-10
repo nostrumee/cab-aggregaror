@@ -11,12 +11,9 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.Duration;
-import java.util.stream.IntStream;
 
 import static com.modsen.ratingservice.util.TestUtils.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -26,7 +23,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
 @RequiredArgsConstructor
-@ExtendWith(MockitoExtension.class)
 public class CircuitBreakerIntegrationTest extends IntegrationTestBase {
 
     @MockBean
@@ -48,31 +44,31 @@ public class CircuitBreakerIntegrationTest extends IntegrationTestBase {
                 .when(rideClient)
                 .getRideById(DEFAULT_ID);
 
-        assertThat(CircuitBreaker.State.CLOSED).isEqualTo(rideServiceCircuitBreaker.getState());
+        assertThat(rideServiceCircuitBreaker.getState()).isEqualTo(CircuitBreaker.State.CLOSED);
 
-        IntStream.range(0, 10).forEach((i) -> {
+        for (int i = 0; i < 10; i++) {
             RideResponse ride = rideService.getRideById(DEFAULT_ID);
-            assertThat(ride.driverId()).isEqualTo(0L);
-        });
+            assertThat(ride.status()).isNull();
+        }
 
-        assertThat(CircuitBreaker.State.OPEN).isEqualTo(rideServiceCircuitBreaker.getState());
+        assertThat(rideServiceCircuitBreaker.getState()).isEqualTo(CircuitBreaker.State.OPEN);
 
         await()
                 .pollInterval(Duration.ofSeconds(5))
                 .atMost(20, SECONDS)
                 .untilAsserted(() -> {
-                    assertThat(CircuitBreaker.State.HALF_OPEN).isEqualTo(rideServiceCircuitBreaker.getState());
+                    assertThat(rideServiceCircuitBreaker.getState()).isEqualTo(CircuitBreaker.State.HALF_OPEN);
                 });
 
         doReturn(getRideResponse(RideStatus.FINISHED))
                 .when(rideClient)
                 .getRideById(DEFAULT_ID);
 
-        IntStream.range(0, 5).forEach((i) -> {
+        for (int i = 0; i < 5; i++) {
             RideResponse ride = rideService.getRideById(DEFAULT_ID);
-            assertThat(ride.driverId()).isNotEqualTo(0L);
-        });
+            assertThat(ride.status()).isNotNull();
+        }
 
-        assertThat(CircuitBreaker.State.CLOSED).isEqualTo(rideServiceCircuitBreaker.getState());
+        assertThat(rideServiceCircuitBreaker.getState()).isEqualTo(CircuitBreaker.State.CLOSED);
     }
 }
