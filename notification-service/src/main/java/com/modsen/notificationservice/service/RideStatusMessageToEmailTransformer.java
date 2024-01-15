@@ -1,4 +1,4 @@
-package com.modsen.notificationservice.service.impl;
+package com.modsen.notificationservice.service;
 
 import com.modsen.notificationservice.dto.message.RideStatusMessage;
 import com.modsen.notificationservice.exception.RideStatusTransformException;
@@ -22,7 +22,7 @@ import static com.modsen.notificationservice.util.MailParams.*;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class RideStatusToEmailTransformer implements GenericTransformer<RideStatusMessage, MimeMessage> {
+public class RideStatusMessageToEmailTransformer implements GenericTransformer<RideStatusMessage, MimeMessage> {
 
     private final JavaMailSender mailSender;
     private final Configuration configuration;
@@ -30,11 +30,17 @@ public class RideStatusToEmailTransformer implements GenericTransformer<RideStat
     @Override
     public MimeMessage transform(RideStatusMessage rideStatusMessage) {
         try {
+            String subject = String.format(SUBJECT, rideStatusMessage.rideId());
+            String to = rideStatusMessage.passengerEmail();
+            String emailContent =getEmailContent(rideStatusMessage);
+
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
-            helper.setSubject(String.format(SUBJECT, rideStatusMessage.rideId()));
-            helper.setTo(rideStatusMessage.passengerEmail());
-            helper.setText(getEmailContent(rideStatusMessage), true);
+            helper.setSubject(subject);
+            helper.setTo(to);
+            helper.setText(emailContent, true);
+
+            log.info("Email is to be sent to passenger '{}' ", to);
 
             return mimeMessage;
         } catch (MessagingException | IOException | TemplateException e) {

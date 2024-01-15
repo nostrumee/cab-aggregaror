@@ -16,6 +16,7 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.messaging.support.ChannelInterceptor;
 
 import java.util.Map;
 
@@ -34,8 +35,13 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public IntegrationFlow consumeFromKafka(ConsumerFactory<String, String> consumerFactory, RideService rideService) {
+    public IntegrationFlow consumeFromKafka(
+            ConsumerFactory<String, String> consumerFactory,
+            RideService rideService,
+            ChannelInterceptor observationPropagationChannelInterceptor
+    ) {
         return IntegrationFlow.from(Kafka.messageDrivenChannelAdapter(consumerFactory, kafkaProperties.acceptRideTopicName()))
+                .intercept(observationPropagationChannelInterceptor)
                 .handle(receiveMessageHandler(rideService), HANDLE_ACCEPT_RIDE_METHOD_NAME)
                 .get();
     }
@@ -61,6 +67,7 @@ public class KafkaConsumerConfig {
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.getContainerProperties().setObservationEnabled(true);
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }

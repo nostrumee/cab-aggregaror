@@ -72,6 +72,8 @@ kafka:
   bootstrap-servers: localhost:9092
 
 logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
   level:
     org.springframework.transaction.interceptor: TRACE
     com.zaxxer.hikari.pool.HikariPool: DEBUG

@@ -24,7 +24,7 @@ public class RideOrderServiceImpl implements RideOrderService {
     @Override
     @Transactional
     public AcceptRideMessage acceptRideOrder(CreateRideMessage orderMessage) {
-        log.info("Searching for a driver to accept a ride order");
+        log.info("Searching for a driver to accept a ride order with id {}", orderMessage.rideId());
 
         List<DriverResponse> availableDrivers = driverService.getAvailableDrivers();
         Long driverId = null;
