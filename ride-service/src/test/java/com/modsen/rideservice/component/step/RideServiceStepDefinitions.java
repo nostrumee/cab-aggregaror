@@ -226,6 +226,9 @@ public class RideServiceStepDefinitions {
         doReturn(expected)
                 .when(rideMapper)
                 .fromEntityToResponse(ride);
+        doReturn(getPassengerResponse())
+                .when(passengerClient)
+                .getPassengerById(DEFAULT_ID);
 
         try {
             rideResponse = rideService.startRide(id);
@@ -240,6 +243,9 @@ public class RideServiceStepDefinitions {
         doReturn(expected)
                 .when(rideMapper)
                 .fromEntityToResponse(ride);
+        doReturn(getPassengerResponse())
+                .when(passengerClient)
+                .getPassengerById(DEFAULT_ID);
 
         try {
             rideResponse = rideService.finishRide(id);

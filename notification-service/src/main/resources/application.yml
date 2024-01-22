@@ -23,6 +23,9 @@ spring:
 eureka:
   instance:
     prefer-ip-address: true
+    metadata-map:
+      "prometheus.scrape": "true"
+      "prometheus.path": "/actuator/prometheus"
   client:
     register-with-eureka: true
     fetch-registry: true
@@ -33,3 +36,12 @@ kafka:
   bootstrap-servers: localhost:9092
   ride-status-topic-name: ride-status-topic
   group-id: ${spring.application.name}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health
+  metrics:
+    tags:
+      application: ${spring.application.name}

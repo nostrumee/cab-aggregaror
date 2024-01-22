@@ -37,12 +37,22 @@ services:
   redis:
     image: redis:7.2-rc-alpine
     container_name: redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
     ports:
       - '6379:6379'
 
   eureka-server:
     image: eureka-server
     container_name: eureka-server
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - '8761:8761'
 
@@ -55,8 +65,10 @@ services:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=${EUREKA_DEFAULTZONE_URL}
       - SPRING_DATA_REDIS_HOST=${REDIS_HOST}
     depends_on:
-      - eureka-server
-      - redis
+      eureka-server:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   passenger-service:
     image: passenger-service
@@ -129,7 +141,29 @@ services:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=${EUREKA_DEFAULTZONE_URL}
     depends_on:
       - kafka
-      - eureka-server
+      - edge-service
+
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: prometheus
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:10.1.5
+    container_name: grafana
+    ports:
+      - '3000:3000'
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=password
+    volumes:
+      - ./observability/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./observability/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    depends_on:
+      - prometheus
 
 volumes:
   postgres:

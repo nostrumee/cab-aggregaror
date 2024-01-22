@@ -64,6 +64,9 @@ springdoc:
 eureka:
   instance:
     prefer-ip-address: true
+    metadata-map:
+      "prometheus.scrape": "true"
+      "prometheus.path": "/actuator/prometheus"
   client:
     register-with-eureka: true
     fetch-registry: true
@@ -80,4 +83,15 @@ kafka:
 logging:
   level:
     org.springframework.transaction.interceptor: TRACE
-    com.zaxxer.hikari.pool.HikariPool: DEBUG
+    com.zaxxer.hikari.pool.HikariPool: WARN
+    org.apache.kafka.clients.consumer.internals.ConsumerCoordinator: WARN
+    org.apache.kafka.clients.Metadata: WARN
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health
+  metrics:
+    tags:
+      application: ${spring.application.name}

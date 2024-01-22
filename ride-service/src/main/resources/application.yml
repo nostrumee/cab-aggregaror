@@ -40,6 +40,9 @@ springdoc:
 eureka:
   instance:
     prefer-ip-address: true
+    metadata-map:
+      "prometheus.scrape": "true"
+      "prometheus.path": "/actuator/prometheus"
   client:
     register-with-eureka: true
     fetch-registry: true
@@ -48,6 +51,8 @@ eureka:
 
 resilience4j:
   circuitbreaker:
+    metrics:
+      enabled: true
     instances:
       driver-service:
         register-health-indicator: true
@@ -96,3 +101,12 @@ driver-service:
 
 passenger-service:
   name: passenger-service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health
+  metrics:
+    tags:
+      application: ${spring.application.name}
