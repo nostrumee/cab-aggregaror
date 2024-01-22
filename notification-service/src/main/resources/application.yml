@@ -23,6 +23,9 @@ spring:
 eureka:
   instance:
     prefer-ip-address: true
+    metadata-map:
+      "prometheus.scrape": "true"
+      "prometheus.path": "/actuator/prometheus"
   client:
     register-with-eureka: true
     fetch-registry: true
