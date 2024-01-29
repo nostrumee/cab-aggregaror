@@ -10,4 +10,9 @@ scrape_configs:
         target_label: __metrics_path__
         regex: (.+)
     eureka_sd_configs:
-      - server: http://eureka-server:8761/eureka
+      - server: http://host.docker.internal:8761/eureka
+
+  - job_name: 'kafka-exporter'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: [ 'kafka-exporter:9308' ]
