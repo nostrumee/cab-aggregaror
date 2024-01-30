@@ -91,9 +91,11 @@ kafka:
   group-id: ${spring.application.name}
 
 logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
   level:
-    org.springframework.transaction.interceptor: TRACE
-    com.zaxxer.hikari.pool.HikariPool: DEBUG
+    org.apache.kafka.clients.consumer.internals.ConsumerCoordinator: WARN
+    org.apache.kafka.clients.Metadata: WARN
     com.modsen.rideservice.client: DEBUG
 
 driver-service:

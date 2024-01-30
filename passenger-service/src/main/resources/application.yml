@@ -40,6 +40,7 @@ spring:
               serializer: org.springframework.kafka.support.serializer.JsonSerializer
             key:
               serializer: org.apache.kafka.common.serialization.StringSerializer
+          enable-observation: true
 
 springdoc:
   override-with-generic-response: false
@@ -63,9 +64,11 @@ kafka:
   passenger-rating-topic-name: passenger-rating-topic
 
 logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
   level:
-    org.springframework.transaction.interceptor: TRACE
-    com.zaxxer.hikari.pool.HikariPool: DEBUG
+    org.apache.kafka.clients.consumer.internals.ConsumerCoordinator: WARN
+    org.apache.kafka.clients.Metadata: WARN
 
 management:
   endpoints:

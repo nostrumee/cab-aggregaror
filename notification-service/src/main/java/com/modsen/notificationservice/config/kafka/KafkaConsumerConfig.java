@@ -1,6 +1,6 @@
 package com.modsen.notificationservice.config.kafka;
 
-import com.modsen.notificationservice.service.impl.RideStatusToEmailTransformer;
+import com.modsen.notificationservice.service.RideStatusMessageToEmailTransformer;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -14,9 +14,9 @@ import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
-import org.springframework.kafka.support.converter.StringJsonMessageConverter;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.messaging.support.ChannelInterceptor;
 
 import java.util.Map;
 
@@ -31,10 +31,12 @@ public class KafkaConsumerConfig {
     @Bean
     public IntegrationFlow consumeFromKafka(
             ConsumerFactory<String, String> consumerFactory,
-            RideStatusToEmailTransformer transformer,
-            JavaMailSender mailSender
+            RideStatusMessageToEmailTransformer transformer,
+            JavaMailSender mailSender,
+            ChannelInterceptor channelInterceptor
     ) {
         return IntegrationFlow.from(Kafka.messageDrivenChannelAdapter(consumerFactory, kafkaProperties.rideStatusTopicName()))
+                .intercept(channelInterceptor)
                 .transform(transformer)
                 .handle(Mail.outboundAdapter(mailSender))
                 .get();
@@ -61,7 +63,7 @@ public class KafkaConsumerConfig {
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
-        factory.setRecordMessageConverter(new StringJsonMessageConverter());
+        factory.getContainerProperties().setObservationEnabled(true);
         return factory;
     }
 }

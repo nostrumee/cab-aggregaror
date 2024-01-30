@@ -55,6 +55,7 @@ spring:
               json:
                 type:
                   mapping: acceptRideMessage:com.modsen.driverservice.dto.message.AcceptRideMessage
+          enable-observation: true
 
 springdoc:
   override-with-generic-response: false
@@ -81,9 +82,9 @@ kafka:
   bootstrap-servers: localhost:9092
 
 logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
   level:
-    org.springframework.transaction.interceptor: TRACE
-    com.zaxxer.hikari.pool.HikariPool: WARN
     org.apache.kafka.clients.consumer.internals.ConsumerCoordinator: WARN
     org.apache.kafka.clients.Metadata: WARN
 
