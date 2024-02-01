@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 9000
 
 spring:
   application:
@@ -9,6 +9,7 @@ spring:
     gateway:
       default-filters:
         - SaveSession
+        - TokenRelay
       discovery:
         locator:
           enabled: true
@@ -45,6 +46,18 @@ spring:
     redis:
       namespace: cab-aggregator:edge
       repository-type: indexed
+
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: edge-service
+            client-secret: cab-aggregator-keycloak-secret
+            scope: openid,roles
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/CabAggregator
 
 springdoc:
   api-docs:
