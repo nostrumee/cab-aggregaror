@@ -20,7 +20,6 @@ import java.net.URI;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.modsen.driverservice.util.SecurityUtils.HAS_ROLE_DRIVER_EXPRESSION;
 import static com.modsen.driverservice.util.UriPaths.*;
 
 @RestController
