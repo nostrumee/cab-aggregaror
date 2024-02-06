@@ -6,6 +6,8 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.UUID;
+
 import static com.modsen.rideservice.util.UriPaths.*;
 
 @FeignClient(
@@ -16,5 +18,5 @@ import static com.modsen.rideservice.util.UriPaths.*;
 public interface PassengerClient {
 
     @GetMapping(GET_BY_ID_PATH)
-    PassengerResponse getPassengerById(@PathVariable("id") long id);
+    PassengerResponse getPassengerById(@PathVariable("id") UUID id);
 }
