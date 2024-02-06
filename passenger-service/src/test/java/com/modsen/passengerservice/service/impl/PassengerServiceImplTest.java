@@ -42,14 +42,14 @@ public class PassengerServiceImplTest {
 
         doReturn(Optional.of(retrievedPassenger))
                 .when(passengerRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
         doReturn(expected)
                 .when(passengerMapper)
                 .fromEntityToResponse(retrievedPassenger);
 
-        var actual = passengerService.getById(DEFAULT_ID);
+        var actual = passengerService.getById(DEFAULT_EXTERNAL_ID);
 
-        verify(passengerRepository).findById(DEFAULT_ID);
+        verify(passengerRepository).findByExternalId(DEFAULT_EXTERNAL_ID);
         verify(passengerMapper).fromEntityToResponse(retrievedPassenger);
 
         assertThat(actual).isEqualTo(expected);
@@ -59,13 +59,13 @@ public class PassengerServiceImplTest {
     void getById_shouldThrowPassengerNotFoundException_whenPassengerNotExist() {
         doReturn(Optional.empty())
                 .when(passengerRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
 
         assertThrows(
                 PassengerNotFoundException.class,
-                () -> passengerService.getById(DEFAULT_ID)
+                () -> passengerService.getById(DEFAULT_EXTERNAL_ID)
         );
-        verify(passengerRepository).findById(DEFAULT_ID);
+        verify(passengerRepository).findByExternalId(DEFAULT_EXTERNAL_ID);
     }
 
     @Test
@@ -144,7 +144,7 @@ public class PassengerServiceImplTest {
                 .when(passengerMapper)
                 .fromEntityToResponse(savedPassenger);
 
-        var actual = passengerService.addPassenger(getCreatePassengerRequest());
+        var actual = passengerService.addPassenger(getCreatePassengerRequest(), DEFAULT_EXTERNAL_ID);
 
         verify(passengerRepository).existsByEmail(DEFAULT_EMAIL);
         verify(passengerRepository).existsByPhone(DEFAULT_PHONE);
@@ -168,7 +168,7 @@ public class PassengerServiceImplTest {
 
         assertThrows(
                 PassengerAlreadyExistsException.class,
-                () -> passengerService.addPassenger(createRequest)
+                () -> passengerService.addPassenger(createRequest, DEFAULT_EXTERNAL_ID)
         );
 
         verify(passengerRepository).existsByEmail(DEFAULT_EMAIL);
@@ -188,7 +188,7 @@ public class PassengerServiceImplTest {
 
         assertThrows(
                 PassengerAlreadyExistsException.class,
-                () -> passengerService.addPassenger(createRequest)
+                () -> passengerService.addPassenger(createRequest, DEFAULT_EXTERNAL_ID)
         );
 
         verify(passengerRepository).existsByEmail(DEFAULT_EMAIL);
@@ -199,6 +199,7 @@ public class PassengerServiceImplTest {
     void updatePassenger_shouldReturnPassengerResponse_whenPassengerExistsAndDataUnique() {
         var expected = PassengerResponse.builder()
                 .id(DEFAULT_ID)
+                .externalId(DEFAULT_EXTERNAL_ID)
                 .firstName(DEFAULT_FIRST_NAME)
                 .lastName(DEFAULT_LAST_NAME)
                 .email(OTHER_EMAIL)
@@ -210,7 +211,7 @@ public class PassengerServiceImplTest {
 
         doReturn(Optional.of(passenger))
                 .when(passengerRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
         doReturn(false)
                 .when(passengerRepository)
                 .existsByEmail(updateRequest.email());
@@ -221,9 +222,9 @@ public class PassengerServiceImplTest {
                 .when(passengerMapper)
                 .fromEntityToResponse(passenger);
 
-        var actual = passengerService.updatePassenger(updateRequest, DEFAULT_ID);
+        var actual = passengerService.updatePassenger(updateRequest, DEFAULT_EXTERNAL_ID);
 
-        verify(passengerRepository).findById(DEFAULT_ID);
+        verify(passengerRepository).findByExternalId(DEFAULT_EXTERNAL_ID);
         verify(passengerRepository).existsByEmail(updateRequest.email());
         verify(passengerRepository).existsByPhone(updateRequest.phone());
         verify(passengerRepository).save(passenger);
@@ -239,11 +240,11 @@ public class PassengerServiceImplTest {
 
         doReturn(Optional.empty())
                 .when(passengerRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
 
         assertThrows(
                 PassengerNotFoundException.class,
-                () -> passengerService.updatePassenger(updateRequest, DEFAULT_ID)
+                () -> passengerService.updatePassenger(updateRequest, DEFAULT_EXTERNAL_ID)
         );
     }
 
@@ -254,7 +255,7 @@ public class PassengerServiceImplTest {
 
         doReturn(Optional.of(passenger))
                 .when(passengerRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
         doReturn(true)
                 .when(passengerRepository)
                 .existsByEmail(OTHER_EMAIL);
@@ -264,10 +265,10 @@ public class PassengerServiceImplTest {
 
         assertThrows(
                 PassengerAlreadyExistsException.class,
-                () -> passengerService.updatePassenger(updateRequest, DEFAULT_ID)
+                () -> passengerService.updatePassenger(updateRequest, DEFAULT_EXTERNAL_ID)
         );
 
-        verify(passengerRepository).findById(DEFAULT_ID);
+        verify(passengerRepository).findByExternalId(DEFAULT_EXTERNAL_ID);
         verify(passengerRepository).existsByEmail(OTHER_EMAIL);
         verify(passengerRepository).existsByPhone(OTHER_PHONE);
     }
@@ -279,7 +280,7 @@ public class PassengerServiceImplTest {
 
         doReturn(Optional.of(passenger))
                 .when(passengerRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
         doReturn(false)
                 .when(passengerRepository)
                 .existsByEmail(OTHER_EMAIL);
@@ -289,10 +290,10 @@ public class PassengerServiceImplTest {
 
         assertThrows(
                 PassengerAlreadyExistsException.class,
-                () -> passengerService.updatePassenger(updateRequest, DEFAULT_ID)
+                () -> passengerService.updatePassenger(updateRequest, DEFAULT_EXTERNAL_ID)
         );
 
-        verify(passengerRepository).findById(DEFAULT_ID);
+        verify(passengerRepository).findByExternalId(DEFAULT_EXTERNAL_ID);
         verify(passengerRepository).existsByEmail(OTHER_EMAIL);
         verify(passengerRepository).existsByPhone(OTHER_PHONE);
     }
@@ -303,11 +304,11 @@ public class PassengerServiceImplTest {
 
         doReturn(Optional.of(passenger))
                 .when(passengerRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
 
-        passengerService.deletePassenger(DEFAULT_ID);
+        passengerService.deletePassenger(DEFAULT_EXTERNAL_ID);
 
-        verify(passengerRepository).findById(DEFAULT_ID);
+        verify(passengerRepository).findByExternalId(DEFAULT_EXTERNAL_ID);
         verify(passengerRepository).delete(passenger);
     }
 
@@ -315,13 +316,13 @@ public class PassengerServiceImplTest {
     void deletePassenger_shouldThrowPassengerNotFoundException_whenPassengerNotExist() {
         doReturn(Optional.empty())
                 .when(passengerRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
 
         assertThrows(
                 PassengerNotFoundException.class,
-                () -> passengerService.deletePassenger(DEFAULT_ID)
+                () -> passengerService.deletePassenger(DEFAULT_EXTERNAL_ID)
         );
-        verify(passengerRepository).findById(DEFAULT_ID);
+        verify(passengerRepository).findByExternalId(DEFAULT_EXTERNAL_ID);
     }
 
     @Test
@@ -331,11 +332,11 @@ public class PassengerServiceImplTest {
         Passenger passenger = getDefaultPassenger();
         doReturn(Optional.of(passenger))
                 .when(passengerRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
 
         passengerService.updatePassengerRating(ratingMessage);
 
-        verify(passengerRepository).findById(DEFAULT_ID);
+        verify(passengerRepository).findByExternalId(DEFAULT_EXTERNAL_ID);
         assertEquals(NEW_RATING, passenger.getRating());
     }
 
@@ -345,12 +346,12 @@ public class PassengerServiceImplTest {
 
         doReturn(Optional.empty())
                 .when(passengerRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
 
         assertThrows(
                 PassengerNotFoundException.class,
                 () -> passengerService.updatePassengerRating(ratingMessage)
         );
-        verify(passengerRepository).findById(DEFAULT_ID);
+        verify(passengerRepository).findByExternalId(DEFAULT_EXTERNAL_ID);
     }
 }

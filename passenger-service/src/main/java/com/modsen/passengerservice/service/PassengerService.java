@@ -6,17 +6,19 @@ import com.modsen.passengerservice.dto.response.PassengerPageResponse;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
 import com.modsen.passengerservice.dto.request.UpdatePassengerRequest;
 
+import java.util.UUID;
+
 public interface PassengerService {
 
     PassengerPageResponse getPassengerPage(int page, int size, String orderBy);
 
-    PassengerResponse getById(long id);
+    PassengerResponse getById(UUID id);
 
-    PassengerResponse addPassenger(CreatePassengerRequest createRequest);
+    PassengerResponse addPassenger(CreatePassengerRequest createRequest, UUID externalId);
 
-    PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, long id);
+    PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, UUID id);
 
-    void deletePassenger(long id);
+    void deletePassenger(UUID id);
 
     void updatePassengerRating(PassengerRatingMessage updateRatingMessage);
 }

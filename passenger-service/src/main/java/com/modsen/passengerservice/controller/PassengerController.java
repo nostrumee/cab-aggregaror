@@ -10,8 +10,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.UUID;
 
 @Tag(name = "Passenger Controller", description = "Passenger API")
 public interface PassengerController {
@@ -44,7 +47,7 @@ public interface PassengerController {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })
     })
-    PassengerResponse getPassengerById(@PathVariable long id);
+    PassengerResponse getPassengerById(@PathVariable UUID id);
 
     @Operation(summary = "Create a passenger")
     @ApiResponses(value = {
@@ -63,6 +66,7 @@ public interface PassengerController {
     })
     ResponseEntity<PassengerResponse> createPassenger(
             CreatePassengerRequest createRequest,
+            Jwt jwt,
             UriComponentsBuilder uriComponentsBuilder
     );
 
@@ -85,7 +89,7 @@ public interface PassengerController {
                             @Content(schema = @Schema(implementation = AlreadyExistsResponse.class))
                     })
     })
-    PassengerResponse updatePassenger(long id, UpdatePassengerRequest updateRequest);
+    PassengerResponse updatePassenger(UUID id, UpdatePassengerRequest updateRequest);
 
     @Operation(summary = "Delete a passenger")
     @ApiResponses(value = {
@@ -95,5 +99,5 @@ public interface PassengerController {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })
     })
-    void deletePassenger(long id);
+    void deletePassenger(UUID id);
 }

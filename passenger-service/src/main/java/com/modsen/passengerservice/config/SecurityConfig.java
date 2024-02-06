@@ -1,4 +1,4 @@
-package com.modsen.driverservice.config;
+package com.modsen.passengerservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,8 +11,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static com.modsen.driverservice.util.SecurityUtils.*;
-import static com.modsen.driverservice.util.UriPaths.DRIVER_SERVICE_BASE_PATH;
+import static com.modsen.passengerservice.util.SecurityUtils.*;
+import static com.modsen.passengerservice.util.UriPaths.PASSENGER_SERVICE_BASE_PATH;
 
 @Configuration
 @EnableWebSecurity
@@ -25,7 +25,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(ACTUATOR_REQUEST_MATCHER).permitAll()
                         .requestMatchers(OPENAPI_REQUEST_MATCHERS).permitAll()
-                        .requestMatchers(HttpMethod.GET, DRIVER_SERVICE_BASE_PATH).hasRole(ADMIN_ROLE_NAME)
+                        .requestMatchers(HttpMethod.GET, PASSENGER_SERVICE_BASE_PATH).hasRole(ADMIN_ROLE_NAME)
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

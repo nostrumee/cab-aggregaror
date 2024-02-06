@@ -24,7 +24,7 @@ public class KafkaConsumerIntegrationTest extends IntegrationTestBase {
     @Test
     void updatePassengerRating_shouldUpdatePassengerRating_whenMessageConsumed() {
         var ratingMessage = PassengerRatingMessage.builder()
-                .passengerId(DEFAULT_ID)
+                .passengerId(DEFAULT_EXTERNAL_ID)
                 .rating(NEW_RATING)
                 .build();
 
@@ -37,7 +37,7 @@ public class KafkaConsumerIntegrationTest extends IntegrationTestBase {
                 .pollInterval(Duration.ofSeconds(3))
                 .atMost(10, SECONDS)
                 .untilAsserted(() -> {
-                    var passenger = passengerRepository.findById(DEFAULT_ID).get();
+                    var passenger = passengerRepository.findByExternalId(DEFAULT_EXTERNAL_ID).get();
                     var actual = passenger.getRating();
                     assertThat(actual).isEqualTo(NEW_RATING);
                 });

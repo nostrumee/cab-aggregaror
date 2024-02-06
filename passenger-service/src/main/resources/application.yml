@@ -23,6 +23,12 @@ spring:
   liquibase:
     change-log: db/changelog/changelog-master.xml
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/cab-aggregator
+
   cloud:
     function:
       definition: updatePassengerRating

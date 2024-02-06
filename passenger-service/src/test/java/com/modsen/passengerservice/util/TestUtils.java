@@ -13,10 +13,12 @@ import org.springframework.data.domain.Sort;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @UtilityClass
 public class TestUtils {
     public final long DEFAULT_ID = 1L;
+    public final UUID DEFAULT_EXTERNAL_ID = UUID.fromString("d6f3c9d1-de66-45ee-beb9-f371fa3a6378");
     public final String DEFAULT_FIRST_NAME = "John";
     public final String DEFAULT_LAST_NAME = "Smith";
     public final String DEFAULT_EMAIL = "johnsmith@example.com";
@@ -24,11 +26,11 @@ public class TestUtils {
     public final double DEFAULT_RATING = 5.0;
 
     public final long OTHER_ID = 2L;
+    public final UUID OTHER_EXTERNAL_ID = UUID.fromString("3b7740b0-5dd7-4fce-88b9-66618931c0dd");
     public final String OTHER_FIRST_NAME = "Jane";
     public final String OTHER_LAST_NAME = "Doe";
     public final String OTHER_EMAIL = "janedoe@example.com";
     public final String OTHER_PHONE = "987-65-43";
-    public final double OTHER_RATING = 5.0;
 
     public final long NEW_ID = 11L;
     public final String NEW_FIRST_NAME = "John";
@@ -83,6 +85,7 @@ public class TestUtils {
     public Passenger getDefaultPassenger() {
         return Passenger.builder()
                 .id(DEFAULT_ID)
+                .externalId(DEFAULT_EXTERNAL_ID)
                 .firstName(DEFAULT_FIRST_NAME)
                 .lastName(DEFAULT_LAST_NAME)
                 .email(DEFAULT_EMAIL)
@@ -94,6 +97,7 @@ public class TestUtils {
     public Passenger getOtherPassenger() {
         return Passenger.builder()
                 .id(OTHER_ID)
+                .externalId(OTHER_EXTERNAL_ID)
                 .firstName(OTHER_FIRST_NAME)
                 .lastName(OTHER_LAST_NAME)
                 .email(OTHER_EMAIL)
@@ -115,6 +119,7 @@ public class TestUtils {
     public PassengerResponse getDefaultPassengerResponse() {
         return PassengerResponse.builder()
                 .id(DEFAULT_ID)
+                .externalId(DEFAULT_EXTERNAL_ID)
                 .firstName(DEFAULT_FIRST_NAME)
                 .lastName(DEFAULT_LAST_NAME)
                 .email(DEFAULT_EMAIL)
@@ -126,6 +131,7 @@ public class TestUtils {
     public PassengerResponse getOtherPassengerResponse() {
         return PassengerResponse.builder()
                 .id(OTHER_ID)
+                .externalId(OTHER_EXTERNAL_ID)
                 .firstName(OTHER_FIRST_NAME)
                 .lastName(OTHER_LAST_NAME)
                 .email(OTHER_EMAIL)
@@ -177,7 +183,7 @@ public class TestUtils {
 
     public PassengerRatingMessage getPassengerRatingMessage() {
         return PassengerRatingMessage.builder()
-                .passengerId(DEFAULT_ID)
+                .passengerId(DEFAULT_EXTERNAL_ID)
                 .rating(NEW_RATING)
                 .build();
     }

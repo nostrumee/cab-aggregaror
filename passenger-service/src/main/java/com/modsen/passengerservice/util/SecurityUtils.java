@@ -1,4 +1,4 @@
-package com.modsen.driverservice.util;
+package com.modsen.passengerservice.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 public final class SecurityUtils {
     public static final String[] OPENAPI_REQUEST_MATCHERS = {
             "/swagger-ui/**",
-            "/driver-service/v3/api-docs/**"
+            "/passenger-service/v3/api-docs/**"
     };
 
     public static final String ACTUATOR_REQUEST_MATCHER = "/actuator/**";
@@ -18,5 +18,5 @@ public final class SecurityUtils {
 
     public static final String ADMIN_ROLE_NAME = "ADMIN";
 
-    public static final String DRIVER_ROLE_NAME = "DRIVER";
+    public static final String PASSENGER_ROLE_NAME = "PASSENGER";
 }

@@ -10,11 +10,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.modsen.passengerservice.util.UriPaths.*;
 
@@ -37,21 +41,24 @@ public class PassengerControllerImpl implements PassengerController {
 
     @GetMapping(GET_PASSENGER_BY_ID_PATH)
     @ResponseStatus(HttpStatus.OK)
-    public PassengerResponse getPassengerById(@PathVariable long id) {
+    @PreAuthorize("@passengerServiceSecurityExpression.canAccessPassenger(#id)")
+    public PassengerResponse getPassengerById(@PathVariable UUID id) {
         return passengerService.getById(id);
     }
 
     @PostMapping
+    @PreAuthorize("@passengerServiceSecurityExpression.canSignUp()")
     public ResponseEntity<PassengerResponse> createPassenger(
             @Valid @RequestBody CreatePassengerRequest createRequest,
+            @AuthenticationPrincipal Jwt jwt,
             UriComponentsBuilder uriComponentsBuilder
     ) {
-        PassengerResponse response = passengerService.addPassenger(createRequest);
-        Long passengerId = response.id();
+        UUID externalId = UUID.fromString(jwt.getSubject());
+        PassengerResponse response = passengerService.addPassenger(createRequest, externalId);
 
         URI location = uriComponentsBuilder
                 .path("api/v1/passengers/{id}")
-                .build(Map.of("id", passengerId));
+                .build(Map.of("id", externalId));
 
         return ResponseEntity
                 .created(location)
@@ -60,8 +67,9 @@ public class PassengerControllerImpl implements PassengerController {
 
     @PutMapping(UPDATE_PASSENGER_BY_ID_PATH)
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("@passengerServiceSecurityExpression.canAccessPassenger(#id)")
     public PassengerResponse updatePassenger(
-            @PathVariable long id,
+            @PathVariable UUID id,
             @Valid @RequestBody UpdatePassengerRequest updateRequest
     ) {
         return passengerService.updatePassenger(updateRequest, id);
@@ -69,7 +77,8 @@ public class PassengerControllerImpl implements PassengerController {
 
     @DeleteMapping(DELETE_PASSENGER_BY_ID_PATH)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePassenger(@PathVariable long id) {
+    @PreAuthorize("@passengerServiceSecurityExpression.canAccessPassenger(#id)")
+    public void deletePassenger(@PathVariable UUID id) {
         passengerService.deletePassenger(id);
     }
 }

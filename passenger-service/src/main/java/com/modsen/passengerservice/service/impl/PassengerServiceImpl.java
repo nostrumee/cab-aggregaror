@@ -54,7 +54,7 @@ public class PassengerServiceImpl implements PassengerService {
 
     @Override
     @Transactional(readOnly = true)
-    public PassengerResponse getById(long id) {
+    public PassengerResponse getById(UUID id) {
         log.info("Retrieving passenger by id {}", id);
 
         Passenger passenger = findPassengerById(id);
@@ -63,12 +63,14 @@ public class PassengerServiceImpl implements PassengerService {
 
     @Override
     @Transactional
-    public PassengerResponse addPassenger(CreatePassengerRequest createRequest) {
+    public PassengerResponse addPassenger(CreatePassengerRequest createRequest, UUID externalId) {
         log.info("Adding passenger");
 
         checkCreateDataUnique(createRequest);
 
         Passenger passengerToCreate = passengerMapper.fromCreateRequestToEntity(createRequest);
+        passengerToCreate.setExternalId(externalId);
+
         Passenger createdPassenger = passengerRepository.save(passengerToCreate);
 
         return passengerMapper.fromEntityToResponse(createdPassenger);
@@ -76,7 +78,7 @@ public class PassengerServiceImpl implements PassengerService {
 
     @Override
     @Transactional
-    public PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, long id) {
+    public PassengerResponse updatePassenger(UpdatePassengerRequest updateRequest, UUID id) {
         log.info("Updating passenger with id {}", id);
 
         Passenger passenger = findPassengerById(id);
@@ -91,7 +93,7 @@ public class PassengerServiceImpl implements PassengerService {
 
     @Override
     @Transactional
-    public void deletePassenger(long id) {
+    public void deletePassenger(UUID id) {
         log.info("Deleting passenger with id {}", id);
 
         Passenger passenger = findPassengerById(id);
@@ -101,7 +103,7 @@ public class PassengerServiceImpl implements PassengerService {
     @Override
     @Transactional
     public void updatePassengerRating(PassengerRatingMessage updateRatingMessage) {
-        long id = updateRatingMessage.passengerId();
+        UUID id = updateRatingMessage.passengerId();
 
         log.info("Updating rating of passenger with id {}", id);
 
@@ -110,8 +112,8 @@ public class PassengerServiceImpl implements PassengerService {
         passengerRepository.save(passenger);
     }
 
-    private Passenger findPassengerById(long id) {
-        return passengerRepository.findById(id)
+    private Passenger findPassengerById(UUID id) {
+        return passengerRepository.findByExternalId(id)
                 .orElseThrow(() -> {
                     log.error("Passenger with id {} was not found", id);
                     return new PassengerNotFoundException(id);

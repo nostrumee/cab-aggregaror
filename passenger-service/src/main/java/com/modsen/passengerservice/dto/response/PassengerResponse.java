@@ -4,12 +4,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.NonNull;
 
+import java.util.UUID;
+
 @Schema(description = "Passenger response")
 @Builder
 public record PassengerResponse(
         @Schema(name = "id", example = "1")
         @NonNull
         Long id,
+
+        @Schema(name = "id", example = "d6f3c9d1-de66-45ee-beb9-f371fa3a6378")
+        @NonNull
+        UUID externalId,
 
         @Schema(name = "First name", example = "John")
         @NonNull
