@@ -28,14 +28,14 @@ public class PassengerServiceImplTest {
         var expected = getPassengerResponse();
         doReturn(expected)
                 .when(passengerClient)
-                .getPassengerById(DEFAULT_ID);
+                .getPassengerById(DEFAULT_PASSENGER_ID);
 
         // act
-        var actual = passengerService.getPassengerById(DEFAULT_ID);
+        var actual = passengerService.getPassengerById(DEFAULT_PASSENGER_ID);
 
         // assert
         assertThat(actual).isEqualTo(expected);
-        verify(passengerClient).getPassengerById(DEFAULT_ID);
+        verify(passengerClient).getPassengerById(DEFAULT_PASSENGER_ID);
     }
 
     @Test
@@ -43,13 +43,13 @@ public class PassengerServiceImplTest {
         // arrange
         doThrow(PassengerNotFoundException.class)
                 .when(passengerClient)
-                .getPassengerById(DEFAULT_ID);
+                .getPassengerById(DEFAULT_PASSENGER_ID);
 
         // act and assert
         assertThrows(
                 PassengerNotFoundException.class,
-                () -> passengerService.getPassengerById(DEFAULT_ID)
+                () -> passengerService.getPassengerById(DEFAULT_PASSENGER_ID)
         );
-        verify(passengerClient).getPassengerById(DEFAULT_ID);
+        verify(passengerClient).getPassengerById(DEFAULT_PASSENGER_ID);
     }
 }

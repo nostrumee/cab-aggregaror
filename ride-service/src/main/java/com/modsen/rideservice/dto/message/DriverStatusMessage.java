@@ -3,9 +3,11 @@ package com.modsen.rideservice.dto.message;
 import com.modsen.rideservice.entity.DriverStatus;
 import lombok.Builder;
 
+import java.util.UUID;
+
 @Builder
 public record DriverStatusMessage(
-        Long driverId,
+        UUID driverId,
         DriverStatus status
 ) {
 }

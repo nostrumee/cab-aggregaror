@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -18,12 +20,12 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     @CircuitBreaker(name = "${driver-service.name}", fallbackMethod = "getFallbackDriver")
-    public DriverResponse getDriverById(long id) {
+    public DriverResponse getDriverById(UUID id) {
         log.info("Retrieving driver by id {}", id);
         return driverClient.getDriverById(id);
     }
 
-    private DriverResponse getFallbackDriver(long id, RetryableException exception) {
+    private DriverResponse getFallbackDriver(UUID id, RetryableException exception) {
         log.info("Fallback response from driver service. Reason: {}", exception.getMessage());
 
         return DriverResponse.builder()

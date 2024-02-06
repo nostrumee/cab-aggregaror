@@ -2,9 +2,11 @@ package com.modsen.rideservice.dto.response;
 
 import lombok.Builder;
 
+import java.util.UUID;
+
 @Builder
 public record PassengerResponse(
-        Long id,
+        UUID id,
         String firstName,
         String email
 ) {

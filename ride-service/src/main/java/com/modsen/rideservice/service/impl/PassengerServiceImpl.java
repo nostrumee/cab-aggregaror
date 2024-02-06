@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -19,17 +21,17 @@ public class PassengerServiceImpl implements PassengerService {
 
     @Override
     @CircuitBreaker(name = "${passenger-service.name}", fallbackMethod = "getFallbackPassenger")
-    public PassengerResponse getPassengerById(long id) {
+    public PassengerResponse getPassengerById(UUID id) {
         log.info("Retrieving passenger by id {}", id);
 
         return passengerClient.getPassengerById(id);
     }
 
-    private PassengerResponse getFallbackPassenger(long id, RetryableException exception) {
+    private PassengerResponse getFallbackPassenger(UUID id, RetryableException exception) {
         log.info("Fallback response from passenger service. Reason: {}", exception.getMessage());
 
         return PassengerResponse.builder()
-                .id(0L)
+                .id(null)
                 .firstName("fallback")
                 .email("fallback")
                 .build();

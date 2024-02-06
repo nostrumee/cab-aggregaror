@@ -7,11 +7,14 @@ import lombok.Builder;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
+import java.util.UUID;
+
 @Schema(description = "Create ride order request")
 @Builder
 public record CreateRideRequest(
-        @Range(min = 1, message = "{passenger-id.positive}")
-        Long passengerId,
+        @NotBlank(message = "{passenger-id.not.blank}")
+        @org.hibernate.validator.constraints.UUID(message = "{passenger-id.valid}")
+        UUID passengerId,
 
         @NotBlank(message = "{start-point.not.blank}")
         @Length(max = 255, message = "{start-point.length}")

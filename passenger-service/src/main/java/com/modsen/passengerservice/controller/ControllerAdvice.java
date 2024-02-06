@@ -6,6 +6,7 @@ import com.modsen.passengerservice.dto.response.ParamErrorResponse;
 import com.modsen.passengerservice.dto.response.ValidationErrorResponse;
 import com.modsen.passengerservice.exception.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -107,6 +108,15 @@ public class ControllerAdvice {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(INVALID_PARAMETER_TYPE_MESSAGE)
                 .errors(error)
+                .build();
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleAccessDenied(AccessDeniedException e) {
+        return ErrorResponse.builder()
+                .status(HttpStatus.FORBIDDEN.value())
+                .message(ACCESS_DENIED_MESSAGE)
                 .build();
     }
 }

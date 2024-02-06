@@ -15,4 +15,5 @@ public class ErrorMessages {
             "Sorting parameter %s is invalid. Acceptable parameters are: %s";
     public final String RESPONSE_HANDLER_MISSING = "Response handler missing for status code: %d, url: %s";
     public final String DRIVER_SERVICE_UNAVAILABLE = "Driver service unavailable";
+    public final String ACCESS_DENIED_MESSAGE = "Access denied";
 }

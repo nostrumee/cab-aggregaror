@@ -25,7 +25,7 @@
 
     <include file="v3/v3-accumulate-changelog.xml" relativeToChangelogFile="true"/>
 
-    <changeSet id="6" author="Eduard Klygunov">
+    <changeSet id="7" author="Eduard Klygunov">
         <tagDatabase tag="v.3.0"/>
     </changeSet>
 

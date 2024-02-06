@@ -6,13 +6,15 @@ import com.modsen.rideservice.dto.response.DriverResponse;
 import com.modsen.rideservice.dto.response.RidePageResponse;
 import com.modsen.rideservice.dto.response.RideResponse;
 
+import java.util.UUID;
+
 public interface RideService {
 
     RidePageResponse getRidesPage(int page, int size, String orderBy);
 
-    RidePageResponse getRidesByDriverId(long driverId, int page, int size, String orderBy);
+    RidePageResponse getRidesByDriverId(UUID driverId, int page, int size, String orderBy);
 
-    RidePageResponse getRidesByPassengerId(long passengerId, int page, int size, String orderBy);
+    RidePageResponse getRidesByPassengerId(UUID passengerId, int page, int size, String orderBy);
 
     RideResponse getById(long id);
 

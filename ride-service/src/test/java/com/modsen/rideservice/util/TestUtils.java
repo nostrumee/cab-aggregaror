@@ -33,10 +33,7 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import static com.modsen.rideservice.util.UriPaths.*;
 
@@ -51,6 +48,9 @@ public class TestUtils {
     public final long ACCEPTED_RIDE_ID = 3L;
     public final long STARTED_RIDE_ID = 4L;
     public final long FINISHED_RIDE_ID = 5L;
+    
+    public final UUID DEFAULT_PASSENGER_ID = UUID.fromString("d6f3c9d1-de66-45ee-beb9-f371fa3a6378");
+    public final UUID DEFAULT_DRIVER_ID = UUID.fromString("d3849c45-a4f6-4e2a-8289-6b662076fabf");
 
     public final String START_POINT = "Default start point";
     public final String DESTINATION_POINT = "Default destination point";
@@ -114,7 +114,7 @@ public class TestUtils {
     public Ride getCreatedRide() {
         return Ride.builder()
                 .id(CREATED_RIDE_ID)
-                .passengerId(DEFAULT_ID)
+                .passengerId(DEFAULT_PASSENGER_ID)
                 .startPoint(START_POINT)
                 .destinationPoint(DESTINATION_POINT)
                 .status(RideStatus.CREATED)
@@ -126,7 +126,7 @@ public class TestUtils {
     public Ride getRejectedRide() {
         return Ride.builder()
                 .id(REJECTED_RIDE_ID)
-                .passengerId(DEFAULT_ID)
+                .passengerId(DEFAULT_PASSENGER_ID)
                 .startPoint(START_POINT)
                 .destinationPoint(DESTINATION_POINT)
                 .status(RideStatus.REJECTED)
@@ -138,8 +138,8 @@ public class TestUtils {
     public Ride getAcceptedRide() {
         return Ride.builder()
                 .id(ACCEPTED_RIDE_ID)
-                .passengerId(DEFAULT_ID)
-                .driverId(DEFAULT_ID)
+                .passengerId(DEFAULT_PASSENGER_ID)
+                .driverId(DEFAULT_DRIVER_ID)
                 .startPoint(START_POINT)
                 .destinationPoint(DESTINATION_POINT)
                 .status(RideStatus.ACCEPTED)
@@ -152,8 +152,8 @@ public class TestUtils {
     public Ride getStartedRide() {
         return Ride.builder()
                 .id(STARTED_RIDE_ID)
-                .passengerId(DEFAULT_ID)
-                .driverId(DEFAULT_ID)
+                .passengerId(DEFAULT_PASSENGER_ID)
+                .driverId(DEFAULT_DRIVER_ID)
                 .startPoint(START_POINT)
                 .destinationPoint(DESTINATION_POINT)
                 .status(RideStatus.STARTED)
@@ -167,8 +167,8 @@ public class TestUtils {
     public Ride getFinishedRide() {
         return Ride.builder()
                 .id(FINISHED_RIDE_ID)
-                .passengerId(DEFAULT_ID)
-                .driverId(DEFAULT_ID)
+                .passengerId(DEFAULT_PASSENGER_ID)
+                .driverId(DEFAULT_DRIVER_ID)
                 .startPoint(START_POINT)
                 .destinationPoint(DESTINATION_POINT)
                 .status(RideStatus.FINISHED)
@@ -182,7 +182,7 @@ public class TestUtils {
 
     public Ride getNotSavedRide() {
         return Ride.builder()
-                .passengerId(DEFAULT_ID)
+                .passengerId(DEFAULT_PASSENGER_ID)
                 .startPoint(START_POINT)
                 .destinationPoint(DESTINATION_POINT)
                 .status(RideStatus.CREATED)
@@ -194,7 +194,7 @@ public class TestUtils {
     public RideResponse getCreatedRideResponse() {
         return RideResponse.builder()
                 .id(CREATED_RIDE_ID)
-                .passengerId(DEFAULT_ID)
+                .passengerId(DEFAULT_PASSENGER_ID)
                 .startPoint(START_POINT)
                 .destinationPoint(DESTINATION_POINT)
                 .status(RideStatus.CREATED)
@@ -206,7 +206,7 @@ public class TestUtils {
     public RideResponse getRejectedRideResponse() {
         return RideResponse.builder()
                 .id(REJECTED_RIDE_ID)
-                .passengerId(DEFAULT_ID)
+                .passengerId(DEFAULT_PASSENGER_ID)
                 .startPoint(START_POINT)
                 .destinationPoint(DESTINATION_POINT)
                 .status(RideStatus.REJECTED)
@@ -218,8 +218,8 @@ public class TestUtils {
     public RideResponse getAcceptedRideResponse() {
         return RideResponse.builder()
                 .id(ACCEPTED_RIDE_ID)
-                .passengerId(DEFAULT_ID)
-                .driverId(DEFAULT_ID)
+                .passengerId(DEFAULT_PASSENGER_ID)
+                .driverId(DEFAULT_DRIVER_ID)
                 .startPoint(START_POINT)
                 .destinationPoint(DESTINATION_POINT)
                 .status(RideStatus.ACCEPTED)
@@ -232,8 +232,8 @@ public class TestUtils {
     public RideResponse getStartedRideResponse() {
         return RideResponse.builder()
                 .id(STARTED_RIDE_ID)
-                .passengerId(DEFAULT_ID)
-                .driverId(DEFAULT_ID)
+                .passengerId(DEFAULT_PASSENGER_ID)
+                .driverId(DEFAULT_DRIVER_ID)
                 .startPoint(START_POINT)
                 .destinationPoint(DESTINATION_POINT)
                 .status(RideStatus.STARTED)
@@ -247,8 +247,8 @@ public class TestUtils {
     public RideResponse getFinishedRideResponse() {
         return RideResponse.builder()
                 .id(FINISHED_RIDE_ID)
-                .passengerId(DEFAULT_ID)
-                .driverId(DEFAULT_ID)
+                .passengerId(DEFAULT_PASSENGER_ID)
+                .driverId(DEFAULT_DRIVER_ID)
                 .startPoint(START_POINT)
                 .destinationPoint(DESTINATION_POINT)
                 .status(RideStatus.FINISHED)
@@ -272,7 +272,7 @@ public class TestUtils {
 
     public PassengerResponse getPassengerResponse() {
         return PassengerResponse.builder()
-                .id(DEFAULT_ID)
+                .id(DEFAULT_PASSENGER_ID)
                 .firstName(FIRST_NAME)
                 .email(EMAIL)
                 .build();
@@ -280,7 +280,7 @@ public class TestUtils {
 
     public CreateRideRequest getCreateRideRequest() {
         return CreateRideRequest.builder()
-                .passengerId(DEFAULT_ID)
+                .passengerId(DEFAULT_PASSENGER_ID)
                 .startPoint(START_POINT)
                 .destinationPoint(DESTINATION_POINT)
                 .build();
@@ -288,12 +288,12 @@ public class TestUtils {
 
     public DriverStatusMessage getDriverStatusMessage(DriverStatus status) {
         return DriverStatusMessage.builder()
-                .driverId(DEFAULT_ID)
+                .driverId(DEFAULT_DRIVER_ID)
                 .status(status)
                 .build();
     }
 
-    public AcceptRideMessage getAcceptRideMessage(Long driverId) {
+    public AcceptRideMessage getAcceptRideMessage(UUID driverId) {
         return AcceptRideMessage.builder()
                 .rideId(DEFAULT_ID)
                 .driverId(driverId)

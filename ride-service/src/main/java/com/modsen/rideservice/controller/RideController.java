@@ -2,33 +2,21 @@ package com.modsen.rideservice.controller;
 
 import com.modsen.rideservice.dto.request.CreateRideRequest;
 import com.modsen.rideservice.dto.response.*;
-import com.modsen.rideservice.service.RideService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
-import java.util.Map;
+import java.util.UUID;
 
-import static com.modsen.rideservice.util.UriPaths.*;
+@Tag(name = "Ride Controller", description = "Ride API")
+public interface RideController {
 
-@RestController
-@RequestMapping(RIDE_SERVICE_BASE_PATH)
-@RequiredArgsConstructor
-public class RideController {
-
-    private final RideService rideService;
-
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get rides page")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Rides found",
@@ -44,16 +32,8 @@ public class RideController {
                             @Content(schema = @Schema(implementation = ParamErrorResponse.class))
                     })
     })
-    public RidePageResponse getRidesPage(
-            @RequestParam(required = false, defaultValue = "1") int page,
-            @RequestParam(required = false, defaultValue = "10") int size,
-            @RequestParam(name = "order_by", required = false) String orderBy
-    ) {
-        return rideService.getRidesPage(page, size, orderBy);
-    }
+    RidePageResponse getRidesPage(int page, int size, String orderBy);
 
-    @GetMapping(GET_DRIVER_RIDE_HISTORY_PATH)
-    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get driver's rides history")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Rides found",
@@ -69,17 +49,8 @@ public class RideController {
                             @Content(schema = @Schema(implementation = ParamErrorResponse.class))
                     })
     })
-    public RidePageResponse getDriverRideHistory(
-            @RequestParam(required = false, defaultValue = "1") int page,
-            @RequestParam(required = false, defaultValue = "10") int size,
-            @RequestParam(name = "order_by", required = false) String orderBy,
-            @PathVariable long driverId
-    ) {
-        return rideService.getRidesByDriverId(driverId, page, size, orderBy);
-    }
+    RidePageResponse getDriverRideHistory(int page, int size, String orderBy, UUID driverId);
 
-    @GetMapping(GET_PASSENGER_RIDE_HISTORY_PATH)
-    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get passenger's rides history")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Rides found",
@@ -95,17 +66,8 @@ public class RideController {
                             @Content(schema = @Schema(implementation = ParamErrorResponse.class))
                     })
     })
-    public RidePageResponse getPassengerRideHistory(
-            @RequestParam(required = false, defaultValue = "1") int page,
-            @RequestParam(required = false, defaultValue = "10") int size,
-            @RequestParam(name = "order_by", required = false) String orderBy,
-            @PathVariable long passengerId
-    ) {
-        return rideService.getRidesByPassengerId(passengerId, page, size, orderBy);
-    }
+    RidePageResponse getPassengerRideHistory(int page, int size, String orderBy, UUID passengerId);
 
-    @GetMapping(GET_BY_ID_PATH)
-    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a ride by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ride found",
@@ -117,11 +79,8 @@ public class RideController {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })
     })
-    public RideResponse getRideById(@PathVariable long id) {
-        return rideService.getById(id);
-    }
+    RideResponse getRideById(long id);
 
-    @PostMapping
     @Operation(summary = "Create a ride")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Ride created",
@@ -137,24 +96,11 @@ public class RideController {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })
     })
-    public ResponseEntity<RideResponse> createRide(
-            @Valid @RequestBody CreateRideRequest createRequest,
+    ResponseEntity<RideResponse> createRide(
+            CreateRideRequest createRequest,
             UriComponentsBuilder uriComponentsBuilder
-    ) {
-        RideResponse response = rideService.createRide(createRequest);
-        Long rideId = response.id();
+    );
 
-        URI location = uriComponentsBuilder
-                .path("api/v1/rides/{id}")
-                .build(Map.of("id", rideId));
-
-        return ResponseEntity
-                .created(location)
-                .body(response);
-    }
-
-    @DeleteMapping(DELETE_BY_ID_PATH)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a ride")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Ride deleted"),
@@ -163,12 +109,8 @@ public class RideController {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })
     })
-    public void deleteRide(@PathVariable long id) {
-        rideService.deleteRide(id);
-    }
+    void deleteRide(long id);
 
-    @GetMapping(START_RIDE_PATH)
-    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Start a ride")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ride started",
@@ -184,12 +126,8 @@ public class RideController {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })
     })
-    public RideResponse startRide(@PathVariable long id) {
-        return rideService.startRide(id);
-    }
+    RideResponse startRide(long id);
 
-    @GetMapping(FINISH_RIDE_PATH)
-    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Finish a ride")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ride finished",
@@ -205,12 +143,8 @@ public class RideController {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     })
     })
-    public RideResponse finishRide(@PathVariable long id) {
-        return rideService.finishRide(id);
-    }
+    RideResponse finishRide(long id);
 
-    @GetMapping(GET_DRIVER_PROFILE_PATH)
-    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "View driver's profile from a ride by ride id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Driver found",
@@ -234,7 +168,5 @@ public class RideController {
                             @Content(schema = @Schema(implementation = ErrorResponse.class))
                     }),
     })
-    public DriverResponse getDriverProfile(@PathVariable long rideId) {
-        return rideService.getDriverProfile(rideId);
-    }
+    DriverResponse getDriverProfile(long rideId);
 }

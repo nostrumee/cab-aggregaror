@@ -10,12 +10,12 @@ Feature: Ride Service
     Then The RideNotFoundException with the message containing id 1 should be thrown
 
   Scenario: Creating a new ride
-    Given A passenger with id 1 exists
-    When A create request with passenger id 1, start point "Start point", destination point "Destination point" passed to createRide method
+    Given A passenger with id "d6f3c9d1-de66-45ee-beb9-f371fa3a6378" exists
+    When A create request with passenger id "d6f3c9d1-de66-45ee-beb9-f371fa3a6378", start point "Start point", destination point "Destination point" passed to createRide method
     Then The response should contain details of the newly created ride
 
   Scenario: Accepting a ride
-    Given Driver with id 1 assigned to a ride with id 1
+    Given Driver with id "d3849c45-a4f6-4e2a-8289-6b662076fabf" assigned to a ride with id 1
     When Accept ride message passed to the acceptRide method
     Then Ride status should be changed to "ACCEPTED"
     And Driver should be assigned to a ride

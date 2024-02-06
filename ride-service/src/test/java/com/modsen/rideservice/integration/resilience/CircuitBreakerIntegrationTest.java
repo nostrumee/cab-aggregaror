@@ -50,12 +50,12 @@ public class CircuitBreakerIntegrationTest extends IntegrationTestBase {
     void testDriverServiceCircuitBreakerFlow() {
         doThrow(RetryableException.class)
                 .when(driverClient)
-                .getDriverById(DEFAULT_ID);
+                .getDriverById(DEFAULT_DRIVER_ID);
 
         assertThat(driverServiceCircuitBreaker.getState()).isEqualTo(CircuitBreaker.State.CLOSED);
 
         for (int i = 0; i < 10; i++) {
-            DriverResponse driver = driverService.getDriverById(DEFAULT_ID);
+            DriverResponse driver = driverService.getDriverById(DEFAULT_DRIVER_ID);
             assertThat(driver.firstName()).isEqualTo("fallback");
         }
 
@@ -70,10 +70,10 @@ public class CircuitBreakerIntegrationTest extends IntegrationTestBase {
 
         doReturn(getDriverResponse())
                 .when(driverClient)
-                .getDriverById(DEFAULT_ID);
+                .getDriverById(DEFAULT_DRIVER_ID);
 
         for (int i = 0; i < 5; i++) {
-            DriverResponse driver = driverService.getDriverById(DEFAULT_ID);
+            DriverResponse driver = driverService.getDriverById(DEFAULT_DRIVER_ID);
             assertThat(driver.firstName()).isNotEqualTo("fallback");
         }
 
@@ -84,12 +84,12 @@ public class CircuitBreakerIntegrationTest extends IntegrationTestBase {
     void testPassengerServiceCircuitBreakerFlow() {
         doThrow(RetryableException.class)
                 .when(passengerClient)
-                .getPassengerById(DEFAULT_ID);
+                .getPassengerById(DEFAULT_PASSENGER_ID);
 
         assertThat(passengerServiceCircuitBreaker.getState()).isEqualTo(CircuitBreaker.State.CLOSED);
 
         for (int i = 0; i < 10; i++) {
-            PassengerResponse passenger = passengerService.getPassengerById(DEFAULT_ID);
+            PassengerResponse passenger = passengerService.getPassengerById(DEFAULT_PASSENGER_ID);
             assertThat(passenger.firstName()).isEqualTo("fallback");
         }
 
@@ -104,10 +104,10 @@ public class CircuitBreakerIntegrationTest extends IntegrationTestBase {
 
         doReturn(getPassengerResponse())
                 .when(passengerClient)
-                .getPassengerById(DEFAULT_ID);
+                .getPassengerById(DEFAULT_PASSENGER_ID);
 
         for (int i = 0; i < 5; i++) {
-            PassengerResponse passenger = passengerService.getPassengerById(DEFAULT_ID);
+            PassengerResponse passenger = passengerService.getPassengerById(DEFAULT_PASSENGER_ID);
             assertThat(passenger.firstName()).isNotEqualTo("fallback");
         }
 

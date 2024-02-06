@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @Entity
@@ -20,9 +21,9 @@ public class Ride {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long passengerId;
+    private UUID passengerId;
 
-    private Long driverId;
+    private UUID driverId;
 
     private String startPoint;
 

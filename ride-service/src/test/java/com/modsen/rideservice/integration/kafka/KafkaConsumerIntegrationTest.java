@@ -59,7 +59,7 @@ public class KafkaConsumerIntegrationTest extends IntegrationTestBase {
                 .withBody(fromObjectToString(passenger)))
         );
 
-        var acceptRideMessage = getAcceptRideMessage(DEFAULT_ID);
+        var acceptRideMessage = getAcceptRideMessage(DEFAULT_DRIVER_ID);
 
         ProducerRecord<String, Object> record = new ProducerRecord<>(
                 ACCEPT_RIDE_TOPIC_NAME,

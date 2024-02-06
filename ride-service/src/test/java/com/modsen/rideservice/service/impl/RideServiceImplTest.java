@@ -109,17 +109,17 @@ public class RideServiceImplTest {
 
         doReturn(ridesPage)
                 .when(rideRepository)
-                .findAllByDriverIdAndStatus(DEFAULT_ID, RideStatus.FINISHED, pageRequest);
+                .findAllByDriverIdAndStatus(DEFAULT_DRIVER_ID, RideStatus.FINISHED, pageRequest);
         doReturn(rideResponseList)
                 .when(rideMapper)
                 .fromEntityListToResponseList(retrievedRides);
 
         // act
-        var actual = rideService.getRidesByDriverId(DEFAULT_ID, VALID_PAGE, VALID_SIZE, VALID_ORDER_BY);
+        var actual = rideService.getRidesByDriverId(DEFAULT_DRIVER_ID, VALID_PAGE, VALID_SIZE, VALID_ORDER_BY);
 
         // assert
         assertThat(actual).isEqualTo(expected);
-        verify(rideRepository).findAllByDriverIdAndStatus(DEFAULT_ID, RideStatus.FINISHED, pageRequest);
+        verify(rideRepository).findAllByDriverIdAndStatus(DEFAULT_DRIVER_ID, RideStatus.FINISHED, pageRequest);
         verify(rideMapper).fromEntityListToResponseList(retrievedRides);
     }
 
@@ -129,7 +129,7 @@ public class RideServiceImplTest {
         // act and assert
         assertThrows(
                 InvalidRequestParamException.class,
-                () -> rideService.getRidesByDriverId(DEFAULT_ID, page, size, orderBy)
+                () -> rideService.getRidesByDriverId(DEFAULT_DRIVER_ID, page, size, orderBy)
         );
     }
 
@@ -148,17 +148,17 @@ public class RideServiceImplTest {
 
         doReturn(ridesPage)
                 .when(rideRepository)
-                .findAllByPassengerIdAndStatus(DEFAULT_ID, RideStatus.FINISHED, pageRequest);
+                .findAllByPassengerIdAndStatus(DEFAULT_PASSENGER_ID, RideStatus.FINISHED, pageRequest);
         doReturn(rideResponseList)
                 .when(rideMapper)
                 .fromEntityListToResponseList(retrievedRides);
 
         // act
-        var actual = rideService.getRidesByPassengerId(DEFAULT_ID, VALID_PAGE, VALID_SIZE, VALID_ORDER_BY);
+        var actual = rideService.getRidesByPassengerId(DEFAULT_PASSENGER_ID, VALID_PAGE, VALID_SIZE, VALID_ORDER_BY);
 
         // assert
         assertThat(actual).isEqualTo(expected);
-        verify(rideRepository).findAllByPassengerIdAndStatus(DEFAULT_ID, RideStatus.FINISHED, pageRequest);
+        verify(rideRepository).findAllByPassengerIdAndStatus(DEFAULT_PASSENGER_ID, RideStatus.FINISHED, pageRequest);
         verify(rideMapper).fromEntityListToResponseList(retrievedRides);
     }
 
@@ -168,7 +168,7 @@ public class RideServiceImplTest {
         // act and assert
         assertThrows(
                 InvalidRequestParamException.class,
-                () -> rideService.getRidesByPassengerId(DEFAULT_ID, page, size, orderBy)
+                () -> rideService.getRidesByPassengerId(DEFAULT_PASSENGER_ID, page, size, orderBy)
         );
     }
 
@@ -295,7 +295,7 @@ public class RideServiceImplTest {
         // arrange
         var ride = getCreatedRide();
         var passengerResponse = getPassengerResponse();
-        var acceptRideMessage = getAcceptRideMessage(DEFAULT_ID);
+        var acceptRideMessage = getAcceptRideMessage(DEFAULT_DRIVER_ID);
         var rideStatusMessage = getRideStatusMessage(RideStatus.ACCEPTED);
 
         doReturn(Optional.of(ride))
@@ -359,7 +359,7 @@ public class RideServiceImplTest {
     @Test
     void acceptRide_shouldThrowRideNotFoundException_whenRideNotExist() {
         // arrange
-        var acceptRideMessage = getAcceptRideMessage(DEFAULT_ID);
+        var acceptRideMessage = getAcceptRideMessage(DEFAULT_DRIVER_ID);
         doReturn(Optional.empty())
                 .when(rideRepository)
                 .findById(DEFAULT_ID);
@@ -435,7 +435,7 @@ public class RideServiceImplTest {
                 .when(rideRepository)
                 .findById(DEFAULT_ID);
 
-        // act an assert
+        // act and assert
         assertThrows(
                 RideNotFoundException.class,
                 () -> rideService.startRide(DEFAULT_ID)

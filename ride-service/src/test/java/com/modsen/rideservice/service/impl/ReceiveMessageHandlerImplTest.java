@@ -23,7 +23,7 @@ public class ReceiveMessageHandlerImplTest {
     @Test
     void handleAcceptRideMessage_shouldCallAcceptRideMethod() {
         // arrange
-        var acceptRideMessage = getAcceptRideMessage(DEFAULT_ID);
+        var acceptRideMessage = getAcceptRideMessage(DEFAULT_DRIVER_ID);
 
         // act
         receiveMessageHandler.handleAcceptRideMessage(acceptRideMessage);

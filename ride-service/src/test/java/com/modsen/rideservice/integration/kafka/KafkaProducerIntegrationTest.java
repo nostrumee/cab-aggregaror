@@ -85,7 +85,7 @@ public class KafkaProducerIntegrationTest extends IntegrationTestBase {
 
     @Test
     void acceptRide_shouldSendAcceptedRideStatusMessageToRideStatusTopic() {
-        var acceptRideMessage = getAcceptRideMessage(DEFAULT_ID);
+        var acceptRideMessage = getAcceptRideMessage(DEFAULT_DRIVER_ID);
         rideService.acceptRide(acceptRideMessage);
 
         await()

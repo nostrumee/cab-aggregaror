@@ -23,10 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -176,7 +173,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
     @Test
     void getDriverRideHistory_shouldReturnRidePageResponseWithDriverFinishedRides() {
         var ridesPage = rideRepository.findAllByDriverIdAndStatus(
-                DEFAULT_ID, RideStatus.FINISHED,
+                DEFAULT_DRIVER_ID, RideStatus.FINISHED,
                 PageRequest.of(VALID_PAGE - 1, VALID_SIZE, Sort.by(VALID_ORDER_BY))
         );
         var rides = rideMapper.fromEntityListToResponseList(ridesPage.getContent());
@@ -207,7 +204,7 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
     @Test
     void getPassengerRideHistory_shouldReturnRidePageResponseWithPassengerFinishedRides() {
         var ridesPage = rideRepository.findAllByPassengerIdAndStatus(
-                DEFAULT_ID, RideStatus.FINISHED,
+                DEFAULT_PASSENGER_ID, RideStatus.FINISHED,
                 PageRequest.of(VALID_PAGE - 1, VALID_SIZE, Sort.by(VALID_ORDER_BY))
         );
         var rides = rideMapper.fromEntityListToResponseList(ridesPage.getContent());
@@ -331,12 +328,11 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
 
     @Test
     void createRide_shouldReturnBadRequestResponse_whenDataNotValid() {
-        String passengerIdValidationMessage = messageService.getMessage(PASSENGER_ID_VALIDATION_MESSAGE_KEY);
         String startPointValidationMessage = messageService.getMessage(START_POINT_VALIDATION_MESSAGE_KEY);
         String destinationPointValidationMessage = messageService.getMessage(DESTINATION_POINT_VALIDATION_MESSAGE_KEY);
 
         var createRequest = CreateRideRequest.builder()
-                .passengerId(INVALID_PASSENGER_ID)
+                .passengerId(DEFAULT_PASSENGER_ID)
                 .startPoint(null)
                 .destinationPoint(null)
                 .build();
@@ -345,7 +341,6 @@ public class RideControllerIntegrationTest extends IntegrationTestBase {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(VALIDATION_FAILED_MESSAGE)
                 .errors(Map.of(
-                        PASSENGER_ID_FIELD_NAME, passengerIdValidationMessage,
                         START_POINT_FIELD_NAME, startPointValidationMessage,
                         DESTINATION_POINT_FIELD_NAME, destinationPointValidationMessage
                 ))

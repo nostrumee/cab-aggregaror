@@ -26,6 +26,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.modsen.rideservice.util.ErrorMessages.*;
 import static com.modsen.rideservice.util.TestUtils.*;
@@ -115,25 +116,25 @@ public class RideServiceStepDefinitions {
         assertThat(actual).isEqualTo(expected);
     }
 
-    @Given("A passenger with id {long} exists")
-    public void passengerWithIdExists(long id) {
+    @Given("A passenger with id {string} exists")
+    public void passengerWithIdExists(String id) {
         var expected = getPassengerResponse();
 
         doReturn(expected)
                 .when(passengerClient)
-                .getPassengerById(id);
+                .getPassengerById(UUID.fromString(id));
 
 
-        var actual = passengerService.getPassengerById(id);
+        var actual = passengerService.getPassengerById(UUID.fromString(id));
         assertThat(actual).isEqualTo(expected);
     }
 
-    @When("A create request with passenger id {long}, start point {string}, destination point {string} passed to createRide method")
-    public void createRequestPassedToCreateRideMethod(long id, String startPoint, String destinationPoint) {
+    @When("A create request with passenger id {string}, start point {string}, destination point {string} passed to createRide method")
+    public void createRequestPassedToCreateRideMethod(String id, String startPoint, String destinationPoint) {
         var rideToSave = getNotSavedRide();
         var savedRide = getCreatedRide();
         var createRequest = CreateRideRequest.builder()
-                .passengerId(id)
+                .passengerId(UUID.fromString(id))
                 .startPoint(startPoint)
                 .destinationPoint(destinationPoint)
                 .build();;
@@ -157,11 +158,11 @@ public class RideServiceStepDefinitions {
         assertThat(rideResponse).isEqualTo(expected);
     }
 
-    @Given("Driver with id {long} assigned to a ride with id {long}")
-    public void driverAssignedToRide(long driverId, long rideId) {
+    @Given("Driver with id {string} assigned to a ride with id {long}")
+    public void driverAssignedToRide(String driverId, long rideId) {
         acceptRideMessage = AcceptRideMessage.builder()
                 .rideId(rideId)
-                .driverId(driverId)
+                .driverId(UUID.fromString(driverId))
                 .build();
         ride = getCreatedRide();
 
@@ -228,7 +229,7 @@ public class RideServiceStepDefinitions {
                 .fromEntityToResponse(ride);
         doReturn(getPassengerResponse())
                 .when(passengerClient)
-                .getPassengerById(DEFAULT_ID);
+                .getPassengerById(DEFAULT_PASSENGER_ID);
 
         try {
             rideResponse = rideService.startRide(id);
@@ -245,7 +246,7 @@ public class RideServiceStepDefinitions {
                 .fromEntityToResponse(ride);
         doReturn(getPassengerResponse())
                 .when(passengerClient)
-                .getPassengerById(DEFAULT_ID);
+                .getPassengerById(DEFAULT_PASSENGER_ID);
 
         try {
             rideResponse = rideService.finishRide(id);

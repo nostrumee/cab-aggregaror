@@ -39,6 +39,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.modsen.rideservice.util.ErrorMessages.*;
@@ -78,7 +79,7 @@ public class RideServiceImpl implements RideService {
 
     @Override
     @Transactional(readOnly = true)
-    public RidePageResponse getRidesByDriverId(long driverId, int page, int size, String orderBy) {
+    public RidePageResponse getRidesByDriverId(UUID driverId, int page, int size, String orderBy) {
         log.info("Retrieving rides for driver with id {}", driverId);
 
         PageRequest pageRequest = getPageRequest(page, size, orderBy);
@@ -99,7 +100,7 @@ public class RideServiceImpl implements RideService {
 
     @Override
     @Transactional(readOnly = true)
-    public RidePageResponse getRidesByPassengerId(long passengerId, int page, int size, String orderBy) {
+    public RidePageResponse getRidesByPassengerId(UUID passengerId, int page, int size, String orderBy) {
         log.info("Retrieving rides for passenger with id {}", passengerId);
 
         PageRequest pageRequest = getPageRequest(page, size, orderBy);
@@ -124,6 +125,7 @@ public class RideServiceImpl implements RideService {
         log.info("Retrieving ride by id {}", id);
 
         Ride ride = findRideById(id);
+
         return rideMapper.fromEntityToResponse(ride);
     }
 
@@ -205,8 +207,6 @@ public class RideServiceImpl implements RideService {
         return rideMapper.fromEntityToResponse(startedRide);
     }
 
-
-
     @Override
     @Transactional
     public RideResponse finishRide(long id) {
@@ -258,7 +258,7 @@ public class RideServiceImpl implements RideService {
         }
 
         try {
-            long driverId = ride.getDriverId();
+            UUID driverId = ride.getDriverId();
             return driverService.getDriverById(driverId);
         } catch (CallNotPermittedException e) {
             log.error("Driver service unavailable. Reason: {}", e.getMessage());

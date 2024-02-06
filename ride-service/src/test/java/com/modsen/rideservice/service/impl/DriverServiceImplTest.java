@@ -29,14 +29,14 @@ public class DriverServiceImplTest {
         var expected = getDriverResponse();
         doReturn(expected)
                 .when(driverClient)
-                .getDriverById(DEFAULT_ID);
+                .getDriverById(DEFAULT_DRIVER_ID);
 
         // act
-        var actual = driverService.getDriverById(DEFAULT_ID);
+        var actual = driverService.getDriverById(DEFAULT_DRIVER_ID);
 
         // assert
         assertThat(actual).isEqualTo(expected);
-        verify(driverClient).getDriverById(DEFAULT_ID);
+        verify(driverClient).getDriverById(DEFAULT_DRIVER_ID);
     }
 
     @Test
@@ -44,13 +44,13 @@ public class DriverServiceImplTest {
         // arrange
         doThrow(DriverNotFoundException.class)
                 .when(driverClient)
-                .getDriverById(DEFAULT_ID);
+                .getDriverById(DEFAULT_DRIVER_ID);
 
         // act and assert
         assertThrows(
                 DriverNotFoundException.class,
-                () -> driverService.getDriverById(DEFAULT_ID)
+                () -> driverService.getDriverById(DEFAULT_DRIVER_ID)
         );
-        verify(driverClient).getDriverById(DEFAULT_ID);
+        verify(driverClient).getDriverById(DEFAULT_DRIVER_ID);
     }
 }

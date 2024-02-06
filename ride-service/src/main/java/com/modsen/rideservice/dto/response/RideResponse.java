@@ -13,6 +13,7 @@ import lombok.NonNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Schema(description = "Ride response")
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -24,10 +25,10 @@ public record RideResponse(
 
         @Schema(name = "Passenger id", example = "1")
         @NonNull
-        Long passengerId,
+        UUID passengerId,
 
         @Schema(name = "Driver id", example = "1")
-        Long driverId,
+        UUID driverId,
 
         @Schema(name = "Start point", example = "Yakuba Kolasa Street, 36")
         @NonNull

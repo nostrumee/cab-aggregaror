@@ -2,7 +2,9 @@ package com.modsen.rideservice.service;
 
 import com.modsen.rideservice.dto.response.PassengerResponse;
 
+import java.util.UUID;
+
 public interface PassengerService {
 
-    PassengerResponse getPassengerById(long id);
+    PassengerResponse getPassengerById(UUID id);
 }

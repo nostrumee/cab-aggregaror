@@ -5,4 +5,6 @@
 
     <include file="changeset/v3-ride-uuid-schema.xml" relativeToChangelogFile="true"/>
 
+    <include file="changeset/v3-ride-init.xml" relativeToChangelogFile="true"/>
+
 </databaseChangeLog>
