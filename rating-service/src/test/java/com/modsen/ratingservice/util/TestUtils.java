@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 import static com.modsen.ratingservice.util.ErrorMessages.VALIDATION_FAILED_MESSAGE;
 import static com.modsen.ratingservice.util.UriPaths.RIDE_SERVICE_BASE_PATH;
@@ -34,6 +35,8 @@ import static com.modsen.ratingservice.util.UriPaths.RIDE_SERVICE_BASE_PATH;
 public final class TestUtils {
 
     public static final long DEFAULT_ID = 1L;
+    public static final UUID DEFAULT_PASSENGER_ID = UUID.fromString("d6f3c9d1-de66-45ee-beb9-f371fa3a6378");
+    public static final UUID DEFAULT_DRIVER_ID = UUID.fromString("d3849c45-a4f6-4e2a-8289-6b662076fabf");
     public static final int DEFAULT_RATING = 3;
     public static BigDecimal UPDATED_RATING = new BigDecimal("3.0");
 
@@ -77,8 +80,8 @@ public final class TestUtils {
 
     public static RideResponse getRideResponse(RideStatus status) {
         return RideResponse.builder()
-                .passengerId(DEFAULT_ID)
-                .driverId(DEFAULT_ID)
+                .passengerId(DEFAULT_PASSENGER_ID)
+                .driverId(DEFAULT_DRIVER_ID)
                 .status(status)
                 .build();
     }
@@ -87,7 +90,7 @@ public final class TestUtils {
         return PassengerRating.builder()
                 .id(DEFAULT_ID)
                 .rideId(DEFAULT_ID)
-                .passengerId(DEFAULT_ID)
+                .passengerId(DEFAULT_PASSENGER_ID)
                 .rating(DEFAULT_RATING)
                 .build();
     }
@@ -96,21 +99,21 @@ public final class TestUtils {
         return DriverRating.builder()
                 .id(DEFAULT_ID)
                 .rideId(DEFAULT_ID)
-                .driverId(DEFAULT_ID)
+                .driverId(DEFAULT_DRIVER_ID)
                 .rating(DEFAULT_RATING)
                 .build();
     }
 
     public static PassengerRatingMessage getPassengerRatingMessage() {
         return PassengerRatingMessage.builder()
-                .passengerId(DEFAULT_ID)
+                .passengerId(DEFAULT_PASSENGER_ID)
                 .rating(3.0)
                 .build();
     }
 
     public static DriverRatingMessage getDriverRatingMessage() {
         return DriverRatingMessage.builder()
-                .driverId(DEFAULT_ID)
+                .driverId(DEFAULT_DRIVER_ID)
                 .rating(3.0)
                 .build();
     }

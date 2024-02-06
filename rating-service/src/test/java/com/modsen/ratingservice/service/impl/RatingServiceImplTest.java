@@ -102,7 +102,7 @@ public class RatingServiceImplTest {
     }
 
     @Test
-    void rateDriver_shouldSaveAndUpdatePassengerRating_whenRideExistsAndHasValidStatus() {
+    void rateDriver_shouldSaveAndUpdateDriverRating_whenRideExistsAndHasValidStatus() {
         // arrange
         var ratingRequest = getDriverRatingRequest();
         var rideResponse = getRideResponse(RideStatus.FINISHED);

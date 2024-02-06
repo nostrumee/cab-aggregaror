@@ -7,6 +7,7 @@ import com.modsen.ratingservice.exception.RideNotFoundException;
 import com.modsen.ratingservice.exception.ServiceUnavailableException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -80,4 +81,14 @@ public class ControllerAdvice {
                 .message(e.getMessage())
                 .build();
     }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleAccessDenied(AccessDeniedException e) {
+        return ErrorResponse.builder()
+                .status(HttpStatus.FORBIDDEN.value())
+                .message(ACCESS_DENIED_MESSAGE)
+                .build();
+    }
 }
+

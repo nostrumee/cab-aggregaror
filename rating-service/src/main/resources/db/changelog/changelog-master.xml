@@ -17,4 +17,10 @@
         <tagDatabase tag="v.1.0"/>
     </changeSet>
 
+    <include file="v2/v2-accumulate-changelog.xml" relativeToChangelogFile="true"/>
+
+    <changeSet id="6" author="Eduard Klygunov">
+        <tagDatabase tag="v.1.0"/>
+    </changeSet>
+
 </databaseChangeLog>

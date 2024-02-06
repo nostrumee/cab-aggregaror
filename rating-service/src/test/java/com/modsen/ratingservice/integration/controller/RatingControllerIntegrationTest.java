@@ -9,7 +9,6 @@ import com.modsen.ratingservice.integration.IntegrationTestBase;
 import com.modsen.ratingservice.repository.DriverRatingRepository;
 import com.modsen.ratingservice.repository.PassengerRatingRepository;
 import com.modsen.ratingservice.service.MessageService;
-import com.modsen.ratingservice.service.RatingService;
 import com.modsen.ratingservice.service.SendMessageHandler;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.AfterEach;

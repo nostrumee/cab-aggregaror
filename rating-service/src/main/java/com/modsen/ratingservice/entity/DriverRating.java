@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -22,7 +24,7 @@ public class DriverRating {
 
     private Long rideId;
 
-    private Long driverId;
+    private UUID driverId;
 
     private Integer rating;
 }

@@ -6,6 +6,7 @@ import jakarta.persistence.Query;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import static com.modsen.ratingservice.util.Queries.*;
 
@@ -15,7 +16,7 @@ public class PassengerRatingRepositoryImpl {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public BigDecimal findPassengerRating(long passengerId) {
+    public BigDecimal findPassengerRating(UUID passengerId) {
         Query query = entityManager.createQuery(FIND_PASSENGER_RATING_QUERY)
                 .setParameter("passengerId", passengerId);
         return BigDecimal.valueOf((Double) query.getSingleResult());

@@ -19,11 +19,15 @@ import com.modsen.ratingservice.service.SendMessageHandler;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.UUID;
 
 import static com.modsen.ratingservice.util.ErrorMessages.*;
 
@@ -80,9 +84,17 @@ public class RatingServiceImpl implements RatingService {
         try {
             RideResponse rideResponse = rideService.getRideById(rideId);
 
+            Authentication authentication = SecurityContextHolder.getContext()
+                    .getAuthentication();
+            UUID userId = UUID.fromString(authentication.getName());
+
+            if (!userId.equals(rideResponse.driverId()) && !userId.equals(rideResponse.passengerId())) {
+                throw new AccessDeniedException(ACCESS_DENIED_MESSAGE);
+            }
+
             if (rideResponse.status() == null) {
                 log.error("Ride service currently unavailable");
-                throw new ServiceUnavailableException(RIDE_SERVICE_UNAVAILABLE);
+                throw new ServiceUnavailableException(RIDE_SERVICE_UNAVAILABLE_MESSAGE);
             } else if (!rideResponse.status().equals(RideStatus.FINISHED)) {
                 log.error("Ride order with id {} is not finished yet", rideId);
                 throw new InvalidRideStatusException(RideStatus.FINISHED.name());
@@ -91,7 +103,7 @@ public class RatingServiceImpl implements RatingService {
             return rideResponse;
         } catch (CallNotPermittedException e) {
             log.error("Ride service unavailable. Reason: {}", e.getMessage());
-            throw new ServiceUnavailableException(RIDE_SERVICE_UNAVAILABLE);
+            throw new ServiceUnavailableException(RIDE_SERVICE_UNAVAILABLE_MESSAGE);
         }
     }
 }

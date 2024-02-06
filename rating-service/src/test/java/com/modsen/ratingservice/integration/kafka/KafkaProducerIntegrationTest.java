@@ -64,9 +64,9 @@ public class KafkaProducerIntegrationTest extends IntegrationTestBase {
         var ratingRequest = getDriverRatingRequest();
         ratingService.rateDriver(ratingRequest);
 
-        var averageRating = driverRatingRepository.findDriverRating(DEFAULT_ID);
+        var averageRating = driverRatingRepository.findDriverRating(DEFAULT_DRIVER_ID);
         var expected = DriverRatingMessage.builder()
-                .driverId(DEFAULT_ID)
+                .driverId(DEFAULT_DRIVER_ID)
                 .rating(averageRating.setScale(2, RoundingMode.HALF_UP).doubleValue())
                 .build();
 
@@ -90,9 +90,9 @@ public class KafkaProducerIntegrationTest extends IntegrationTestBase {
         var ratingRequest = getPassengerRatingRequest();
         ratingService.ratePassenger(ratingRequest);
 
-        var averageRating = passengerRatingRepository.findPassengerRating(DEFAULT_ID);
+        var averageRating = passengerRatingRepository.findPassengerRating(DEFAULT_PASSENGER_ID);
         var expected = PassengerRatingMessage.builder()
-                .passengerId(DEFAULT_ID)
+                .passengerId(DEFAULT_PASSENGER_ID)
                 .rating(averageRating.setScale(2, RoundingMode.HALF_UP).doubleValue())
                 .build();
 

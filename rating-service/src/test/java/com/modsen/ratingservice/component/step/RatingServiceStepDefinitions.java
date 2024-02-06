@@ -60,8 +60,8 @@ public class RatingServiceStepDefinitions {
     @Given("Ride with id {long} exists and has {string} status")
     public void rideExistsWithIdAndStatus(long id, String status) {
         rideResponse = RideResponse.builder()
-                .passengerId(DEFAULT_ID)
-                .driverId(DEFAULT_ID)
+                .passengerId(DEFAULT_PASSENGER_ID)
+                .driverId(DEFAULT_DRIVER_ID)
                 .status(RideStatus.valueOf(status))
                 .build();
         doReturn(rideResponse)
@@ -98,7 +98,7 @@ public class RatingServiceStepDefinitions {
 
     @When("A driver rating request with ride id {long} and rating {int} passed to rateDriver method")
     public void driverRatingRequestPassedToRateDriverMethod(long rideId, int rating) {
-        var ratingRequest = DriverRatingRequest.builder()
+        var ratingRequest = PassengerRatingRequest.builder()
                 .rideId(rideId)
                 .rating(rating)
                 .build();
@@ -108,15 +108,14 @@ public class RatingServiceStepDefinitions {
                 .when(ratingMapper)
                 .fromRideResponseAndRatingRequest(rideResponse, ratingRequest);
         doReturn(UPDATED_RATING)
-                .when(driverRatingRepository)
-                .findDriverRating(rideResponse.passengerId());
+                .when(passengerRatingRepository)
+                .findPassengerRating(rideResponse.driverId());
 
         try {
-            ratingService.rateDriver(ratingRequest);
+            ratingService.ratePassenger(ratingRequest);
         } catch (InvalidRideStatusException e) {
             exception = e;
         }
-
     }
 
     @Then("A new driver rating saved to the database")

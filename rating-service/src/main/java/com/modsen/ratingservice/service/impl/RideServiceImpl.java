@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -28,8 +30,8 @@ public class RideServiceImpl implements RideService {
         log.info("Fallback response from passenger service. Reason: {}", exception.getMessage());
 
         return RideResponse.builder()
-                .driverId(0L)
-                .passengerId(0L)
+                .driverId(new UUID(0, 0))
+                .passengerId(new UUID(0, 0))
                 .build();
     }
 }
