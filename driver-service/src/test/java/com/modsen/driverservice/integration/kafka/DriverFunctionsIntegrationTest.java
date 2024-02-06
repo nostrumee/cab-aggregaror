@@ -40,7 +40,7 @@ public class DriverFunctionsIntegrationTest extends IntegrationTestBase {
     @Test
     void updateDriverRating_shouldUpdateDriverRating_whenMessageConsumed() {
         var ratingMessage = DriverRatingMessage.builder()
-                .driverId(DEFAULT_ID)
+                .driverId(DEFAULT_EXTERNAL_ID)
                 .rating(OTHER_RATING)
                 .build();
         ProducerRecord<String, Object> record = new ProducerRecord<>(
@@ -53,7 +53,7 @@ public class DriverFunctionsIntegrationTest extends IntegrationTestBase {
                 .pollInterval(Duration.ofSeconds(3))
                 .atMost(10, SECONDS)
                 .untilAsserted(() -> {
-                    var driver = driverRepository.findById(ratingMessage.driverId()).get();
+                    var driver = driverRepository.findByExternalId(ratingMessage.driverId()).get();
                     var actual = driver.getRating();
                     assertThat(actual).isEqualTo(ratingMessage.rating());
                 });
@@ -62,7 +62,7 @@ public class DriverFunctionsIntegrationTest extends IntegrationTestBase {
     @Test
     void updateDriverStatus_shouldUpdateDriverStatus_whenMessageConsumed() {
         var statusMessage = DriverStatusMessage.builder()
-                .driverId(DEFAULT_ID)
+                .driverId(DEFAULT_EXTERNAL_ID)
                 .status(DriverStatus.UNAVAILABLE)
                 .build();
         ProducerRecord<String, Object> record = new ProducerRecord<>(
@@ -75,7 +75,7 @@ public class DriverFunctionsIntegrationTest extends IntegrationTestBase {
                 .pollInterval(Duration.ofSeconds(3))
                 .atMost(10, SECONDS)
                 .untilAsserted(() -> {
-                    var driver = driverRepository.findById(statusMessage.driverId()).get();
+                    var driver = driverRepository.findByExternalId(statusMessage.driverId()).get();
                     var actual = driver.getStatus();
                     assertThat(actual).isEqualTo(statusMessage.status());
                 });

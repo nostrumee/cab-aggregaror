@@ -57,7 +57,7 @@ spring:
             scope: openid,roles
         provider:
           keycloak:
-            issuer-uri: http://localhost:8080/realms/CabAggregator
+            issuer-uri: http://localhost:8080/realms/cab-aggregator
 
 springdoc:
   api-docs:

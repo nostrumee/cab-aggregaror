@@ -25,12 +25,14 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 
 import static com.modsen.driverservice.util.KafkaTypeMappings.JSON_DESERIALIZER_TYPE_MAPPINGS;
 
 @UtilityClass
 public class TestUtils {
     public final long DEFAULT_ID = 1L;
+    public final UUID DEFAULT_EXTERNAL_ID = UUID.fromString("d3849c45-a4f6-4e2a-8289-6b662076fabf");
     public final String DEFAULT_FIRST_NAME = "John";
     public final String DEFAULT_LAST_NAME = "Doe";
     public final String DEFAULT_LICENCE_NUMBER = "123456789";
@@ -40,6 +42,7 @@ public class TestUtils {
     public final DriverStatus DEFAULT_STATUS = DriverStatus.AVAILABLE;
 
     public final long OTHER_ID = 11L;
+    public final UUID OTHER_EXTERNAL_ID = UUID.fromString("02a7aaaa-0e7e-4596-adf5-a8e00fbce29f");
     public final String OTHER_FIRST_NAME = "Amber";
     public final String OTHER_LAST_NAME = "Lewis";
     public final String OTHER_LICENCE_NUMBER = "111222333";
@@ -93,6 +96,7 @@ public class TestUtils {
     public Driver getDefaultDriver() {
         return Driver.builder()
                 .id(DEFAULT_ID)
+                .externalId(DEFAULT_EXTERNAL_ID)
                 .firstName(DEFAULT_FIRST_NAME)
                 .lastName(DEFAULT_LAST_NAME)
                 .licenceNumber(DEFAULT_LICENCE_NUMBER)
@@ -106,6 +110,7 @@ public class TestUtils {
     public Driver getOtherDriver() {
         return Driver.builder()
                 .id(OTHER_ID)
+                .externalId(OTHER_EXTERNAL_ID)
                 .firstName(OTHER_FIRST_NAME)
                 .lastName(OTHER_LAST_NAME)
                 .licenceNumber(OTHER_LICENCE_NUMBER)
@@ -118,8 +123,6 @@ public class TestUtils {
 
     public Driver getNotSavedDriver() {
         return Driver.builder()
-                .firstName(DEFAULT_FIRST_NAME)
-                .lastName(DEFAULT_LAST_NAME)
                 .licenceNumber(DEFAULT_LICENCE_NUMBER)
                 .email(DEFAULT_EMAIL)
                 .phone(DEFAULT_PHONE)
@@ -129,6 +132,7 @@ public class TestUtils {
     public DriverResponse getDefaultDriverResponse() {
         return DriverResponse.builder()
                 .id(DEFAULT_ID)
+                .externalId(DEFAULT_EXTERNAL_ID)
                 .firstName(DEFAULT_FIRST_NAME)
                 .lastName(DEFAULT_LAST_NAME)
                 .licenceNumber(DEFAULT_LICENCE_NUMBER)
@@ -142,6 +146,7 @@ public class TestUtils {
     public DriverResponse getOtherDriverResponse() {
         return DriverResponse.builder()
                 .id(OTHER_ID)
+                .externalId(OTHER_EXTERNAL_ID)
                 .firstName(OTHER_FIRST_NAME)
                 .lastName(OTHER_LAST_NAME)
                 .licenceNumber(OTHER_LICENCE_NUMBER)
@@ -155,6 +160,7 @@ public class TestUtils {
     public DriverResponse getUpdatedDriverResponse() {
         return DriverResponse.builder()
                 .id(DEFAULT_ID)
+                .externalId(DEFAULT_EXTERNAL_ID)
                 .firstName(DEFAULT_FIRST_NAME)
                 .lastName(DEFAULT_LAST_NAME)
                 .licenceNumber(OTHER_LICENCE_NUMBER)
@@ -187,14 +193,14 @@ public class TestUtils {
 
     public DriverRatingMessage getDriverRatingMessage() {
         return DriverRatingMessage.builder()
-                .driverId(DEFAULT_ID)
+                .driverId(DEFAULT_EXTERNAL_ID)
                 .rating(OTHER_RATING)
                 .build();
     }
 
     public DriverStatusMessage getDriverStatusMessage() {
         return DriverStatusMessage.builder()
-                .driverId(DEFAULT_ID)
+                .driverId(DEFAULT_EXTERNAL_ID)
                 .status(DriverStatus.UNAVAILABLE)
                 .build();
     }
@@ -202,7 +208,7 @@ public class TestUtils {
     public AcceptRideMessage getAcceptRideMessage() {
         return AcceptRideMessage.builder()
                 .rideId(DEFAULT_ID)
-                .driverId(DEFAULT_ID)
+                .driverId(DEFAULT_EXTERNAL_ID)
                 .build();
     }
 

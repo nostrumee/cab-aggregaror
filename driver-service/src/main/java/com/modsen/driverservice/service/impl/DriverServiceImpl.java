@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,7 +65,7 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     @Transactional(readOnly = true)
-    public DriverResponse getById(long id) {
+    public DriverResponse getById(UUID id) {
         log.info("Retrieving driver by id {}", id);
 
         Driver driver = findDriverById(id);
@@ -73,12 +74,14 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     @Transactional
-    public DriverResponse addDriver(CreateDriverRequest createRequest) {
+    public DriverResponse addDriver(CreateDriverRequest createRequest, UUID externalId) {
         log.info("Adding driver");
 
         checkCreateDataUnique(createRequest);
 
         Driver driverToCreate = driverMapper.fromCreateRequestToEntity(createRequest);
+        driverToCreate.setExternalId(externalId);
+
         Driver createdDriver = driverRepository.save(driverToCreate);
 
         return driverMapper.fromEntityToResponse(createdDriver);
@@ -86,7 +89,7 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     @Transactional
-    public DriverResponse updateDriver(UpdateDriverRequest updateRequest, long id) {
+    public DriverResponse updateDriver(UpdateDriverRequest updateRequest, UUID id) {
         log.info("Updating driver with id {}", id);
 
         Driver driver = findDriverById(id);
@@ -101,7 +104,7 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     @Transactional
-    public void deleteDriver(long id) {
+    public void deleteDriver(UUID id) {
         log.info("Deleting driver with id {}", id);
 
         Driver driver = findDriverById(id);
@@ -110,7 +113,7 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     @Transactional
-    public void updateDriverStatus(long id, DriverStatus status) {
+    public void updateDriverStatus(UUID id, DriverStatus status) {
         log.info("Changing status of driver with id {}", id);
 
         Driver driver = findDriverById(id);
@@ -121,7 +124,7 @@ public class DriverServiceImpl implements DriverService {
     @Override
     @Transactional
     public void updateDriverRating(DriverRatingMessage updateRatingMessage) {
-        long id = updateRatingMessage.driverId();
+        UUID id = updateRatingMessage.driverId();
 
         log.info("Updating rating of driver with id {}", id);
 
@@ -130,8 +133,8 @@ public class DriverServiceImpl implements DriverService {
         driverRepository.save(driver);
     }
 
-    private Driver findDriverById(long id) {
-        return driverRepository.findById(id)
+    private Driver findDriverById(UUID id) {
+        return driverRepository.findByExternalId(id)
                 .orElseThrow(() -> {
                     log.error("Driver with id {} was not found", id);
                     return new DriverNotFoundException(id);

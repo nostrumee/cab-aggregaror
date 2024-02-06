@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -27,14 +28,14 @@ public class RideOrderServiceImpl implements RideOrderService {
         log.info("Searching for a driver to accept a ride order with id {}", orderMessage.rideId());
 
         List<DriverResponse> availableDrivers = driverService.getAvailableDrivers();
-        Long driverId = null;
+        UUID driverId = null;
 
         if (!availableDrivers.isEmpty()) {
             Random random = new Random();
 
             DriverResponse driver = availableDrivers.get(random.nextInt(availableDrivers.size()));
-            driverService.updateDriverStatus(driver.id(), DriverStatus.UNAVAILABLE);
-            driverId = driver.id();
+            driverService.updateDriverStatus(driver.externalId(), DriverStatus.UNAVAILABLE);
+            driverId = driver.externalId();
         }
 
         return AcceptRideMessage.builder()

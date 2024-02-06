@@ -17,6 +17,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.modsen.driverservice.util.ErrorMessages.*;
 import static com.modsen.driverservice.util.TestUtils.*;
@@ -40,47 +41,47 @@ public class DriverServiceStepDefinitions {
         this.driverService = new DriverServiceImpl(driverRepository, driverMapper);
     }
 
-    @Given("A driver with id {long} exists")
-    public void driverWithIdExists(long id) {
+    @Given("A driver with id {string} exists")
+    public void driverWithIdExists(String id) {
         var expected = getDefaultDriverResponse();
         var retrievedDriver = getDefaultDriver();
 
         doReturn(Optional.of(retrievedDriver))
                 .when(driverRepository)
-                .findById(id);
+                .findByExternalId(UUID.fromString(id));
         doReturn(expected)
                 .when(driverMapper)
                 .fromEntityToResponse(retrievedDriver);
 
-        var driver = driverRepository.findById(id);
+        var driver = driverRepository.findByExternalId(UUID.fromString(id));
         assertThat(driver.isPresent()).isEqualTo(true);
     }
 
-    @Given("A driver with id {long} doesn't exist")
-    public void driverWithIdNotExist(long id) {
-        var driver = driverRepository.findById(id);
+    @Given("A driver with id {string} doesn't exist")
+    public void driverWithIdNotExist(String id) {
+        var driver = driverRepository.findByExternalId(UUID.fromString(id));
         assertThat(driver.isPresent()).isEqualTo(false);
     }
 
-    @When("The id {long} is passed to the getById method")
-    public void idPassedToGetByIdMethod(long id) {
+    @When("The id {string} is passed to the getById method")
+    public void idPassedToGetByIdMethod(String id) {
         try {
-            driverResponse = driverService.getById(id);
+            driverResponse = driverService.getById(UUID.fromString(id));
         } catch (DriverNotFoundException e) {
             exception = e;
         }
     }
 
-    @Then("The response should contain details of the driver with id {long}")
-    public void responseContainsDriverDetails(long id) {
-        var driver = driverRepository.findById(id).get();
+    @Then("The response should contain details of the driver with id {string}")
+    public void responseContainsDriverDetails(String id) {
+        var driver = driverRepository.findByExternalId(UUID.fromString(id)).get();
         var expected = driverMapper.fromEntityToResponse(driver);
 
         assertThat(driverResponse).isEqualTo(expected);
     }
 
-    @Then("The DriverNotFoundException with the message containing id {long} should be thrown")
-    public void driverNotFoundExceptionThrown(long id) {
+    @Then("The DriverNotFoundException with the message containing id {string} should be thrown")
+    public void driverNotFoundExceptionThrown(String id) {
         var expected = String.format(NOT_FOUND_WITH_ID_MESSAGE, id);
         var actual = exception.getMessage();
 
@@ -157,7 +158,7 @@ public class DriverServiceStepDefinitions {
                 .phone(phone)
                 .build();
         try {
-            driverResponse = driverService.addDriver(createRequest);
+            driverResponse = driverService.addDriver(createRequest, DEFAULT_EXTERNAL_ID);
         } catch (DriverAlreadyExistsException e) {
             exception = e;
         }
@@ -174,25 +175,25 @@ public class DriverServiceStepDefinitions {
         assertThat(exception.getMessage()).isEqualTo(DRIVER_ALREADY_EXISTS_MESSAGE);
     }
 
-    @When("The id {long} is passed to the deleteDriver method")
-    public void idPassedToDeleteDriverMethod(long id) {
+    @When("The id {string} is passed to the deleteDriver method")
+    public void idPassedToDeleteDriverMethod(String id) {
         try {
-            driverService.deleteDriver(id);
+            driverService.deleteDriver(UUID.fromString(id));
         } catch (DriverNotFoundException e) {
             exception = e;
         }
     }
 
-    @Then("The driver with id {long} should be deleted from the database")
-    public void driverDeletedFromDatabase(long id) {
-        var driver = driverRepository.findById(id);
+    @Then("The driver with id {string} should be deleted from the database")
+    public void driverDeletedFromDatabase(String id) {
+        var driver = driverRepository.findByExternalId(UUID.fromString(id));
         verify(driverRepository).delete(driver.get());
     }
 
-    @When("The rating message with id {long} and rating {double} passed to the updateDriverRating method")
-    public void ratingMessagePassedToUpdateDriverRatingMethod(long id, double rating) {
+    @When("The rating message with id {string} and rating {double} passed to the updateDriverRating method")
+    public void ratingMessagePassedToUpdateDriverRatingMethod(String id, double rating) {
         var ratingMessage = DriverRatingMessage.builder()
-                .driverId(id)
+                .driverId(UUID.fromString(id))
                 .rating(rating)
                 .build();
 
@@ -203,10 +204,11 @@ public class DriverServiceStepDefinitions {
         }
     }
 
-    @Then("Rating of the driver with id {long} is updated to {double}")
-    public void ratingOfDriverUpdated(long id, double rating) {
+    @Then("Rating of the driver with id {string} is updated to {double}")
+    public void ratingOfDriverUpdated(String id, double rating) {
         var driver = Driver.builder()
-                .id(id)
+                .id(DEFAULT_ID)
+                .externalId(UUID.fromString(id))
                 .firstName(DEFAULT_FIRST_NAME)
                 .lastName(DEFAULT_LAST_NAME)
                 .licenceNumber(DEFAULT_LICENCE_NUMBER)
@@ -218,25 +220,26 @@ public class DriverServiceStepDefinitions {
 
         doReturn(Optional.of(driver))
                 .when(driverRepository)
-                .findById(id);
+                .findByExternalId(UUID.fromString(id));
 
-        var actual = driverRepository.findById(id).get();
+        var actual = driverRepository.findByExternalId(UUID.fromString(id)).get();
         assertThat(actual.getRating()).isEqualTo(rating);
     }
 
-    @When("The driver id {long} and status {string} passed to the updateDriverStatus method")
-    public void idAndStatusPassedToUpdateDriverStatusMethod(long id, String status) {
+    @When("The driver id {string} and status {string} passed to the updateDriverStatus method")
+    public void idAndStatusPassedToUpdateDriverStatusMethod(String id, String status) {
         try {
-            driverService.updateDriverStatus(id, DriverStatus.valueOf(status));
+            driverService.updateDriverStatus(UUID.fromString(id), DriverStatus.valueOf(status));
         } catch (DriverNotFoundException e) {
             exception = e;
         }
     }
 
-    @Then("Status of the driver with id {long} is updated to {string}")
-    public void statusOfDriverUpdated(long id, String status) {
+    @Then("Status of the driver with id {string} is updated to {string}")
+    public void statusOfDriverUpdated(String id, String status) {
         var driver = Driver.builder()
-                .id(id)
+                .id(DEFAULT_ID)
+                .externalId(UUID.fromString(id))
                 .firstName(DEFAULT_FIRST_NAME)
                 .lastName(DEFAULT_LAST_NAME)
                 .licenceNumber(DEFAULT_LICENCE_NUMBER)
@@ -248,9 +251,9 @@ public class DriverServiceStepDefinitions {
 
         doReturn(Optional.of(driver))
                 .when(driverRepository)
-                .findById(id);
+                .findByExternalId(UUID.fromString(id));
 
-        var actual = driverRepository.findById(id).get();
+        var actual = driverRepository.findByExternalId(UUID.fromString(id)).get();
         assertThat(actual.getStatus().name()).isEqualTo(status);
     }
 }

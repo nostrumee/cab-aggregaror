@@ -5,12 +5,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.NonNull;
 
+import java.util.UUID;
+
 @Schema(description = "Driver response")
 @Builder
 public record DriverResponse(
         @Schema(name = "id", example = "1")
         @NonNull
         Long id,
+
+        @Schema(name = "externalId", example = "d3849c45-a4f6-4e2a-8289-6b662076fabf")
+        @NonNull
+        UUID externalId,
 
         @Schema(name = "First name", example = "400")
         @NonNull

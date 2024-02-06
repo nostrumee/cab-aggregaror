@@ -27,7 +27,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/CabAggregator
+          issuer-uri: http://localhost:8080/realms/cab-aggregator
+          #jwk-set-uri: http://localhost:8080/realms/cab-aggregator/protocol/openid-connect/certs
 
   cloud:
     function:
