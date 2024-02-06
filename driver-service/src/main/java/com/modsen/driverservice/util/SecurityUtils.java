@@ -16,9 +16,7 @@ public final class SecurityUtils {
 
     public static final String AUTHORITIES_CLAIM_NAME = "roles";
 
-    public static final String HAS_ROLE_DRIVER_EXPRESSION = "hasRole('DRIVER')";
-
     public static final String ADMIN_ROLE_NAME = "ADMIN";
 
-    public static final String DRIVER_ROLE_NAME = "DRIVER_ROLE_NAME";
+    public static final String DRIVER_ROLE_NAME = "DRIVER";
 }
