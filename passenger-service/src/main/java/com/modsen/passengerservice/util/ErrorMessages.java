@@ -15,4 +15,5 @@ public class ErrorMessages {
             "Sorting parameter %s is invalid. Acceptable parameters are: %s";
     public final String PASSENGER_WITH_EMAIL_EXISTS_MESSAGE = "Passenger with email %s already exists";
     public final String PASSENGER_WITH_PHONE_EXISTS_MESSAGE = "Passenger with phone %s already exists";
+    public final String ACCESS_DENIED_MESSAGE = "Access denied";
 }
