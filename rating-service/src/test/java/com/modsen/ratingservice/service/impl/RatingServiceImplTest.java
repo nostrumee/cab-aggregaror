@@ -69,7 +69,7 @@ public class RatingServiceImplTest {
     }
 
     @Test
-    void ratePassenger_shouldThrowInvalidRideStatusException_whenRideExistsAndHasInalidStatus() {
+    void ratePassenger_shouldThrowInvalidRideStatusException_whenRideExistsAndHasInvalidStatus() {
         // arrange
         var ratingRequest = getPassengerRatingRequest();
         var rideResponse = getRideResponse(RideStatus.STARTED);

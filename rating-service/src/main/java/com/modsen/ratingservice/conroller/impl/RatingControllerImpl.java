@@ -7,6 +7,7 @@ import com.modsen.ratingservice.service.RatingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import static com.modsen.ratingservice.util.UriPaths.*;
@@ -20,6 +21,7 @@ public class RatingControllerImpl implements RatingController {
 
     @PostMapping(RATE_DRIVER_PATH)
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@ratingServiceSecurityExpression.canRateDriver(#ratingRequest.rideId)")
     public void rateDriver(
             @Valid @RequestBody DriverRatingRequest ratingRequest
     ) {
@@ -28,6 +30,7 @@ public class RatingControllerImpl implements RatingController {
 
     @PostMapping(RATE_PASSENGER_PATH)
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@ratingServiceSecurityExpression.canRatePassenger(#ratingRequest.rideId)")
     public void ratePassenger(
             @Valid @RequestBody PassengerRatingRequest ratingRequest
     ) {
