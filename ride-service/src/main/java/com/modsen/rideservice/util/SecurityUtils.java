@@ -20,7 +20,5 @@ public final class SecurityUtils {
 
     public static final String ADMIN_ROLE_NAME = "ADMIN";
 
-    public static final String DRIVER_ROLE_NAME = "DRIVER";
-
     public static final String PASSENGER_ROLE_NAME = "PASSENGER";
 }

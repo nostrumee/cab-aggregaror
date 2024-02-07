@@ -27,7 +27,6 @@ public class SecurityConfig {
                         .requestMatchers(OPENAPI_REQUEST_MATCHERS).permitAll()
                         .requestMatchers(HttpMethod.GET, RIDE_SERVICE_BASE_PATH).hasRole(ADMIN_ROLE_NAME)
                         .requestMatchers(HttpMethod.DELETE, RIDE_BY_ID_REQUEST_MATCHER).hasRole(ADMIN_ROLE_NAME)
-                        .requestMatchers(HttpMethod.POST, RIDE_SERVICE_BASE_PATH).hasRole(PASSENGER_ROLE_NAME)
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

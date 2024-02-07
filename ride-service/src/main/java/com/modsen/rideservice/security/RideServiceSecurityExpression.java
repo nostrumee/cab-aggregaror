@@ -11,8 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-import static com.modsen.rideservice.util.SecurityUtils.ADMIN_ROLE_NAME;
-import static com.modsen.rideservice.util.SecurityUtils.AUTHORITY_PREFIX;
+import static com.modsen.rideservice.util.SecurityUtils.*;
 
 @Service("rideServiceSecurityExpression")
 @RequiredArgsConstructor
@@ -51,6 +50,15 @@ public class RideServiceSecurityExpression {
         RideResponse ride = rideService.getById(id);
 
         return userId.equals(ride.driverId());
+    }
+
+    public boolean canCreateRide(UUID id) {
+        Authentication authentication = SecurityContextHolder.getContext()
+                .getAuthentication();
+
+        UUID userId = UUID.fromString(authentication.getName());
+
+        return id.equals(userId) && hasAnyRole(authentication, PASSENGER_ROLE_NAME);
     }
 
     private boolean hasAnyRole(Authentication authentication, String... roles) {

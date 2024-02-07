@@ -272,7 +272,6 @@ public class TestUtils {
 
     public PassengerResponse getPassengerResponse() {
         return PassengerResponse.builder()
-                .id(DEFAULT_PASSENGER_ID)
                 .firstName(FIRST_NAME)
                 .email(EMAIL)
                 .build();
