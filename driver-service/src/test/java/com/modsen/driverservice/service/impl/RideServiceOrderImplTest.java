@@ -41,7 +41,7 @@ public class RideServiceOrderImplTest {
 
         assertThat(actual.rideId()).isEqualTo(expected.rideId());
         verify(driverService).getAvailableDrivers();
-        verify(driverService).updateDriverStatus(DEFAULT_ID, DriverStatus.UNAVAILABLE);
+        verify(driverService).updateDriverStatus(DEFAULT_EXTERNAL_ID, DriverStatus.UNAVAILABLE);
     }
 
     @Test

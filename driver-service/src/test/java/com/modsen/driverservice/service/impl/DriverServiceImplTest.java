@@ -129,17 +129,17 @@ public class DriverServiceImplTest {
 
         doReturn(Optional.of(retrievedDriver))
                 .when(driverRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
         doReturn(expected)
                 .when(driverMapper)
                 .fromEntityToResponse(retrievedDriver);
 
         // act
-        var actual = driverService.getById(DEFAULT_ID);
+        var actual = driverService.getById(DEFAULT_EXTERNAL_ID);
 
         // assert
         assertThat(actual).isEqualTo(expected);
-        verify(driverRepository).findById(DEFAULT_ID);
+        verify(driverRepository).findByExternalId(DEFAULT_EXTERNAL_ID);
         verify(driverMapper).fromEntityToResponse(retrievedDriver);
     }
 
@@ -148,14 +148,14 @@ public class DriverServiceImplTest {
         // arrange
         doReturn(Optional.empty())
                 .when(driverRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
 
         // act and assert
         assertThrows(
                 DriverNotFoundException.class,
-                () -> driverService.getById(DEFAULT_ID)
+                () -> driverService.getById(DEFAULT_EXTERNAL_ID)
         );
-        verify(driverRepository).findById(DEFAULT_ID);
+        verify(driverRepository).findByExternalId(DEFAULT_EXTERNAL_ID);
     }
 
     @Test
@@ -186,7 +186,7 @@ public class DriverServiceImplTest {
                 .fromEntityToResponse(savedDriver);
 
         // act
-        var actual = driverService.addDriver(createRequest);
+        var actual = driverService.addDriver(createRequest, DEFAULT_EXTERNAL_ID);
 
         // assert
         assertThat(actual).isEqualTo(expected);
@@ -218,7 +218,7 @@ public class DriverServiceImplTest {
         // act and assert
         assertThrows(
                 DriverAlreadyExistsException.class,
-                () -> driverService.addDriver(createRequest)
+                () -> driverService.addDriver(createRequest, DEFAULT_EXTERNAL_ID)
         );
         verify(driverRepository).existsByEmail(createRequest.email());
         verify(driverRepository).existsByPhone(createRequest.phone());
@@ -243,7 +243,7 @@ public class DriverServiceImplTest {
         // act and assert
         assertThrows(
                 DriverAlreadyExistsException.class,
-                () -> driverService.addDriver(createRequest)
+                () -> driverService.addDriver(createRequest, DEFAULT_EXTERNAL_ID)
         );
         verify(driverRepository).existsByEmail(createRequest.email());
         verify(driverRepository).existsByPhone(createRequest.phone());
@@ -268,7 +268,7 @@ public class DriverServiceImplTest {
         // act and assert
         assertThrows(
                 DriverAlreadyExistsException.class,
-                () -> driverService.addDriver(createRequest)
+                () -> driverService.addDriver(createRequest, DEFAULT_EXTERNAL_ID)
         );
         verify(driverRepository).existsByEmail(createRequest.email());
         verify(driverRepository).existsByPhone(createRequest.phone());
@@ -284,7 +284,7 @@ public class DriverServiceImplTest {
 
         doReturn(Optional.of(driver))
                 .when(driverRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
         doReturn(false)
                 .when(driverRepository)
                 .existsByEmail(updateRequest.email());
@@ -299,12 +299,12 @@ public class DriverServiceImplTest {
                 .fromEntityToResponse(driver);
 
         // act
-        var actual = driverService.updateDriver(updateRequest, DEFAULT_ID);
+        var actual = driverService.updateDriver(updateRequest, DEFAULT_EXTERNAL_ID);
 
         // assert
         assertThat(actual).isEqualTo(expected);
 
-        verify(driverRepository).findById(DEFAULT_ID);
+        verify(driverRepository).findByExternalId(DEFAULT_EXTERNAL_ID);
         verify(driverRepository).existsByEmail(updateRequest.email());
         verify(driverRepository).existsByPhone(updateRequest.phone());
         verify(driverRepository).save(driver);
@@ -319,14 +319,14 @@ public class DriverServiceImplTest {
         var updateRequest = getUpdateDriverRequest();
         doReturn(Optional.empty())
                 .when(driverRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
 
         // act and assert
         assertThrows(
                 DriverNotFoundException.class,
-                () -> driverService.updateDriver(updateRequest, DEFAULT_ID)
+                () -> driverService.updateDriver(updateRequest, DEFAULT_EXTERNAL_ID)
         );
-        verify(driverRepository).findById(DEFAULT_ID);
+        verify(driverRepository).findByExternalId(DEFAULT_EXTERNAL_ID);
     }
 
     @Test
@@ -337,7 +337,7 @@ public class DriverServiceImplTest {
 
         doReturn(Optional.of(driver))
                 .when(driverRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
         doReturn(true)
                 .when(driverRepository)
                 .existsByEmail(updateRequest.email());
@@ -351,9 +351,9 @@ public class DriverServiceImplTest {
         // act and assert
         assertThrows(
                 DriverAlreadyExistsException.class,
-                () -> driverService.updateDriver(updateRequest, DEFAULT_ID)
+                () -> driverService.updateDriver(updateRequest, DEFAULT_EXTERNAL_ID)
         );
-        verify(driverRepository).findById(DEFAULT_ID);
+        verify(driverRepository).findByExternalId(DEFAULT_EXTERNAL_ID);
         verify(driverRepository).existsByEmail(OTHER_EMAIL);
         verify(driverRepository).existsByPhone(OTHER_PHONE);
     }
@@ -366,7 +366,7 @@ public class DriverServiceImplTest {
 
         doReturn(Optional.of(driver))
                 .when(driverRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
         doReturn(false)
                 .when(driverRepository)
                 .existsByEmail(updateRequest.email());
@@ -380,9 +380,9 @@ public class DriverServiceImplTest {
         // act and assert
         assertThrows(
                 DriverAlreadyExistsException.class,
-                () -> driverService.updateDriver(updateRequest, DEFAULT_ID)
+                () -> driverService.updateDriver(updateRequest, DEFAULT_EXTERNAL_ID)
         );
-        verify(driverRepository).findById(DEFAULT_ID);
+        verify(driverRepository).findByExternalId(DEFAULT_EXTERNAL_ID);
         verify(driverRepository).existsByEmail(OTHER_EMAIL);
         verify(driverRepository).existsByPhone(OTHER_PHONE);
     }
@@ -395,7 +395,7 @@ public class DriverServiceImplTest {
 
         doReturn(Optional.of(driver))
                 .when(driverRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
         doReturn(false)
                 .when(driverRepository)
                 .existsByEmail(updateRequest.email());
@@ -409,9 +409,9 @@ public class DriverServiceImplTest {
         // act and assert
         assertThrows(
                 DriverAlreadyExistsException.class,
-                () -> driverService.updateDriver(updateRequest, DEFAULT_ID)
+                () -> driverService.updateDriver(updateRequest, DEFAULT_EXTERNAL_ID)
         );
-        verify(driverRepository).findById(DEFAULT_ID);
+        verify(driverRepository).findByExternalId(DEFAULT_EXTERNAL_ID);
         verify(driverRepository).existsByEmail(OTHER_EMAIL);
         verify(driverRepository).existsByPhone(OTHER_PHONE);
     }
@@ -423,13 +423,13 @@ public class DriverServiceImplTest {
 
         doReturn(Optional.of(driver))
                 .when(driverRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
 
         // act
-        driverService.deleteDriver(DEFAULT_ID);
+        driverService.deleteDriver(DEFAULT_EXTERNAL_ID);
 
         // assert
-        verify(driverRepository).findById(DEFAULT_ID);
+        verify(driverRepository).findByExternalId(DEFAULT_EXTERNAL_ID);
         verify(driverRepository).delete(driver);
     }
 
@@ -438,14 +438,14 @@ public class DriverServiceImplTest {
         // arrange
         doReturn(Optional.empty())
                 .when(driverRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
 
         // act and assert
         assertThrows(
                 DriverNotFoundException.class,
-                () -> driverService.deleteDriver(DEFAULT_ID)
+                () -> driverService.deleteDriver(DEFAULT_EXTERNAL_ID)
         );
-        verify(driverRepository).findById(DEFAULT_ID);
+        verify(driverRepository).findByExternalId(DEFAULT_EXTERNAL_ID);
     }
 
     @Test
@@ -457,7 +457,7 @@ public class DriverServiceImplTest {
 
         doReturn(Optional.of(driver))
                 .when(driverRepository)
-                .findById(ratingMessage.driverId());
+                .findByExternalId(ratingMessage.driverId());
 
         // act
         driverService.updateDriverRating(ratingMessage);
@@ -465,7 +465,7 @@ public class DriverServiceImplTest {
         // assert
         var actual = driver.getRating();
         assertThat(actual).isEqualTo(expected);
-        verify(driverRepository).findById(ratingMessage.driverId());
+        verify(driverRepository).findByExternalId(ratingMessage.driverId());
         verify(driverRepository).save(driver);
     }
 
@@ -476,14 +476,14 @@ public class DriverServiceImplTest {
 
         doReturn(Optional.empty())
                 .when(driverRepository)
-                .findById(ratingMessage.driverId());
+                .findByExternalId(ratingMessage.driverId());
 
         // act and assert
         assertThrows(
                 DriverNotFoundException.class,
                 () -> driverService.updateDriverRating(ratingMessage)
         );
-        verify(driverRepository).findById(ratingMessage.driverId());
+        verify(driverRepository).findByExternalId(ratingMessage.driverId());
     }
 
     @Test
@@ -495,7 +495,7 @@ public class DriverServiceImplTest {
 
         doReturn(Optional.of(driver))
                 .when(driverRepository)
-                .findById(statusMessage.driverId());
+                .findByExternalId(statusMessage.driverId());
 
         // act
         driverService.updateDriverStatus(statusMessage.driverId(), statusMessage.status());
@@ -503,7 +503,7 @@ public class DriverServiceImplTest {
         // assert
         var actual = driver.getStatus();
         assertThat(actual).isEqualTo(expected);
-        verify(driverRepository).findById(statusMessage.driverId());
+        verify(driverRepository).findByExternalId(statusMessage.driverId());
         verify(driverRepository).save(driver);
     }
 
@@ -514,14 +514,14 @@ public class DriverServiceImplTest {
 
         doReturn(Optional.empty())
                 .when(driverRepository)
-                .findById(statusMessage.driverId());
+                .findByExternalId(statusMessage.driverId());
 
         // act and assert
         assertThrows(
                 DriverNotFoundException.class,
                 () -> driverService.updateDriverStatus(statusMessage.driverId(), statusMessage.status())
         );
-        verify(driverRepository).findById(statusMessage.driverId());
+        verify(driverRepository).findByExternalId(statusMessage.driverId());
     }
 
     private static Stream<Arguments> getInvalidParamsForGetDriverPageTest() {

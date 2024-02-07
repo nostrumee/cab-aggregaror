@@ -53,7 +53,7 @@ public class AcceptRideStepDefinitions {
                 .findAllByStatus(DriverStatus.AVAILABLE);
         doReturn(Optional.of(driver))
                 .when(driverRepository)
-                .findById(DEFAULT_ID);
+                .findByExternalId(DEFAULT_EXTERNAL_ID);
         doReturn(List.of(getDefaultDriverResponse()))
                 .when(driverMapper)
                 .fromEntityListToResponseList(retrievedDrivers);
@@ -86,7 +86,7 @@ public class AcceptRideStepDefinitions {
 
     @Then("Accept ride message with assigned driver id should be returned")
     public void acceptRideMessageWithDriverIdReturned() {
-        assertThat(acceptRideMessage.driverId()).isEqualTo(DEFAULT_ID);
+        assertThat(acceptRideMessage.driverId()).isEqualTo(DEFAULT_EXTERNAL_ID);
         assertThat(driver.getStatus()).isEqualTo(DriverStatus.UNAVAILABLE);
     }
 
@@ -94,6 +94,4 @@ public class AcceptRideStepDefinitions {
     public void acceptRideMessageWithoutDriverIdReturned() {
         assertThat(acceptRideMessage.driverId()).isNull();
     }
-
-
 }

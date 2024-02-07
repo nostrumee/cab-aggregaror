@@ -6,8 +6,10 @@ import com.modsen.driverservice.dto.request.UpdateDriverRequest;
 import com.modsen.driverservice.dto.response.DriverPageResponse;
 import com.modsen.driverservice.dto.response.DriverResponse;
 import com.modsen.driverservice.entity.DriverStatus;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface DriverService {
 
@@ -15,15 +17,15 @@ public interface DriverService {
 
     List<DriverResponse> getAvailableDrivers();
 
-    DriverResponse getById(long id);
+    DriverResponse getById(UUID id);
 
-    DriverResponse addDriver(CreateDriverRequest createRequest);
+    DriverResponse addDriver(CreateDriverRequest createRequest, UUID externalId);
 
-    DriverResponse updateDriver(UpdateDriverRequest updateRequest, long id);
+    DriverResponse updateDriver(UpdateDriverRequest updateRequest, UUID id);
 
-    void deleteDriver(long id);
+    void deleteDriver(UUID id);
 
-    void updateDriverStatus(long id, DriverStatus status);
+    void updateDriverStatus(UUID id, DriverStatus status);
 
     void updateDriverRating(DriverRatingMessage updateRatingMessage);
 }

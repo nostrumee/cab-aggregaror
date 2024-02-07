@@ -66,7 +66,7 @@ public class RideFunctionsIntegrationTest extends IntegrationTestBase {
                     }
 
                     var acceptRideMessage = (AcceptRideMessage) records.iterator().next().value();
-                    var driver = driverRepository.findById(acceptRideMessage.driverId()).get();
+                    var driver = driverRepository.findByExternalId(acceptRideMessage.driverId()).get();
 
                     assertThat(driver.getStatus()).isEqualTo(DriverStatus.UNAVAILABLE);
                     assertThat(acceptRideMessage.rideId()).isEqualTo(createRideMessage.rideId());

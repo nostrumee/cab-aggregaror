@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @Entity
 @AllArgsConstructor
@@ -16,6 +18,8 @@ public class Driver {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private UUID externalId;
 
     private String firstName;
 
@@ -28,8 +32,10 @@ public class Driver {
     private String phone;
 
     @Column(precision = 3, scale = 2, columnDefinition = "numeric")
+    @Builder.Default
     private Double rating = 5.0;
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private DriverStatus status = DriverStatus.AVAILABLE;
 }
