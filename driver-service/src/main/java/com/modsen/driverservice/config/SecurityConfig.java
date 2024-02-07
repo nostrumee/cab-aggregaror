@@ -12,7 +12,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.web.SecurityFilterChain;
 
 import static com.modsen.driverservice.util.SecurityUtils.*;
-import static com.modsen.driverservice.util.UriPaths.DRIVER_SERVICE_BASE_PATH;
+import static com.modsen.driverservice.util.UriPaths.*;
 
 @Configuration
 @EnableWebSecurity

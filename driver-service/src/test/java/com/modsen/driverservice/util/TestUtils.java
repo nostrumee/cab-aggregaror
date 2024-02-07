@@ -92,6 +92,13 @@ public class TestUtils {
 
     public final String POSTGRES_IMAGE_NAME = "postgres:15-alpine";
     public final String KAFKA_IMAGE_NAME = "confluentinc/cp-kafka:7.3.3";
+    public final String KEYCLOAK_IMAGE_NAME = "quay.io/keycloak/keycloak:19.0";
+
+    public final String AUTHORIZATION_HEADER_NAME = "Authorization";
+    public final String ACCESS_TOKEN_PREFIX = "Bearer ";
+    public final String REALM_IMPORT_FILE_NAME = "test-realm-config.json";
+    public final String REALM_URL = "realms/cab-aggregator";
+    public final String GET_ACCESS_TOKEN_URL = "realms/cab-aggregator/protocol/openid-connect/token";
 
     public Driver getDefaultDriver() {
         return Driver.builder()

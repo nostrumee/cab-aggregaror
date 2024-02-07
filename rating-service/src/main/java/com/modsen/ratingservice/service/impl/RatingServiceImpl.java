@@ -1,5 +1,7 @@
 package com.modsen.ratingservice.service.impl;
 
+import com.modsen.ratingservice.dto.message.DriverRatingMessage;
+import com.modsen.ratingservice.dto.message.PassengerRatingMessage;
 import com.modsen.ratingservice.dto.request.DriverRatingRequest;
 import com.modsen.ratingservice.dto.request.PassengerRatingRequest;
 import com.modsen.ratingservice.dto.response.RideResponse;
@@ -9,8 +11,6 @@ import com.modsen.ratingservice.entity.RideStatus;
 import com.modsen.ratingservice.exception.InvalidRideStatusException;
 import com.modsen.ratingservice.exception.ServiceUnavailableException;
 import com.modsen.ratingservice.mapper.RatingMapper;
-import com.modsen.ratingservice.dto.message.DriverRatingMessage;
-import com.modsen.ratingservice.dto.message.PassengerRatingMessage;
 import com.modsen.ratingservice.repository.DriverRatingRepository;
 import com.modsen.ratingservice.repository.PassengerRatingRepository;
 import com.modsen.ratingservice.service.RatingService;
@@ -19,15 +19,11 @@ import com.modsen.ratingservice.service.SendMessageHandler;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.UUID;
 
 import static com.modsen.ratingservice.util.ErrorMessages.*;
 
@@ -83,14 +79,6 @@ public class RatingServiceImpl implements RatingService {
     private RideResponse getAndCheckRideResponse(long rideId) {
         try {
             RideResponse rideResponse = rideService.getRideById(rideId);
-
-            Authentication authentication = SecurityContextHolder.getContext()
-                    .getAuthentication();
-            UUID userId = UUID.fromString(authentication.getName());
-
-            if (!userId.equals(rideResponse.driverId()) && !userId.equals(rideResponse.passengerId())) {
-                throw new AccessDeniedException(ACCESS_DENIED_MESSAGE);
-            }
 
             if (rideResponse.status() == null) {
                 log.error("Ride service currently unavailable");

@@ -11,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -71,6 +69,7 @@ public class RideControllerImpl implements RideController {
     }
 
     @PostMapping
+    @PreAuthorize("@rideServiceSecurityExpression.canCreateRide(#createRequest.passengerId)")
     public ResponseEntity<RideResponse> createRide(
             @Valid @RequestBody CreateRideRequest createRequest,
             UriComponentsBuilder uriComponentsBuilder

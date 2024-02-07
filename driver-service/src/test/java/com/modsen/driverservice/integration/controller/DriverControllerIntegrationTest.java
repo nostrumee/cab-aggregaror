@@ -1,6 +1,9 @@
 package com.modsen.driverservice.integration.controller;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.modsen.driverservice.dto.request.CreateDriverRequest;
 import com.modsen.driverservice.dto.request.UpdateDriverRequest;
 import com.modsen.driverservice.dto.response.*;
@@ -11,6 +14,7 @@ import com.modsen.driverservice.repository.DriverRepository;
 import com.modsen.driverservice.service.MessageService;
 import io.restassured.http.ContentType;
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -41,8 +45,15 @@ public class DriverControllerIntegrationTest extends IntegrationTestBase {
     private final DriverMapper driverMapper;
     private final MessageService messageService;
 
+    private static String accessToken;
+
     @LocalServerPort
     private int port;
+
+    @BeforeAll
+    static void beforeAll() {
+        accessToken = getAccessToken("isabelle", "password");
+    }
 
     @Test
     void getDriverPage_shouldReturnDriverPageResponse_whenValidParamsPassed() {
@@ -159,13 +170,16 @@ public class DriverControllerIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    void getDriverById_shouldReturnDriverResponse_whenDriverExists() {
+    void getDriverById_shouldReturnDriverResponse_whenDriverExists_andUserAuthenticated() {
         var driver = driverRepository.findById(DEFAULT_ID);
         var expected = driverMapper.fromEntityToResponse(driver.get());
 
         var actual = given()
                 .port(port)
-                .pathParam(ID_PARAM_NAME, DEFAULT_ID)
+                .header(
+                        AUTHORIZATION_HEADER_NAME, ACCESS_TOKEN_PREFIX + accessToken
+                )
+                .pathParam(ID_PARAM_NAME, DEFAULT_EXTERNAL_ID)
                 .when()
                 .get(DRIVER_SERVICE_BASE_PATH + GET_DRIVER_BY_ID_PATH)
                 .then()
@@ -174,6 +188,18 @@ public class DriverControllerIntegrationTest extends IntegrationTestBase {
                 .as(DriverResponse.class);
 
         assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void getDriverById_shouldReturnUnauthorizedStatus_whenUserNotAuthenticated() {
+        given()
+                .port(port)
+                .pathParam(ID_PARAM_NAME, DEFAULT_EXTERNAL_ID)
+                .when()
+                .get(DRIVER_SERVICE_BASE_PATH + GET_DRIVER_BY_ID_PATH)
+                .then()
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
+
     }
 
     @Test
@@ -513,5 +539,19 @@ public class DriverControllerIntegrationTest extends IntegrationTestBase {
 
         String acceptableParams = String.join(", ", fieldNames);
         return String.format(INVALID_SORTING_PARAMETER_MESSAGE, INVALID_ORDER_BY, acceptableParams);
+    }
+
+    private static String getAccessToken(String username, String password) {
+        return given()
+                .baseUri(keycloak.getAuthServerUrl() + GET_ACCESS_TOKEN_URL)
+                .contentType(ContentType.URLENC)
+                .formParam("grant_type", "password")
+                .formParam("client_id", "cab-aggregator-test")
+                .formParam("username", username)
+                .formParam("password", password)
+                .post()
+                .jsonPath()
+                .get("access_token")
+                .toString();
     }
 }

@@ -1,5 +1,6 @@
 package com.modsen.driverservice.integration;
 
+import dasniko.testcontainers.keycloak.KeycloakContainer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -24,15 +25,19 @@ public abstract class IntegrationTestBase {
 
     protected static PostgreSQLContainer<?> postgres;
     protected static KafkaContainer kafka;
+    protected static final KeycloakContainer keycloak;
 
     static {
         postgres = new PostgreSQLContainer<>(POSTGRES_IMAGE_NAME);
         kafka = new KafkaContainer(
                 DockerImageName.parse(KAFKA_IMAGE_NAME)
         );
+        keycloak = new KeycloakContainer(KEYCLOAK_IMAGE_NAME)
+                        .withRealmImportFile(REALM_IMPORT_FILE_NAME);
 
         postgres.start();
         kafka.start();
+        keycloak.start();
     }
 
     @DynamicPropertySource
@@ -42,5 +47,7 @@ public abstract class IntegrationTestBase {
         registry.add("spring.datasource.password", postgres::getPassword);
         registry.add("postgresql.driver", postgres::getDriverClassName);
         registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
+        registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri",
+                () -> keycloak.getAuthServerUrl() + REALM_URL);
     }
 }
