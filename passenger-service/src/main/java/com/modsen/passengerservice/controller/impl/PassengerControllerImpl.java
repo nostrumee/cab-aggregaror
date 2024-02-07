@@ -41,7 +41,6 @@ public class PassengerControllerImpl implements PassengerController {
 
     @GetMapping(GET_PASSENGER_BY_ID_PATH)
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("@passengerServiceSecurityExpression.canAccessPassenger(#id)")
     public PassengerResponse getPassengerById(@PathVariable UUID id) {
         return passengerService.getById(id);
     }

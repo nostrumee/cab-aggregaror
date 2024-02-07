@@ -12,7 +12,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.web.SecurityFilterChain;
 
 import static com.modsen.passengerservice.util.SecurityUtils.*;
-import static com.modsen.passengerservice.util.UriPaths.PASSENGER_SERVICE_BASE_PATH;
+import static com.modsen.passengerservice.util.UriPaths.*;
 
 @Configuration
 @EnableWebSecurity
