@@ -41,7 +41,6 @@ public class DriverControllerImpl implements DriverController {
 
     @GetMapping(GET_DRIVER_BY_ID_PATH)
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("@driverServiceSecurityExpression.canAccessDriver(#id)")
     public DriverResponse getDriverById(@PathVariable UUID id) {
         return driverService.getById(id);
     }

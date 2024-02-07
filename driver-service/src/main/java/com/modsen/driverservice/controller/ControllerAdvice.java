@@ -4,11 +4,12 @@ import com.modsen.driverservice.dto.response.AlreadyExistsResponse;
 import com.modsen.driverservice.dto.response.ErrorResponse;
 import com.modsen.driverservice.dto.response.ParamErrorResponse;
 import com.modsen.driverservice.dto.response.ValidationErrorResponse;
-import com.modsen.driverservice.exception.*;
+import com.modsen.driverservice.exception.DriverAlreadyExistsException;
+import com.modsen.driverservice.exception.DriverNotFoundException;
+import com.modsen.driverservice.exception.InvalidRequestParamException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -101,7 +102,7 @@ public class ControllerAdvice {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ParamErrorResponse handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException  e) {
+    public ParamErrorResponse handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException e) {
         var error = Map.of(e.getName(), e.getMessage());
 
         return ParamErrorResponse.builder()
