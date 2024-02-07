@@ -98,7 +98,7 @@ public class RatingServiceStepDefinitions {
 
     @When("A driver rating request with ride id {long} and rating {int} passed to rateDriver method")
     public void driverRatingRequestPassedToRateDriverMethod(long rideId, int rating) {
-        var ratingRequest = PassengerRatingRequest.builder()
+        var ratingRequest = DriverRatingRequest.builder()
                 .rideId(rideId)
                 .rating(rating)
                 .build();
@@ -108,11 +108,11 @@ public class RatingServiceStepDefinitions {
                 .when(ratingMapper)
                 .fromRideResponseAndRatingRequest(rideResponse, ratingRequest);
         doReturn(UPDATED_RATING)
-                .when(passengerRatingRepository)
-                .findPassengerRating(rideResponse.driverId());
+                .when(driverRatingRepository)
+                .findDriverRating(rideResponse.driverId());
 
         try {
-            ratingService.ratePassenger(ratingRequest);
+            ratingService.rateDriver(ratingRequest);
         } catch (InvalidRideStatusException e) {
             exception = e;
         }

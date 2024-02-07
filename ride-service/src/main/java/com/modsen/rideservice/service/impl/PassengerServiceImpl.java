@@ -31,7 +31,6 @@ public class PassengerServiceImpl implements PassengerService {
         log.info("Fallback response from passenger service. Reason: {}", exception.getMessage());
 
         return PassengerResponse.builder()
-                .id(null)
                 .firstName("fallback")
                 .email("fallback")
                 .build();
